@@ -6,7 +6,7 @@ import json
 import poster as poster
 import sys
 import oss2
-from test_config import LOCALHOST, PORT, DATA_TEXT_PATH
+from test_config import LOCALHOST, PORT, DATA_TEXT_PATH, ADMIN_TOKEN
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -99,7 +99,152 @@ def get_tender_list():
     print result
     return json.loads(result)
 
+# 创建一级类型
+def create_type1_background(typeName):
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/create_type1_background/' % (LOCALHOST, PORT)
+    info = {}
+    info['tokenID'] = ADMIN_TOKEN
+    info['typeName'] = typeName
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+# 创建二级类型
+def create_type2_background(type1ID, typeName):
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/create_type2_background/' % (LOCALHOST, PORT)
+    info = {}
+    info['tokenID'] = ADMIN_TOKEN
+    info['typeName'] = typeName
+    info['superTypeID'] = type1ID
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+
+# 创建二级类型
+def create_type3_background(type2ID, typeName):
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/create_type3_background/' % (LOCALHOST, PORT)
+    info = {}
+    info['tokenID'] = ADMIN_TOKEN
+    info['typeName'] = typeName
+    info['superTypeID'] = type2ID
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+# 创建二级类型
+def get_type_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_type_list/' % (LOCALHOST, PORT)
+    info = {}
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    print result
+    return result
+
+def test_create_all_types():
+    jsonInfo = '''[
+    {
+        "typeName": "房间市政",
+        "subTypes": [
+            {
+                "typeName": "工程类",
+                "subTypes": [
+                    {
+                        "typeName": "施工"
+                    },
+                    {
+                        "typeName": "监理"
+                    },
+                    {
+                        "typeName": "勘察设计"
+                    },
+                    {
+                        "typeName": "基坑支护"
+                    },
+                    {
+                        "typeName": "桩基"
+                    }
+                ]
+            },
+            {
+                "typeName": "专业类",
+                "subTypes": []
+            },
+            {
+                "typeName": "服务类",
+                "subTypes": []
+            },
+            {
+                "typeName": "货物类",
+                "subTypes": []
+            },
+            {
+                "typeName": "其他",
+                "subTypes": []
+            }
+        ]
+    },
+    {
+        "typeName": "交通航运",
+        "subTypes": []
+    },
+    {
+        "typeName": "水利",
+        "subTypes": []
+    },
+    {
+        "typeName": "铁路",
+        "subTypes": []
+    }
+]'''
+    info = json.loads(jsonInfo)
+    for t1 in info:
+        t1Name = t1['typeName']
+        result = create_type1_background(typeName=t1Name)
+        result = json.loads(result)
+        status = result['status']
+        if status != 'SUCCESS':
+            return (False, t1Name)
+        type1ID = result['data']
+        for t2 in t1['subTypes']:
+            t2Name = t2['typeName']
+            result2 = create_type2_background(type1ID=type1ID, typeName=t2Name)
+            result2 = json.loads(result2)
+            status2 = result2['status']
+            if status2 != 'SUCCESS':
+                return (False, t2Name)
+            type2ID = result2['data']
+            for t3 in t2['subTypes']:
+                t3Name = t3['typeName']
+                result3 = create_type3_background(type2ID=type2ID, typeName=t3Name)
+                result3 = json.loads(result3)
+                status3= result3['status']
+                if status3 != 'SUCCESS':
+                    return (False, t3Name)
+    return (True, None)
 if __name__ == '__main__':
     # get_province_city_info()
     # batck_create_tender()
-    get_tender_list()
+    # get_tender_list()
+    # test_create_all_types()
+    get_type_list()

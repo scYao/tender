@@ -13,9 +13,6 @@ class City(db.Model):
     provinceID = db.Column(db.String(100), db.ForeignKey('Province.provinceID'))
 
     tender = db.relationship('Tender', backref='City', lazy='dynamic')
-
-
-
     def __repr__(self):
         return self.cityName
 
