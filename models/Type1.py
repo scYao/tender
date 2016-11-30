@@ -20,8 +20,8 @@ class Type1(db.Model):
     @staticmethod
     def generate(type1):
         res = {}
-        res['type1ID'] = type1.typeID
-        res['type1Name'] = type1.typeName
+        res['typeID'] = type1.typeID
+        res['typeName'] = type1.typeName
 
         return res
 

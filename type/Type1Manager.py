@@ -49,3 +49,15 @@ class Type1Manager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
+    def __generate(self, t):
+        type1 = t
+        res = {}
+        res.update(Type1.generate(type1=type1))
+        return res
+
+    # 获取一级列表
+    def getType1List(self):
+        allResult = db.session.query(Type1).all()
+
+        typeList = [self.__generate(t=t) for t in allResult]
+        return (True, typeList)

@@ -102,3 +102,20 @@ class Type3Manager(Util):
         typeList = filter(None, typeList)
         return (True, typeList)
 
+    def __generateType3(self, t):
+        type3 = t
+        res = {}
+        res.update(Type3.generate(type3=type3))
+        return res
+
+    # 获取三级类型列表
+    def getType3List(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        typeID = info['typeID']
+
+        allResult = db.session.query(Type3).filter(
+            Type3.superTypeID == typeID
+        ).all()
+
+        typeList = [self.__generateType3(t=t) for t in allResult]
+        return (True, typeList)

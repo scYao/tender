@@ -119,3 +119,48 @@ def get_type_list():
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
         return json.dumps(data)
+
+# 获取一级类型
+@app.route('/get_type1_list/', methods=['POST', 'GET'])
+def get_type1_list():
+    type1Manager = Type1Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = type1Manager.getType1List()
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取二级类型
+@app.route('/get_type2_list/', methods=['POST', 'GET'])
+def get_type2_list():
+    type2Manager = Type2Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = type2Manager.getType2List(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取三级类型
+@app.route('/get_type3_list/', methods=['POST', 'GET'])
+def get_type3_list():
+    type3Manager = Type3Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = type3Manager.getType3List(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)

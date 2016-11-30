@@ -147,8 +147,8 @@ def create_type3_background(type2ID, typeName):
     result = data.read()
     return result
 
-# 创建二级类型
-def get_type_list():
+# 获取三级列表树
+def get_type_tree_list():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:%s/get_type_list/' % (LOCALHOST, PORT)
     info = {}
@@ -160,6 +160,70 @@ def get_type_list():
     result = data.read()
     print result
     return result
+
+# 获取一级类型列表
+def get_type1_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_type1_list/' % (LOCALHOST, PORT)
+    info = {}
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+# 获取二级类型列表
+def get_type2_list(typeID):
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_type2_list/' % (LOCALHOST, PORT)
+    info = {}
+    info['typeID'] = typeID
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+# 获取三级类型列表
+def get_type3_list(typeID):
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_type3_list/' % (LOCALHOST, PORT)
+    info = {}
+    info['typeID'] = typeID
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+def get_type_list():
+    result = get_type1_list()
+    result = json.loads(result)
+    status1 = result['status']
+    if status1 != 'SUCCESS':
+        return (False, 'get type1 list error')
+    type1IDList = result['data']
+    for type1 in type1IDList:
+        type1ID = type1['typeID']
+        result2 = get_type2_list(typeID=type1ID)
+        result2 = json.loads(result2)
+        status2 = result2['status']
+        if status2 != 'SUCCESS':
+            return (False, 'error type2 : ' + type1ID)
+        type2IDList = result2['data']
+        for type2 in type2IDList:
+            type2ID = type2['typeID']
+            result3 = get_type3_list(typeID=type2ID)
+            result3 = json.loads(result3)
+            status3 = result3['status']
+            if status3 != 'SUCCESS':
+                return (False, 'error when get type3 : ' + type2ID)
 
 def test_create_all_types():
     jsonInfo = '''[
@@ -247,4 +311,5 @@ if __name__ == '__main__':
     # batck_create_tender()
     # get_tender_list()
     # test_create_all_types()
+    # get_type_tree_list()
     get_type_list()

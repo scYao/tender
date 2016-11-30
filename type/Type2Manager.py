@@ -50,3 +50,20 @@ class Type2Manager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
+    def __generate(self, t):
+        type2 = t
+        res = {}
+        res.update(Type2.generate(type2=type2))
+        return res
+
+    # 获取二级类型列表
+    def getType2List(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        typeID = info['typeID']
+
+        allResult = db.session.query(Type2).filter(
+            Type2.superTypeID == typeID
+        ).all()
+
+        typeList = [self.__generate(t=t) for t in allResult]
+        return (True, typeList)
