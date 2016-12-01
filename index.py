@@ -166,6 +166,21 @@ def get_type3_list():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 通过类型1ID获取类型2和3的树
+@app.route('/get_type23_by_type1/', methods=['POST', 'GET'])
+def get_type23_by_type1():
+    type3Manager = Type3Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = type3Manager.getType23ByType1(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 # 获取省列表
 @app.route('/get_province_list/', methods=['POST', 'GET'])
 def get_province_list():

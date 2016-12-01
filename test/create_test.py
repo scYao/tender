@@ -6,7 +6,7 @@ import json
 import poster as poster
 import sys
 import oss2
-from test_config import LOCALHOST, PORT, DATA_TEXT_PATH, ADMIN_TOKEN
+from test_config import LOCALHOST, PORT, DATA_TEXT_PATH, ADMIN_TOKEN, TYPE1_ID
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -271,6 +271,7 @@ def test_get_provinces_citys():
             return (False, province['provinceName'])
 
 
+
 def test_create_all_types():
     jsonInfo = '''[
     {
@@ -352,6 +353,22 @@ def test_create_all_types():
                 if status3 != 'SUCCESS':
                     return (False, t3Name)
     return (True, None)
+
+# 获取二级类型列表
+def get_type23_by_type1():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_type23_by_type1/' % (LOCALHOST, PORT)
+    info = {}
+    info['typeID'] =TYPE1_ID
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    print result
+    return result
+
 if __name__ == '__main__':
     # get_province_city_info()
     # batck_create_tender()
@@ -359,4 +376,5 @@ if __name__ == '__main__':
     # test_create_all_types()
     # get_type_tree_list()
     # get_type_list()
-    test_get_provinces_citys()
+    # test_get_provinces_citys()
+    get_type23_by_type1()

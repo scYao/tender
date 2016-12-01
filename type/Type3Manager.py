@@ -60,14 +60,16 @@ class Type3Manager(Util):
             t2['typeName'] = type2.typeName
             t3List = []
             dict2[type2.typeID] = t3List
-            t3 = Type3.generate(t.Type3)
-            t3List.append(t3)
+            if t.Type3 is not None:
+                t3 = Type3.generate(t.Type3)
+                t3List.append(t3)
             t2['subTypes'] = t3List
             return t2
         else:
-            t3List = dict2[type2.typeID]
-            t3 = Type3.generate(t.Type3)
-            t3List.append(t3)
+            if t.Type3 is not None:
+                t3List = dict2[type2.typeID]
+                t3 = Type3.generate(t.Type3)
+                t3List.append(t3)
 
     def __generate(self, dict1, dict2, t):
         type1 = t.Type1
@@ -118,4 +120,20 @@ class Type3Manager(Util):
         ).all()
 
         typeList = [self.__generateType3(t=t) for t in allResult]
+        return (True, typeList)
+
+    def getType23ByType1(self, jsonInfo):
+        info = json.loads(jsonInfo)
+
+        typeID = info['typeID']
+
+        allResult = db.session.query(Type2, Type3).outerjoin(
+            Type3, Type3.superTypeID == Type2.typeID
+        ).filter(
+            Type2.superTypeID == typeID
+        ).all()
+
+        dict2 = {}
+        typeList = [self.__generateType2(dict2=dict2, t=t) for t in allResult]
+        typeList = filter(None, typeList)
         return (True, typeList)
