@@ -225,6 +225,52 @@ def get_type_list():
             if status3 != 'SUCCESS':
                 return (False, 'error when get type3 : ' + type2ID)
 
+# 获取省份列表
+def get_province_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_province_list/' % (LOCALHOST, PORT)
+    info = {}
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+
+# 获取城市列表
+def get_city_list(provinceID):
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_city_list/' % (LOCALHOST, PORT)
+    info = {}
+    info['provinceID'] = provinceID
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    return result
+
+
+def test_get_provinces_citys():
+    result = get_province_list()
+    result = json.loads(result)
+    status = result['status']
+    if status != 'SUCCESS':
+        return (False, 'get province error')
+
+    provinceList = result['data']
+    for province in provinceList:
+        provinceID = province['provinceID']
+        result2 = get_city_list(provinceID=provinceID)
+        result2 = json.loads(result2)
+        status2 = result2['status']
+        if status2 != 'SUCCESS':
+            return (False, province['provinceName'])
+
+
 def test_create_all_types():
     jsonInfo = '''[
     {
@@ -312,4 +358,5 @@ if __name__ == '__main__':
     # get_tender_list()
     # test_create_all_types()
     # get_type_tree_list()
-    get_type_list()
+    # get_type_list()
+    test_get_provinces_citys()

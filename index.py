@@ -12,6 +12,7 @@ from tender.TenderManager import TenderManager
 from type.Type1Manager import Type1Manager
 from type.Type2Manager import Type2Manager
 from type.Type3Manager import Type3Manager
+from province.ProvinceManager import ProvinceManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -164,3 +165,33 @@ def get_type3_list():
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
         return json.dumps(data)
+
+# 获取省列表
+@app.route('/get_province_list/', methods=['POST', 'GET'])
+def get_province_list():
+    provinceManager = ProvinceManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        (status, jsonlist) = provinceManager.getProvinceList()
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取城市列表
+@app.route('/get_city_list/', methods=['POST', 'GET'])
+def get_city_list():
+    provinceManager = ProvinceManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = provinceManager.getCityList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
