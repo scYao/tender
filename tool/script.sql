@@ -93,12 +93,28 @@ create table token
 );
 
 -- 收藏表
-create table favorite
+create table Favorite
 (
 	favoriteID nvarchar(100) primary key comment '收藏的ID',
     tenderID nvarchar(100) comment '收藏商品的ID',
     userID nvarchar(100) comment '收藏者的ID',
     createTime datetime comment '收藏的时间'
+);
+
+-- sms code
+create table SmsCode(
+    codeID nvarchar(100) primary key comment '短信验证码ID',
+    tel nvarchar(20) comment '手机号',
+    code nvarchar(100) comment '验证码',
+    createTime datetime comment '创建时间'
+);
+
+--用户注册IP地址
+create table UserIP(
+    joinID nvarchar(100) primary key comment '注册ID',
+    userID nvarchar(100) comment '用户ID',
+    ipAddress nvarchar(100) comment 'ip地址',
+    createTime datetime comment '注册时间'
 );
 
 ALTER TABLE province CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -108,8 +124,15 @@ ALTER TABLE MerchandiseSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb
 ALTER TABLE Type1 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type2 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type3 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE Favorite CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE UserIP CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE UserInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE Token CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE SmsCode CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE adminInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table city add constraint city_FK_province foreign key(provinceID) references province(provinceID);
 alter table tender add constraint tender_FK_city foreign key(cityID) references city(cityID);
 alter table Type2 add constraint type2_FK_type1 foreign key(superTypeID) references Type1(typeID);
 alter table Type3 add constraint type3_FK_type2 foreign key(superTypeID) references Type2(typeID);
+alter table UserIP add constraint ip_FK_user foreign key(userID) references UserInfo(userID);

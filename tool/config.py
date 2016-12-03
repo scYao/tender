@@ -25,6 +25,24 @@ ErrorInfo['TENDER_04'] = {
     'zhInfo' : 'tenderID无效!'
 }
 
+ErrorInfo['TENDER_05'] = {
+    'code' : 'TENDER_05',
+    'info' : 'wrong password',
+    'zhInfo' : '密码错误!'
+}
+
+ErrorInfo['TENDER_06'] = {
+    'code' : 'TENDER_06',
+    'info' : 'sms code invalid!',
+    'zhInfo' : '验证码错误!'
+}
+
+ErrorInfo['TENDER_07'] = {
+    'code' : 'TENDER_07',
+    'info' : 'user already exists',
+    'zhInfo' : '用户已存在!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

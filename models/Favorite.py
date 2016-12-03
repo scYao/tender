@@ -13,10 +13,10 @@ class Favorite(db.Model):
     tenderID = db.Column(db.String(100))
     userID = db.Column(db.String(100), db.ForeignKey('UserInfo.userID'))
 
-    def __init__(self, favoriteID=None, timeAndDate=None,
+    def __init__(self, favoriteID=None, createTime=None,
                  tenderID=None, userID=None):
         self.favoriteID = favoriteID
-        self.timeAndDate = timeAndDate
+        self.createTime = createTime
         self.tenderID = tenderID
         self.userID = userID
 

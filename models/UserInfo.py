@@ -23,6 +23,8 @@ class UserInfo(db.Model):
     cityID = db.Column(db.String(100), db.ForeignKey('City.cityID'))
     provinceID = db.Column(db.String(100), db.ForeignKey('Province.provinceID'))
 
+    userIp = db.relationship('UserIP', backref='UserInfo', lazy='dynamic')
+
     def __init__(self, userID=None, userName=None, password=None,
                  info=None, portraitPath='default_portrait.png', account=0,
                  tel=None, email=None, gender=0,
