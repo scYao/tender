@@ -35,7 +35,7 @@ def create_tender():
         data['data'] = jsonlist
         return json.dumps(data)
 
-# 获取投标信息
+# 获取投标信息列表
 @app.route('/get_tender_list/', methods=['POST', 'GET'])
 def get_tender_list():
     tenderManager = TenderManager()
@@ -45,6 +45,21 @@ def get_tender_list():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = tenderManager.getTenderList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取投标信息详情
+@app.route('/get_tender_detail/', methods=['POST', 'GET'])
+def get_tender_detail():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.getTenderDetail(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -129,7 +144,6 @@ def get_type1_list():
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
-        paramsJson = request.form['data']
         (status, jsonlist) = type1Manager.getType1List()
         if status is not False:
             data['status'] = 'SUCCESS'

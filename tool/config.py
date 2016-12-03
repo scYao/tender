@@ -19,6 +19,12 @@ ErrorInfo['TENDER_03'] = {
     'zhInfo' : '没有数据'
 }
 
+ErrorInfo['TENDER_04'] = {
+    'code' : 'TENDER_04',
+    'info' : 'tender id is null',
+    'zhInfo' : 'tenderID无效!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

@@ -15,9 +15,10 @@ class Tender(db.Model):
     url = db.Column(db.String(100))
     datetime = db.Column(db.DateTime)
     detail = db.Column(db.Text)
+    typeID = db.Column(db.String(100))
 
     def __init__(self, tenderID=None, title=None, cityID=None, location=None,
-                 url=None, datetime=None, detail=None):
+                 url=None, datetime=None, detail=None, typeID=None):
         self.tenderID = tenderID
         self.title = title
         self.cityID = cityID
@@ -25,6 +26,7 @@ class Tender(db.Model):
         self.url = url
         self.datetime = datetime
         self.detail = detail
+        self.typeID = typeID
 
     @staticmethod
     def generate(tender):

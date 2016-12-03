@@ -11,7 +11,7 @@ from test_config import LOCALHOST, PORT, DATA_TEXT_PATH, ADMIN_TOKEN, TYPE1_ID
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 # 单个创建
@@ -85,11 +85,28 @@ def get_tender_list():
     info = {}
     info['startIndex'] = 0
     info['pageCount'] = 10
-    info['searchKey'] = "桥桩"
+    info['searchKey'] = "jiao"
     info['cityID'] = '63'
     info['provinceID'] = '10'
+    info['period'] = 30
 
 
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    print result
+    return json.loads(result)
+
+
+# 获取投标详情
+def get_tender_detail(tenderID):
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_tender_detail/' % (LOCALHOST, PORT)
+    info = {}
+    info['tenderID'] = tenderID
 
     params = {'data': json.dumps(info)}
     datagen, headers = poster.encode.multipart_encode(params)
@@ -150,7 +167,7 @@ def create_type3_background(type2ID, typeName):
 # 获取三级列表树
 def get_type_tree_list():
     opener = poster.streaminghttp.register_openers()
-    upload_url = 'http://%s:%s/get_type_list/' % (LOCALHOST, PORT)
+    upload_url = 'http://%s:%s/get_type_tree_list/' % (LOCALHOST, PORT)
     info = {}
 
     params = {'data': json.dumps(info)}
@@ -372,9 +389,10 @@ def get_type23_by_type1():
 if __name__ == '__main__':
     # get_province_city_info()
     # batck_create_tender()
-    # get_tender_list()
+    get_tender_list()
     # test_create_all_types()
     # get_type_tree_list()
     # get_type_list()
     # test_get_provinces_citys()
-    get_type23_by_type1()
+    # get_type23_by_type1()
+    # get_tender_detail('005689d8-bfe6-4c7e-9339-072fbded5caa')

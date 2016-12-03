@@ -12,7 +12,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
 from models.flask_app import db
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from pypinyin import lazy_pinyin
 
@@ -41,7 +41,8 @@ class TenderManager(Util):
         detail = info['detail']
 
         tender = Tender(tenderID=tenderID, title=title, cityID=cityID,
-                        location=location, url=url, datetime=_datetime, detail=detail)
+                        location=location, url=url, datetime=_datetime,
+                        detail=detail, typeID=None)
 
         try:
             db.session.add(tender)
@@ -64,7 +65,7 @@ class TenderManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
-    def __generateTenderList(self, t):
+    def __generateTender(self, t):
         tender = t.Tender
         province = t.Province
         city = t.City
@@ -84,6 +85,7 @@ class TenderManager(Util):
         searchKey = info['searchKey']
         provinceID = info['provinceID']
         cityID = info['cityID']
+        period = info['period']
 
         query = db.session.query(Tender, Province, City).outerjoin(
             City, Tender.cityID == City.cityID
@@ -110,11 +112,33 @@ class TenderManager(Util):
                 City.provinceID == provinceID
             )
 
+        if period != '-1':
+            period = int(period)
+            startTime = datetime.now().date() - timedelta(days=period)
+            query = query.filter(
+                Tender.datetime > startTime
+            )
+
         allResult = query.order_by(desc(Tender.datetime)).offset(startIndex).limit(pageCount).all()
-        resultList = [self.__generateTenderList(item) for item in allResult]
+        resultList = [self.__generateTender(item) for item in allResult]
 
         return (True, resultList)
 
+    def getTenderDetail(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tenderID = info['tenderID']
+        result = db.session.query(Tender, Province, City).outerjoin(
+            City, Tender.cityID == City.cityID
+        ).outerjoin(
+            Province, City.provinceID == Province.provinceID
+        ).filter(
+            Tender.tenderID == tenderID
+        ).first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_04']
+            return (False, errorInfo)
+        tenderDetail = self.__generateTender(t=result)
+        return (True, tenderDetail)
 
     def getProvinceCityInfo(self):
         province = []

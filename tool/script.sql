@@ -23,7 +23,8 @@ create table tender(
     location text comment '具体地址',
     url text comment '详情链接',
     datetime datetime comment '发布时间',
-    detail mediumtext comment '详情'
+    detail mediumtext comment '详情',
+    typeID nvarchar(100) comment '招标类型, type3类型'
 );
 
 -- 关键词库
@@ -89,6 +90,15 @@ create table token
     userID nvarchar(100) comment '用户ID',
     createtime datetime comment 'token被创建的时间',
     validity long comment 'token的有效时长'
+);
+
+-- 收藏表
+create table favorite
+(
+	favoriteID nvarchar(100) primary key comment '收藏的ID',
+    tenderID nvarchar(100) comment '收藏商品的ID',
+    userID nvarchar(100) comment '收藏者的ID',
+    createTime datetime comment '收藏的时间'
 );
 
 ALTER TABLE province CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
