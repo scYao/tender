@@ -2,7 +2,7 @@
 #标准库导入
 import sys
 
-from src.tool.config import ErrorInfo
+from tool.config import ErrorInfo
 
 reload(sys)
 sys.setdefaultencoding('utf-8')

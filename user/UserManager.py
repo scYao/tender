@@ -18,7 +18,7 @@ from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.StringConfig import STRING_INFO_SMS_REGISTER
 
-from token.TokenManager import TokenManager
+from stoken.TokenManager import TokenManager
 
 class UserManager(Util):
     def __init__(self):
