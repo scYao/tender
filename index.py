@@ -6,7 +6,7 @@ import sys
 
 sys.path.append('..')
 import json
-from models.flask_app import app
+from models.flask_app import app, cache
 
 from tender.TenderManager import TenderManager
 from type.Type1Manager import Type1Manager
@@ -16,11 +16,11 @@ from province.ProvinceManager import ProvinceManager
 from user.UserManager import UserManager
 from favorite.FavoriteManager import FavoriteManager
 
+
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
 
 # 创建投标信息
 @app.route('/create_tender/', methods=['POST', 'GET'])
@@ -62,6 +62,20 @@ def get_tender_detail():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = tenderManager.getTenderDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取索引tenderID
+@app.route('/get_tender_id_list/', methods=['POST', 'GET'])
+def get_tender_id_list():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        (status, jsonlist) = tenderManager.getTenderIDList()
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist

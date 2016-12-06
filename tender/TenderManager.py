@@ -11,9 +11,8 @@ import os
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
-from models.flask_app import db
+from models.flask_app import db, cache
 from datetime import datetime, timedelta
-import logging
 from pypinyin import lazy_pinyin
 
 from tool.Util import Util
@@ -77,6 +76,7 @@ class TenderManager(Util):
         return res
 
     # 获取投标信息列表
+    @cache.cached(timeout=60 * 2)
     def getTenderList(self, jsonInfo):
         info = json.loads(jsonInfo)
 
@@ -161,3 +161,10 @@ class TenderManager(Util):
             c['cityName'] = city.cityName
             cityList.append(c)
         return (True, province)
+
+    # 获取全部的tenderID,
+    def getTenderIDList(self):
+        allResult = db.session.query(Tender).all()
+
+        tenderList = [t.tenderID for t in allResult]
+        return (True, tenderList)

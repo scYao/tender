@@ -5,10 +5,27 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 from tool.config import WHOOSH_BASE
+from flask_cache import Cache
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
+cache = Cache()
+
+cache_config = {
+    'CACHE_TYPE': 'redis',
+    'CACHE_REDIS_HOST': '127.0.0.1',
+    'CACHE_REDIS_PORT': 6379,
+    'CACHE_REDIS_DB': '',
+    'CACHE_REDIS_PASSWORD': '',
+    'CACHE_REDIS_URL' : 'redis://localhost:6379'
+}
+
 app = Flask(__name__)
+
+app.config.from_object(cache_config)
+cache.init_app(app)
+
 app.config['WHOOSH_BASE'] = WHOOSH_BASE
 # app.config["SQLALCHEMY_ECHO"] = True
 

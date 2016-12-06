@@ -85,7 +85,7 @@ def get_tender_list():
     info = {}
     info['startIndex'] = 0
     info['pageCount'] = 10
-    info['searchKey'] = "jiao"
+    info['searchKey'] = "-1"
     info['cityID'] = '63'
     info['provinceID'] = '10'
     info['period'] = 30
@@ -386,13 +386,24 @@ def get_type23_by_type1():
     print result
     return result
 
+def test_get_tender_list_time():
+    dt1 = datetime.now()
+    for i in xrange(1, 1000):
+        get_tender_list()
+        print i
+    dt2 = datetime.now()
+
+    print dt2 - dt1
+
 if __name__ == '__main__':
     # get_province_city_info()
     # batck_create_tender()
-    get_tender_list()
+    # get_tender_list()
     # test_create_all_types()
     # get_type_tree_list()
     # get_type_list()
     # test_get_provinces_citys()
     # get_type23_by_type1()
     # get_tender_detail('005689d8-bfe6-4c7e-9339-072fbded5caa')
+
+    test_get_tender_list_time()
