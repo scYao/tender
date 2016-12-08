@@ -33,7 +33,14 @@ class Type1Manager(Util):
 
         type1Name = info['typeName']
 
-        type1ID = self.generateID(type1Name)
+        # type1ID = self.generateID(type1Name)
+        # 获取最大ID
+        maxType2IDResult = db.session.query(Type1).order_by(desc(Type1.typeID + 0)).first()
+        if maxType2IDResult is None:
+            maxType1ID = 0
+        else:
+            maxType1ID = int(maxType2IDResult.typeID)
+        type1ID = maxType1ID + 1
 
         type1 = Type1(typeID=type1ID, typeName=type1Name)
 

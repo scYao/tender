@@ -43,6 +43,12 @@ ErrorInfo['TENDER_07'] = {
     'zhInfo' : '用户已存在!'
 }
 
+ErrorInfo['TENDER_08'] = {
+    'code' : 'TENDER_08',
+    'info' : 'get max type1 id error',
+    'zhInfo' : '获取最大type1类型错误!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

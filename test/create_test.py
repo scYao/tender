@@ -399,11 +399,11 @@ if __name__ == '__main__':
     # get_province_city_info()
     # batck_create_tender()
     # get_tender_list()
-    # test_create_all_types()
+    test_create_all_types()
     # get_type_tree_list()
     # get_type_list()
     # test_get_provinces_citys()
     # get_type23_by_type1()
     # get_tender_detail('005689d8-bfe6-4c7e-9339-072fbded5caa')
 
-    test_get_tender_list_time()
+    # test_get_tender_list_time()

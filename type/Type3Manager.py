@@ -36,12 +36,19 @@ class Type3Manager(Util):
         type3Name = info['typeName']
         superTypeID = info['superTypeID']
 
-        type3ID = self.generateID(type3Name)
+        # type3ID = self.generateID(type3Name)
+        # 获取最大ID
+        maxType3IDResult = db.session.query(Type3).order_by(desc(Type3.typeID + 0)).first()
+        if maxType3IDResult is None:
+            maxType3ID = 0
+        else:
+            maxType3ID = int(maxType3IDResult.typeID)
+        type3ID = maxType3ID + 1
 
-        type2 = Type3(typeID=type3ID, typeName=type3Name, superTypeID=superTypeID)
+        type3 = Type3(typeID=type3ID, typeName=type3Name, superTypeID=superTypeID)
 
         try:
-            db.session.add(type2)
+            db.session.add(type3)
             db.session.commit()
             return (True, type3ID)
         except Exception as e:

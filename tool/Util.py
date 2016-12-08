@@ -91,7 +91,7 @@ class Util:
         #判断tokenID 是否存在
         result = db.session.query(Token).filter(Token.tokenID==tokenID).first()
         if result is None:
-            errorInfo = ErrorInfo['SPORTS_09']
+            errorInfo = ErrorInfo['TENDER_01']
             errorInfo['detail'] = result
             return (False, errorInfo)
         createTime = result.createTime
