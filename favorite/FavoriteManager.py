@@ -19,6 +19,8 @@ from datetime import datetime
 from tool.Util import Util
 from tool.config import ErrorInfo
 
+from sqlalchemy import func
+
 
 class FavoriteManager(Util):
     def __init__(self):
@@ -89,8 +91,21 @@ class FavoriteManager(Util):
 
         query = db.session.query(Tender, Favorite).outerjoin(
             Favorite, Tender.tenderID == Favorite.tenderID
+        ).filter(
+            Favorite.userID == userID
         )
 
         allResult = query.all()
         tenderList = [self.__generate(t=t) for t in allResult]
+
+        count = db.session.query(func.count(Favorite.favoriteID)).filter(
+            Favorite.userID == userID
+        ).first()
+
+        if count is None:
+            count = 0
+
+        result = {}
+        result['tenderList'] = tenderList
+        result['count'] = count
         return (True, tenderList)

@@ -37,6 +37,7 @@ class UserManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         # 验证登录密码正确
+        password = self.getMD5String(password)
         passwordResult = query.filter(
             and_(UserInfo.tel == tel,
                  UserInfo.password == password)
@@ -124,16 +125,6 @@ class UserManager(Util):
             errorInfo['detail'] = None
             return (False, errorInfo)
 
-        # result = db.session.query(UserInfo).filter(
-        #     UserInfo.deviceID == deviceID
-        # ).first()
-        # if result is not None:
-        #     # 判断同一个设备是否已经注册过
-        #     errorInfo = ErrorInfo['SPORTS_07']
-        #     errorInfo['detail'] = None
-        #     errorInfo['zhInfo'] = '同一设备只能注册一次！'
-        #     return (False, errorInfo)
-
         # 添加用户信息
         userID = self.generateID(tel)
         createInfo = {}
@@ -142,6 +133,7 @@ class UserManager(Util):
         createInfo['portrait'] = portrait
         code = self.generateCode(tel)
         createTime = datetime.now()
+        pwd = self.getMD5String(pwd)
         userInfo = UserInfo(
             userID=userID, userName=userName,
             password=pwd, portraitPath=portrait,
@@ -260,3 +252,45 @@ class UserManager(Util):
             db.session.rollback()
             return (False, errorInfo)
         return (True, userDetail)
+
+    # 找回密码接口, 不校验验证码
+    def __resetPassWord(self, tel, pwd):
+        userQuery = db.session.query(UserInfo).filter(
+            UserInfo.tel == tel
+        )
+        result = userQuery.first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_10']
+            return (False, errorInfo)
+
+        try:
+            userQuery.update(
+                {
+                    UserInfo.password: pwd
+                },
+                synchronize_session=False
+            )
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+        return True
+
+    # 找回密码接口, 校验验证码
+    def findPasswordWithSmsCode(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tel = info['tel']
+        pwd = info['password']
+
+        (status, reason) = self.checkSmsCode(info)
+        if status is not True:
+            return (False, reason)
+        pwd = self.getMD5String(pwd)
+        (status, reason) = self.__resetPassWord(tel=tel, pwd=pwd)
+        if status is not True:
+            return (False, reason)
+
+        return (True, None)

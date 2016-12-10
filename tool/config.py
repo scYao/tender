@@ -55,6 +55,12 @@ ErrorInfo['TENDER_09'] = {
     'zhInfo' : 'userID 错误!'
 }
 
+ErrorInfo['TENDER_10'] = {
+    'code' : 'TENDER_10',
+    'info' : 'tel not exists',
+    'zhInfo' : '手机号不存在!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

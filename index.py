@@ -301,6 +301,21 @@ def update_user_info():
         data['data'] = result
         return json.dumps(data)
 
+# 找回密码
+@app.route('/find_password_with_sms_code/', methods=['POST', 'GET'])
+def find_password_with_sms_code():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = userManager.findPasswordWithSmsCode(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 注册, 有短信验证码校验
 @app.route('/register_with_sms_code/', methods=['POST', 'GET'])
