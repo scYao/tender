@@ -71,7 +71,8 @@ NG9zpgmLCUYuLkxpLQIDAQAB\n
 -----END PUBLIC KEY-----'''
 
 
-WHOOSH_BASE =  '/home/yz/work/smartsearchData/'
+WHOOSH_BASE =  '../../smartsearchData/'
+# WHOOSH_BASE =  '/home/yz/work/smartsearchData/'
 # WHOOSH_BASE = '/opt/smartsearchData/'
 # WHOOSH_BASE = '/Users/zhushijie/Documents/Server/smartsearchData/'
 
