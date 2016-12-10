@@ -32,6 +32,6 @@ app.config['WHOOSH_BASE'] = WHOOSH_BASE
 CORS(app)
 
 
-app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://yz:yz@192.168.30.156:3306/tender?charset=utf8mb4'
-# app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://sjsecondhand:Zhushijie219211l@rdsptsk6v7h7s4bfo107.mysql.rds.aliyuncs.com:3306/sjsecondhand?charset=utf8mb4'
+# app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://yz:yz@192.168.30.156:3306/tender?charset=utf8mb4'
+app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://tender:Zhushijie219211l@rdsptsk6v7h7s4bfo107.mysql.rds.aliyuncs.com:3306/tender?charset=utf8mb4'
 db = SQLAlchemy(app)
