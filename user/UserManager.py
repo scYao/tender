@@ -200,3 +200,63 @@ class UserManager(Util):
             db.session.rollback()
             return (False, errorInfo)
         return (True, None)
+
+    # 更新用户信息
+    def updateUserInfo(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        email = info['email'].replace('\'', '\\\'').replace('\"', '\\\"')
+        gender = info['gender'].replace('\'', '\\\'').replace('\"', '\\\"')
+        description = info['info'].replace('\'', '\\\'').replace('\"', '\\\"')
+
+        try:
+            db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).update({
+                UserInfo.userName : userName,
+                UserInfo.email : email,
+                UserInfo.gender : gender,
+                UserInfo.info : description
+            },
+                synchronize_session=False)
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+        return (True, None)
+
+    # 获取用户详情
+    def getUserInfoDetail(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        try:
+            result = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+
+            if result is None:
+                errorInfo = ErrorInfo['TENDER_09']
+                return (False, errorInfo)
+
+            userDetail = UserInfo.generate(userInfo=result)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+        return (True, userDetail)

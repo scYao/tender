@@ -29,12 +29,13 @@ class MerchandiseSearchKey(db.Model):
     @staticmethod
     def createSearchInfo(info):
         merchandiseName = info['merchandiseName']
-        description = info['description']
+        # description = info['description']
         merchandiseID = info['merchandiseID']
         createTime = info['createTime']
         joinID = info['joinID']
         # 添加搜索记录
-        searchInfo = merchandiseName + ',' + description
+        searchInfo = merchandiseName
+        # searchInfo = merchandiseName + ',' + description
         # 汉语分词
         fenciList = jieba.cut_for_search(searchInfo)  # 搜索引擎模式
         fenci = " ".join(fenciList)

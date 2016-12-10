@@ -257,8 +257,8 @@ def send_sms_code():
 
 
 # 新的登录函数
-@app.route('/login_with_portrait/', methods=['POST', 'GET'])
-def login_with_portrait():
+@app.route('/login/', methods=['POST', 'GET'])
+def login():
     userManager = UserManager()
     data = {}
     data['status'] = 'FAILED'
@@ -266,6 +266,36 @@ def login_with_portrait():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = userManager.login(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取用户详情
+@app.route('/get_user_info_detail/', methods=['POST', 'GET'])
+def get_user_info_detail():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = userManager.getUserInfoDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 更新用户信息
+@app.route('/update_user_info/', methods=['POST', 'GET'])
+def update_user_info():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = userManager.updateUserInfo(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

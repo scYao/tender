@@ -292,7 +292,7 @@ def test_get_provinces_citys():
 def test_create_all_types():
     jsonInfo = '''[
     {
-        "typeName": "房间市政",
+        "typeName": "房建市政",
         "subTypes": [
             {
                 "typeName": "工程类",
@@ -311,6 +311,9 @@ def test_create_all_types():
                     },
                     {
                         "typeName": "桩基"
+                    },
+                    {
+                        "typeName": "其他"
                     }
                 ]
             },
@@ -337,12 +340,17 @@ def test_create_all_types():
         "subTypes": []
     },
     {
-        "typeName": "水利",
-        "subTypes": []
-    },
-    {
-        "typeName": "铁路",
-        "subTypes": []
+        "typeName": "其他",
+        "subTypes": [
+            {
+                "typeName": "其他",
+                "subTypes": [
+                    {
+                        "typeName": "其他"
+                    }
+                ]
+            }
+        ]
     }
 ]'''
     info = json.loads(jsonInfo)
