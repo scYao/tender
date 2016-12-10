@@ -176,7 +176,7 @@ class UserManager(Util):
                              }, timeout=3, verify=False)
         result = json.loads(resp.content)
         if result['msg'] != 'ok':
-            errorInfo = ErrorInfo['SPORTS_27']
+            errorInfo = ErrorInfo['TENDER_11']
             errorInfo['detail'] = result['error']
             return (False, errorInfo)
 
@@ -187,7 +187,7 @@ class UserManager(Util):
             db.session.commit()
         except Exception as e:
             print e
-            errorInfo = ErrorInfo['SPORTS_02']
+            errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)

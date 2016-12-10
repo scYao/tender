@@ -61,6 +61,12 @@ ErrorInfo['TENDER_10'] = {
     'zhInfo' : '手机号不存在!'
 }
 
+ErrorInfo['TENDER_11'] = {
+    'code' : 'TENDER_11',
+    'info' : 'sms code error!',
+    'zhInfo' : '验证码无效!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
