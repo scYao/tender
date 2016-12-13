@@ -9,7 +9,7 @@ from flask_app import db
 class Favorite(db.Model):
     __tablename__ = 'Favorite'
     favoriteID = db.Column(db.String(100), primary_key=True)
-    dateTime = db.Column(db.DateTime)
+    createTime = db.Column(db.DateTime)
     tenderID = db.Column(db.String(100))
     userID = db.Column(db.String(100), db.ForeignKey('UserInfo.userID'))
 
@@ -22,3 +22,8 @@ class Favorite(db.Model):
 
     def __repr__(self):
         return self.favoriteID
+
+    def generate(self, f):
+        res = {}
+        res['favoriteID'] = f.FavoriteID
+        return res

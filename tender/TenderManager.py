@@ -22,6 +22,7 @@ from models.Province import Province
 from models.City import City
 from models.Tender import Tender
 from models.MerchandiseSearchKey import MerchandiseSearchKey
+from models.Favorite import Favorite
 #后台管理引用
 
 
@@ -64,7 +65,7 @@ class TenderManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
-    def __generateTender(self, t):
+    def __generateTender(self, t, tag=None):
         tender = t.Tender
         province = t.Province
         city = t.City
@@ -73,6 +74,16 @@ class TenderManager(Util):
         res.update(Tender.generate(tender=tender))
         res.update(Province.generate(province=province))
         res.update(City.generate(city=city))
+        # 列表中不带详情
+        if tag is not None:
+            del res['detail']
+        else:
+            # 详情中的情况
+            favorite = t.Favorite
+            if favorite is not None:
+                res['favorite'] = True
+            else:
+                res['favorite'] = False
         return res
 
     # 获取投标信息列表
@@ -120,17 +131,19 @@ class TenderManager(Util):
             )
 
         allResult = query.order_by(desc(Tender.datetime)).offset(startIndex).limit(pageCount).all()
-        resultList = [self.__generateTender(item) for item in allResult]
+        resultList = [self.__generateTender(t=item, tag=True) for item in allResult]
 
         return (True, resultList)
 
     def getTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
         tenderID = info['tenderID']
-        result = db.session.query(Tender, Province, City).outerjoin(
+        result = db.session.query(Tender, Province, City, Favorite).outerjoin(
             City, Tender.cityID == City.cityID
         ).outerjoin(
             Province, City.provinceID == Province.provinceID
+        ).outerjoin(
+            Favorite, Tender.tenderID == Favorite.tenderID
         ).filter(
             Tender.tenderID == tenderID
         ).first()

@@ -89,11 +89,14 @@ class FavoriteManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
 
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+
         query = db.session.query(Tender, Favorite).outerjoin(
             Favorite, Tender.tenderID == Favorite.tenderID
         ).filter(
             Favorite.userID == userID
-        )
+        ).offset(startIndex).limit(pageCount)
 
         allResult = query.all()
         tenderList = [self.__generate(t=t) for t in allResult]
@@ -108,4 +111,4 @@ class FavoriteManager(Util):
         result = {}
         result['tenderList'] = tenderList
         result['count'] = count
-        return (True, tenderList)
+        return (True, result)
