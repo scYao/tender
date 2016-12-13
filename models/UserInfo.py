@@ -55,4 +55,5 @@ class UserInfo(db.Model):
         res['userID'] = userInfo.userID
         res['userName'] = userInfo.userName
         res['portraitPath'] = userInfo.portraitPath
+        res['info'] = userInfo.info
         return res
