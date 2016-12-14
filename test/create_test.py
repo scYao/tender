@@ -406,8 +406,8 @@ def test_get_tender_list_time():
 if __name__ == '__main__':
     # get_province_city_info()
     # batck_create_tender()
-    # get_tender_list()
-    test_create_all_types()
+    get_tender_list()
+    # test_create_all_types()
     # get_type_tree_list()
     # get_type_list()
     # test_get_provinces_citys()

@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     args = options.parse_command_line()
     if len(args) == 0:
-        port = 5006
+        port = 5007
     else:
         port = args[0]
 
