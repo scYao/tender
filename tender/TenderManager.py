@@ -108,11 +108,11 @@ class TenderManager(Util):
         ).outerjoin(
             Province, City.provinceID == Province.provinceID
         ).outerjoin(
-            Type1, Type1.typeID == Type2.superTypeID
+            Type3, Type3.typeID == Tender.typeID
         ).outerjoin(
             Type2, Type2.typeID == Type3.superTypeID
         ).outerjoin(
-            Type3, Type3.typeID == Tender.typeID
+            Type1, Type1.typeID == Type2.superTypeID
         )
 
         if searchKey != '-1':
