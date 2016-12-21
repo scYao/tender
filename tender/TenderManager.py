@@ -103,7 +103,7 @@ class TenderManager(Util):
         type2ID = info['type2ID']
         type3ID = info['type3ID']
 
-        query = db.session.query(Tender, Province, City, Type1, Type2, Type3).outerjoin(
+        query = db.session.query(Tender, Province, City).outerjoin(
             City, Tender.cityID == City.cityID
         ).outerjoin(
             Province, City.provinceID == Province.provinceID
