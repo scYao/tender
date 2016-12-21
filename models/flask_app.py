@@ -10,8 +10,6 @@ from flask_cache import Cache
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-cache = Cache()
-
 cache_config = {
     'CACHE_TYPE': 'redis',
     'CACHE_REDIS_HOST': '127.0.0.1',
@@ -23,8 +21,9 @@ cache_config = {
 
 app = Flask(__name__)
 
-app.config.from_object(cache_config)
-cache.init_app(app)
+cache = Cache(app, cache_config)
+# app.config.from_object(cache_config)
+# cache.init_app(app)
 
 app.config['WHOOSH_BASE'] = WHOOSH_BASE
 # app.config["SQLALCHEMY_ECHO"] = True
