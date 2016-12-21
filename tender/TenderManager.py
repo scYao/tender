@@ -23,7 +23,9 @@ from models.City import City
 from models.Tender import Tender
 from models.MerchandiseSearchKey import MerchandiseSearchKey
 from models.Favorite import Favorite
-#后台管理引用
+from models.Type1 import Type1
+from models.Type2 import Type2
+from models.Type3 import Type3
 
 
 class TenderManager(Util):
@@ -97,11 +99,20 @@ class TenderManager(Util):
         provinceID = info['provinceID']
         cityID = info['cityID']
         period = info['period']
+        type1ID = info['type1ID']
+        type2ID = info['type2ID']
+        type3ID = info['type3ID']
 
-        query = db.session.query(Tender, Province, City).outerjoin(
+        query = db.session.query(Tender, Province, City, Type1, Type2, Type3).outerjoin(
             City, Tender.cityID == City.cityID
         ).outerjoin(
             Province, City.provinceID == Province.provinceID
+        ).outerjoin(
+            Type1, Type1.typeID == Type2.superTypeID
+        ).outerjoin(
+            Type2, Type2.typeID == Type3.superTypeID
+        ).outerjoin(
+            Type3, Type3.typeID == Tender.typeID
         )
 
         if searchKey != '-1':
@@ -128,6 +139,21 @@ class TenderManager(Util):
             startTime = datetime.now().date() - timedelta(days=period)
             query = query.filter(
                 Tender.datetime > startTime
+            )
+
+        if type1ID != '-1':
+            query = query.filter(
+                Type1.typeID == type1ID
+            )
+
+        if type2ID != '-1':
+            query = query.filter(
+                Type2.typeID == type2ID
+            )
+
+        if type3ID != '-1':
+            query = query.filter(
+                Type3.typeID == type3ID
             )
 
         allResult = query.order_by(desc(Tender.datetime)).offset(startIndex).limit(pageCount).all()
