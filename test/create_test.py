@@ -89,9 +89,9 @@ def get_tender_list():
     info['cityID'] = '63'
     info['provinceID'] = '10'
     info['period'] = 30
-    info['type1ID'] = '-1'
-    info['type2ID'] = '-1'
-    info['type3ID'] = '-1'
+    info['type1ID'] = '1'
+    info['type2ID'] = '1'
+    info['type3ID'] = '1'
 
 
 

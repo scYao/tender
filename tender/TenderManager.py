@@ -89,7 +89,7 @@ class TenderManager(Util):
         return res
 
     # 获取投标信息列表
-    @cache.cached(timeout=60 * 2)
+    @cache.memoize(timeout=60 * 2)
     def getTenderList(self, jsonInfo):
         info = json.loads(jsonInfo)
 
@@ -102,6 +102,7 @@ class TenderManager(Util):
         type1ID = info['type1ID']
         type2ID = info['type2ID']
         type3ID = info['type3ID']
+
 
         query = db.session.query(Tender, Province, City).outerjoin(
             City, Tender.cityID == City.cityID
@@ -134,6 +135,30 @@ class TenderManager(Util):
             query = query.filter(
                 Tender.datetime > startTime
             )
+
+        type3IDTuple = '-1'
+        if type3ID != '-1':
+            query = query.filter(
+                Tender.typeID == type3ID
+            )
+        else:
+            if type2ID != '-1':
+                type3IDResult = db.session.query(Type3).filter(
+                    Type3.superTypeID == type2ID
+                ).all()
+                type3IDTuple = (t.typeID for t in type3IDResult)
+            else:
+                if type1ID != '-1':
+                    type3IDResult = db.session.query(Type3).outerjoin(
+                        Type2, Type3.superTypeID == Type2.typeID
+                    ).outerjoin(
+                        Type1, Type2.superTypeID == Type1.typeID
+                    ).group_by(Type3.typeID).all()
+                    type3IDTuple = (t.typeID for t in type3IDResult)
+
+        if type3IDTuple != '-1':
+            query = query.filter(Tender.typeID.in_(type3IDTuple))
+
 
         # if type1ID != '-1':
         #     query = query.filter(
