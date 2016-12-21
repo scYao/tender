@@ -21,7 +21,7 @@ cache_config = {
 
 app = Flask(__name__)
 
-cache = Cache(app, cache_config)
+cache = Cache(app=app, config=cache_config)
 # app.config.from_object(cache_config)
 # cache.init_app(app)
 
