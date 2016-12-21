@@ -107,12 +107,6 @@ class TenderManager(Util):
             City, Tender.cityID == City.cityID
         ).outerjoin(
             Province, City.provinceID == Province.provinceID
-        ).outerjoin(
-            Type3, Type3.typeID == Tender.typeID
-        ).outerjoin(
-            Type2, Type2.typeID == Type3.superTypeID
-        ).outerjoin(
-            Type1, Type1.typeID == Type2.superTypeID
         )
 
         if searchKey != '-1':
@@ -141,20 +135,20 @@ class TenderManager(Util):
                 Tender.datetime > startTime
             )
 
-        if type1ID != '-1':
-            query = query.filter(
-                Type1.typeID == type1ID
-            )
-
-        if type2ID != '-1':
-            query = query.filter(
-                Type2.typeID == type2ID
-            )
-
-        if type3ID != '-1':
-            query = query.filter(
-                Type3.typeID == type3ID
-            )
+        # if type1ID != '-1':
+        #     query = query.filter(
+        #         Type1.typeID == type1ID
+        #     )
+        #
+        # if type2ID != '-1':
+        #     query = query.filter(
+        #         Type2.typeID == type2ID
+        #     )
+        #
+        # if type3ID != '-1':
+        #     query = query.filter(
+        #         Type3.typeID == type3ID
+        #     )
 
         allResult = query.order_by(desc(Tender.datetime)).offset(startIndex).limit(pageCount).all()
         resultList = [self.__generateTender(t=item, tag=True) for item in allResult]
