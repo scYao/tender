@@ -78,6 +78,7 @@ class FavoriteManager(Util):
     def __generate(self, t):
         res = {}
         res.update(Tender.generate(t.Tender))
+        res.update(Favorite.generate(t.Favorite))
         return res
 
     def getFavoriteList(self, jsonInfo):

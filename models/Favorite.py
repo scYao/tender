@@ -23,7 +23,9 @@ class Favorite(db.Model):
     def __repr__(self):
         return self.favoriteID
 
-    def generate(self, f):
+    @staticmethod
+    def generate(f):
         res = {}
-        res['favoriteID'] = f.FavoriteID
+        res['favoriteID'] = f.favoriteID
+        res['favoriteCreateTime'] = str(f.createTime)
         return res
