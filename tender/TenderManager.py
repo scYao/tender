@@ -224,5 +224,5 @@ class TenderManager(Util):
     def getTenderIDList(self):
         allResult = db.session.query(Tender.tenderID).all()
 
-        tenderList = [t for t in allResult]
+        tenderList = [t[0] for t in allResult]
         return (True, tenderList)
