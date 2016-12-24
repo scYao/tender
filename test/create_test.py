@@ -83,17 +83,32 @@ def get_tender_list():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:%s/get_tender_list/' % (LOCALHOST, PORT)
     info = {}
-    info['startIndex'] = 0
+    info['startIndex'] = 1
     info['pageCount'] = 10
     info['searchKey'] = "-1"
     info['cityID'] = '63'
     info['provinceID'] = '10'
     info['period'] = 30
-    info['type1ID'] = '1'
-    info['type2ID'] = '1'
-    info['type3ID'] = '1'
+    info['type1ID'] = '-1'
+    info['type2ID'] = '-1'
+    info['type3ID'] = '-1'
 
 
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    print result
+    return json.loads(result)
+
+# 获取投标id列表
+def get_tender_id_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_tender_id_list/' % (LOCALHOST, PORT)
+    print upload_url
+    info = {}
 
     params = {'data': json.dumps(info)}
     datagen, headers = poster.encode.multipart_encode(params)
@@ -409,7 +424,12 @@ def test_get_tender_list_time():
 if __name__ == '__main__':
     # get_province_city_info()
     # batck_create_tender()
-    get_tender_list()
+    get_tender_id_list()
+    # d1 = datetime.now()
+    # for i in xrange(0, 50):
+    #     get_tender_list()
+    # d2 = datetime.now()
+    # print d2 - d1
     # test_create_all_types()
     # get_type_tree_list()
     # get_type_list()

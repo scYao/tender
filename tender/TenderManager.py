@@ -222,7 +222,7 @@ class TenderManager(Util):
 
     # 获取全部的tenderID,
     def getTenderIDList(self):
-        allResult = db.session.query(Tender).all()
+        allResult = db.session.query(Tender.tenderID).all()
 
-        tenderList = [t.tenderID for t in allResult]
+        tenderList = [t for t in allResult]
         return (True, tenderList)
