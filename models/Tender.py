@@ -39,3 +39,6 @@ class Tender(db.Model):
         res['detail'] = tender.detail
         return res
 
+
+    def __repr__(self):
+        return self.tenderID
