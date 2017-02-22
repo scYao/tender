@@ -15,6 +15,7 @@ from type.Type3Manager import Type3Manager
 from province.ProvinceManager import ProvinceManager
 from user.UserManager import UserManager
 from favorite.FavoriteManager import FavoriteManager
+from company.CompanyManager import CompanyManager
 
 
 def allowed_file(filename):
@@ -381,4 +382,36 @@ def delete_favorite():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+
+# 创建公司
+@app.route('/create_company/', methods=['POST', 'GET'])
+def create_company():
+    companyManager = CompanyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = companyManager.createCompany(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建公司, 上传图片
+@app.route('/upload_company_image/', methods=['POST', 'GET'])
+def upload_company_image():
+    companyManager = CompanyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = companyManager.uploadCompanyImage(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
