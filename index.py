@@ -16,6 +16,9 @@ from province.ProvinceManager import ProvinceManager
 from user.UserManager import UserManager
 from favorite.FavoriteManager import FavoriteManager
 from company.CompanyManager import CompanyManager
+from projectManager.PMManager import PMManager
+from projectManager.LicenseManager import LicenseManager
+from projectManager.AchievementManager import AchievementManager
 
 
 def allowed_file(filename):
@@ -409,6 +412,52 @@ def upload_company_image():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = companyManager.uploadCompanyImage(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建项目经理表
+@app.route('/create_project_manager/', methods=['POST', 'GET'])
+def create_project_manager():
+    pMManager = PMManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = pMManager.createProjectManager(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 创建项目经理证件表
+@app.route('/create_manager_license/', methods=['POST', 'GET'])
+def create_manager_license():
+    licenseManager = LicenseManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = licenseManager.createManagerLicense(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建项目经理业绩表
+@app.route('/create_manager_achievement/', methods=['POST', 'GET'])
+def create_manager_achievement():
+    achievementManager = AchievementManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = achievementManager.createManagerAchievement(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

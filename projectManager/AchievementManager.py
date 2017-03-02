@@ -24,7 +24,7 @@ class AchievementManager(Util):
         pass
 
     # 创建公司
-    def createManagerLicense(self, jsonInfo):
+    def createManagerAchievement(self, jsonInfo):
         info = json.loads(jsonInfo)
         projectName = info['projectName'].replace('\'', '\\\'').replace('\"', '\\\"')
         companyName = info['companyName'].replace('\'', '\\\'').replace('\"', '\\\"')
