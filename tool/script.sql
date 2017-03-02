@@ -111,6 +111,18 @@ create table companyAchievement(
 	tag smallint comment '0 场内项目业绩, 1 自己填写的信息' 
 );
 
+-- 不良行为
+create table delinquenentConduct(
+	conductID nvarchar(100) comment '不良行为ID',
+	conductName nvarchar(100) comment '不良行为',
+	consequence nvarchar(100) comment '情节后果',
+	penaltyType nvarchar(100) comment '处罚种类',
+	penaltyAuthority nvarchar(100) comment '处罚机关',
+	penaltyDate date comment '处理时间',
+	publicDateFrom date comment '公示期限始',
+	publicDateEnd date comment '公示期限止'
+);
+
 
 ALTER TABLE company CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE qualificationGrade CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -119,6 +131,7 @@ ALTER TABLE projectManager CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unic
 ALTER TABLE managerLicense CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE managerAchievement CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE companyAchievement CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE delinquenentConduct CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table companyQualification add constraint company_q_FK_company foreign key(companyID) references company(companyID);
 alter table companyQualification add constraint company_q_FK_qualification foreign key(qualificationID) references qualificationGrade(qualificationID);
