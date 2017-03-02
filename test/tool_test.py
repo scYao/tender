@@ -148,7 +148,8 @@ if __name__ == '__main__':
 	winBiddingDate date comment '中标时间',
 	price float comment '中标金额(万元)',
 	projectManagerName nvarchar(100) comment '项目经理',
-	tag smallint comment '0 招标网提供的信息，1 自己填写的信息' '''
+	projectManageID nvarchar(100) comment '项目经理ID, 此字段不设外键, 防止有项目经理不在表中',
+	tag smallint comment '0 场内项目业绩, 1 自己填写的信息'  '''
     # sql_to_create_info(sql)
     sql_to_model_init_model_param(sql)
     # sql_to_model_members(sql)
