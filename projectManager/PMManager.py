@@ -20,13 +20,13 @@ from tool.config import ErrorInfo
 from image.ImageManager import ImageManager
 
 
-class CompanyManager(Util):
+class PMManager(Util):
 
     def __init__(self):
         pass
 
     # 创建公司
-    def createCompany(self, jsonInfo):
+    def createProjectManager(self, jsonInfo):
         info = json.loads(jsonInfo)
         managerName = info['managerName'].replace('\'', '\\\'').replace('\"', '\\\"')
         gender = info['gender'].replace('\'', '\\\'').replace('\"', '\\\"')
