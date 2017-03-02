@@ -99,6 +99,18 @@ create table managerAchievement(
 	tag smallint comment '0 招标网提供的信息，1 自己填写的信息'
 );
 
+-- 企业业绩
+create table companyAchievement(
+	achievementID nvarchar(100) primary key comment '项目ID',
+	projectName nvarchar(100) comment '项目名称',
+	companyName nvarchar(100) comment '建设单位, 即甲方',
+	winBiddingDate date comment '中标时间',
+	price float comment '中标金额(万元)',
+	projectManagerName nvarchar(100) comment '项目经理',
+	projectManageID nvarchar(100) comment '项目经理ID, 此字段不设外键, 防止有项目经理不在表中',
+	tag smallint comment '0 场内项目业绩, 1 自己填写的信息' 
+);
+
 
 ALTER TABLE company CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE qualificationGrade CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -106,8 +118,8 @@ ALTER TABLE companyQualification CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb
 ALTER TABLE projectManager CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE managerLicense CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE managerAchievement CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE companyAchievement CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table companyQualification add constraint company_q_FK_company foreign key(companyID) references company(companyID);
 alter table companyQualification add constraint company_q_FK_qualification foreign key(qualificationID) references qualificationGrade(qualificationID);
 alter table managerLicense add constraint manager_l_FK_manager foreign key(managerID) references projectManager(managerID);
-alter table managerAchievement add constraint achievement_FK_manager foreign key(managerID) references projectManager(managerID);
