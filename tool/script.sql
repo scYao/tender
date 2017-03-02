@@ -67,7 +67,6 @@ create table projectManager(
 	managerID nvarchar(100) primary key comment '项目经理ID',
 	managerName nvarchar(100) comment '项目经理姓名',
 	gender smallint comment '0 female, 1 male',
-	grade nvarchar(100) comment '专业等级',
 	positionalTitles nvarchar(100) comment '职称',
 	post nvarchar(100) comment '职务',
 	safetyAssessment nvarchar(100) comment '安全生产考核证号',
@@ -80,6 +79,11 @@ create table projectManager(
 create table managerLicense(
 	licenseID nvarchar(100) primary key comment '项目经理证ID',
 	licenseName nvarchar(100) comment '证书名称',
+	licenseNum nvarchar(100) comment '证件号',
+	grade nvarchar(100) comment '专业等级',
+	authority nvarchar(100) comment '发证机关',
+	licenseDate date comment '发证日期',
+	licenseEndDate date comment '有效期',
 	managerID nvarchar(100) comment '项目经理ID',
 	tag smallint comment '0 项目经理证, 1 注册建造师证件'
 );
@@ -91,7 +95,7 @@ create table managerAchievement(
 	companyName nvarchar(100) comment '建设单位, 即甲方',
 	winBiddingDate date comment '中标时间',
 	price float comment '中标金额(万元)',
-	managerID nvarchar(100) comment '项目经理ID',
+	projectManagerName nvarchar(100) comment '项目经理',
 	tag smallint comment '0 招标网提供的信息，1 自己填写的信息'
 );
 
