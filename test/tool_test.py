@@ -14,6 +14,7 @@ sys.setdefaultencoding('utf-8')
 from datetime import datetime, timedelta
 
 # 从sql表内容，生成创建时的info解析出的内容
+# companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
 def sql_to_create_info(info):
     lines = info.split('\n')
     for l in lines:
@@ -24,6 +25,9 @@ def sql_to_create_info(info):
         print template
 
 # create 时, model参数列表
+# companyID=companyID, companyName=companyName, newArchiveID=newArchiveID,
+# registerArea=registerArea, companyAreaType=companyAreaType, certificateID=certificateID,
+# certificationAuthority=certificationAuthority, legalRepresentative=legalRepresentative,
 def sql_to_model_init_model_param(info):
     lines = info.split('\n')
     paramList = []
@@ -37,6 +41,11 @@ def sql_to_model_init_model_param(info):
     print ','.join(paramList)
 
 # 从sql表内容，到model类的成员变量
+# companyID = db.Column(db.String(100), primary_key=True)
+# companyName = db.Column(db.String(100))
+# newArchiveID = db.Column(db.String(100))
+# registerArea = db.Column(db.String(100))
+# companyAreaType = db.Column(db.String(100))
 def sql_to_model_members(info):
     typeDic = {}
     typeDic['nvarchar'] = 'String'
@@ -74,6 +83,9 @@ def sql_to_model_members(info):
         print template
 
 # 构造函数
+# self.creditFinancialStaff = creditFinancialStaff
+# self.companyBrief = companyBrief
+#  companyID=None, companyName=None, newArchiveID=None, r
 def sql_to_model_init(info):
     lines = info.split('\n')
     paramList = []
@@ -99,6 +111,9 @@ def sql_to_model_init(info):
 
     print ','.join(paramList)
 
+# res['companyID'] = o.companyID
+# res['companyName'] = o.companyName
+# res['newArchiveID'] = o.newArchiveID
 def sql_to_model_generate(info, o):
     lines = info.split('\n')
     for l in lines:
@@ -110,44 +125,36 @@ def sql_to_model_generate(info, o):
 
         print template
 
+# info['companyName'] = companyName
+# info['newArchiveID'] = newArchiveID
+# info['registerArea'] = registerArea
+# info['companyAreaType'] = companyAreaType
+# info['certificateID'] = certificateID
+def sql_to_generate_info(str):
+    lines = str.split('\n')
+    for l in lines:
+        str = l.strip()
+        words = str.split(' ')
+        name = words[0]
+
+        template = 'info[\'%s\'] = %s' % (name, name)
+
+        print template
+
 if __name__ == '__main__':
-    sql = '''companyID nvarchar(100) primary key comment '公司ID',
-	companyName nvarchar(100) comment '公司名称，单位名称',
-	newArchiveID nvarchar(100) comment '新档案号',
-	registerArea nvarchar(100) comment '注册地区',
-	companyAreaType nvarchar(100) comment '企业地点类别',
-	certificateID nvarchar(100) comment '证书编号',
-	certificationAuthority nvarchar(100) comment '资质证书, 发证机关',
-	legalRepresentative nvarchar(100) comment '法定代表人',
-	enterprisePrincipal nvarchar(100) comment '企业负责人',
-	technologyDirector nvarchar(100) comment '技术负责人',
-	remarks nvarchar(100) comment '备注',
-	licenseID nvarchar(100) comment '营业执照, 注册号',
-	registeredCapital float comment '注册资本',
-	companyType nvarchar(100) comment '公司类型',
-	foundingTime date comment '公司成立时间',
-	businessTermFrom date comment '营业期限从',
-	safetyProductionPermitID nvarchar(100) comment '安全生产许可证ID',
-	safePrincipal nvarchar(100) comment '主要负责人',
-	range nvarchar(100) comment '许可范围',
-	safeAuthority nvarchar(100) comment '安全生产许可证, 发证机关',
-	safeFromDate date comment '安全生产许可证, 发证时间',
+    sql = '''managerID nvarchar(100) primary key comment '项目经理ID',
+	managerName nvarchar(100) comment '项目经理姓名',
+	gender smallint comment '0 female, 1 male',
+	grade nvarchar(100) comment '专业等级',
+	positionalTitles nvarchar(100) comment '职称',
+	post nvarchar(100) comment '职务',
+	safetyAssessment nvarchar(100) comment '安全生产考核证号',
 	safeEndDate date comment '有效期',
-	creditBookID nvarchar(100) comment '信用手册ID',
-	creditScore1 float comment '信用分，最近半年',
-	creditScore2 float comment '信用分，前一个半年',
-	creditEndDate date comment '信用手册，有效期',
-	creditAuthority nvarchar(100) comment '信用手册, 发证单位',
-	creditAddress nvarchar(100) comment '信用手册， 详细地址',
-	creditWebSet nvarchar(500) comment '信用手册, 企业网址',
-	creditContact nvarchar(100) comment '信用手册, 联系人',
-	creditNjAddress nvarchar(100) comment '信用手册, 驻宁地址',
-	creditNjPrincipal nvarchar(100) comment '信用手册, 驻宁负责人',
-	creditNjTech nvarchar(100) comment '信用手册, 驻宁技术负责人',
-	creditFinancialStaff nvarchar(100) comment '信用手册, 驻宁财务负责人',
-	companyBrief text comment '公司简介' '''
+	safeAuthority nvarchar(100) comment '安全生产考核证号, 发证机关',
+	safeFromDate date comment '发证时间' '''
     # sql_to_create_info(sql)
-    sql_to_model_init_model_param(sql)
-    # sql_to_model_members(sql)
+    # sql_to_model_init_model_param(sql)
+    sql_to_model_members(sql)
     # sql_to_model_init(sql)
     # sql_to_model_generate(sql, 'o')
+    # sql_to_generate_info(sql)

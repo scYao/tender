@@ -47,7 +47,7 @@ class CompanyManager(Util):
         businessTermFrom = info['businessTermFrom'].replace('\'', '\\\'').replace('\"', '\\\"')
         safetyProductionPermitID = info['safetyProductionPermitID'].replace('\'', '\\\'').replace('\"', '\\\"')
         safePrincipal = info['safePrincipal'].replace('\'', '\\\'').replace('\"', '\\\"')
-        range = info['range'].replace('\'', '\\\'').replace('\"', '\\\"')
+        businessScope = info['businessScope'].replace('\'', '\\\'').replace('\"', '\\\"')
         safeAuthority = info['safeAuthority'].replace('\'', '\\\'').replace('\"', '\\\"')
         safeFromDate = info['safeFromDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         safeEndDate = info['safeEndDate'].replace('\'', '\\\'').replace('\"', '\\\"')
@@ -74,7 +74,7 @@ class CompanyManager(Util):
                           technologyDirector=technologyDirector, remarks=remarks, licenseID=licenseID,
                           registeredCapital=registeredCapital, companyType=companyType, foundingTime=foundingTime,
                           businessTermFrom=businessTermFrom, safetyProductionPermitID=safetyProductionPermitID,
-                          safePrincipal=safePrincipal, range=range, safeAuthority=safeAuthority,
+                          safePrincipal=safePrincipal, businessScope=businessScope, safeAuthority=safeAuthority,
                           safeFromDate=safeFromDate, safeEndDate=safeEndDate, creditBookID=creditBookID,
                           creditScore1=creditScore1, creditScore2=creditScore2, creditEndDate=creditEndDate,
                           creditAuthority=creditAuthority, creditAddress=creditAddress, creditWebSet=creditWebSet,

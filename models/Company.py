@@ -27,7 +27,7 @@ class Company(db.Model):
     businessTermFrom = db.Column(db.Date)
     safetyProductionPermitID = db.Column(db.String(100))
     safePrincipal = db.Column(db.String(100))
-    range = db.Column(db.String(100))
+    businessScope = db.Column(db.String(100))
     safeAuthority = db.Column(db.String(100))
     safeFromDate = db.Column(db.Date)
     safeEndDate = db.Column(db.Date)
@@ -50,7 +50,7 @@ class Company(db.Model):
                  certificationAuthority=None, legalRepresentative=None, enterprisePrincipal=None,
                  technologyDirector=None, remarks=None, licenseID=None, registeredCapital=0,
                  companyType=None, foundingTime=None, businessTermFrom=None,
-                 safetyProductionPermitID=None, safePrincipal=None, range=None,
+                 safetyProductionPermitID=None, safePrincipal=None, businessScope=None,
                  safeAuthority=None, safeFromDate=None, safeEndDate=None, creditBookID=None,
                  creditScore1=0, creditScore2=0, creditEndDate=None, creditAuthority=None,
                  creditAddress=None, creditWebSet=None, creditContact=None, creditNjAddress=None,
@@ -73,7 +73,7 @@ class Company(db.Model):
         self.businessTermFrom = businessTermFrom
         self.safetyProductionPermitID = safetyProductionPermitID
         self.safePrincipal = safePrincipal
-        self.range = range
+        self.businessScope = businessScope
         self.safeAuthority = safeAuthority
         self.safeFromDate = safeFromDate
         self.safeEndDate = safeEndDate
@@ -113,7 +113,7 @@ class Company(db.Model):
         res['businessTermFrom'] = c.businessTermFrom
         res['safetyProductionPermitID'] = c.safetyProductionPermitID
         res['safePrincipal'] = c.safePrincipal
-        res['range'] = c.range
+        res['businessScope'] = c.businessScope
         res['safeAuthority'] = c.safeAuthority
         res['safeFromDate'] = c.safeFromDate
         res['safeEndDate'] = c.safeEndDate
