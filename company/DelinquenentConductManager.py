@@ -33,13 +33,14 @@ class DelinquenentConductManager(Util):
         penaltyDate = info['penaltyDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         publicDateFrom = info['publicDateFrom'].replace('\'', '\\\'').replace('\"', '\\\"')
         publicDateEnd = info['publicDateEnd'].replace('\'', '\\\'').replace('\"', '\\\"')
+        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         conductID = self.generateID(conductName)
 
         delinquenentConduct = DelinquenentConduct(
             conductID=conductID, conductName=conductName, consequence=consequence,
             penaltyType=penaltyType, penaltyAuthority=penaltyAuthority, penaltyDate=penaltyDate,
-            publicDateFrom=publicDateFrom, publicDateEnd=publicDateEnd
+            publicDateFrom=publicDateFrom, publicDateEnd=publicDateEnd, companyID=companyID
         )
         try:
             db.session.add(delinquenentConduct)

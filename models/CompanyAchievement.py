@@ -15,20 +15,22 @@ class CompanyAchievement(db.Model):
     winBiddingDate = db.Column(db.Date)
     price = db.Column(db.Float)
     projectManagerName = db.Column(db.String(100))
-    projectManageID = db.Column(db.String(100))
+    managerID = db.Column(db.String(100))
+    companyID = db.Column(db.String(100), db.ForeignKey('Company.companyID'))
     tag = db.Column(db.Integer)
 
 
     def __init__(self, achievementID=None, projectName=None, companyName=None,
                  winBiddingDate=None, price=0, projectManagerName=None,
-                 projectManageID=None, tag=0):
+                 managerID=None, companyID=None, tag=0):
         self.achievementID = achievementID
         self.projectName = projectName
         self.companyName = companyName
         self.winBiddingDate = winBiddingDate
         self.price = price
         self.projectManagerName = projectManagerName
-        self.projectManageID = projectManageID
+        self.managerID = managerID
+        self.companyID = companyID
         self.tag = tag
 
     @staticmethod
@@ -40,7 +42,8 @@ class CompanyAchievement(db.Model):
         res['winBiddingDate'] = o.winBiddingDate
         res['price'] = o.price
         res['projectManagerName'] = o.projectManagerName
-        res['projectManageID'] = o.projectManageID
+        res['managerID'] = o.managerID
+        res['companyID'] = o.companyID
         res['tag'] = o.tag
         return res
 

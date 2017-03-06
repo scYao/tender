@@ -30,21 +30,21 @@ class PMManager(Util):
         info = json.loads(jsonInfo)
         managerName = info['managerName'].replace('\'', '\\\'').replace('\"', '\\\"')
         gender = info['gender'].replace('\'', '\\\'').replace('\"', '\\\"')
-        grade = info['grade'].replace('\'', '\\\'').replace('\"', '\\\"')
         positionalTitles = info['positionalTitles'].replace('\'', '\\\'').replace('\"', '\\\"')
         post = info['post'].replace('\'', '\\\'').replace('\"', '\\\"')
         safetyAssessment = info['safetyAssessment'].replace('\'', '\\\'').replace('\"', '\\\"')
         safeEndDate = info['safeEndDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         safeAuthority = info['safeAuthority'].replace('\'', '\\\'').replace('\"', '\\\"')
         safeFromDate = info['safeFromDate'].replace('\'', '\\\'').replace('\"', '\\\"')
+        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         managerID = self.generateID(managerName)
 
         projectManager = ProjectManager(
             managerID=managerID, managerName=managerName, gender=gender,
-            grade=grade, positionalTitles=positionalTitles, post=post,
+            positionalTitles=positionalTitles, post=post,
             safetyAssessment=safetyAssessment, safeEndDate=safeEndDate, safeAuthority=safeAuthority,
-            safeFromDate=safeFromDate
+            safeFromDate=safeFromDate, companyID=companyID
         )
         try:
             db.session.add(projectManager)

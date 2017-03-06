@@ -33,7 +33,7 @@ class LicenseManager(Util):
         licenseDate = info['licenseDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         licenseEndDate = info['licenseEndDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         managerID = info['managerID'].replace('\'', '\\\'').replace('\"', '\\\"')
-        tag = info['tag'].replace('\'', '\\\'').replace('\"', '\\\"')
+        tag = info['tag']
 
         licenseID = self.generateID(licenseName)
 

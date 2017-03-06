@@ -142,17 +142,14 @@ def sql_to_generate_info(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''conductID nvarchar(100) comment '不良行为ID',
-	conductName nvarchar(100) comment '不良行为',
-	consequence nvarchar(100) comment '情节后果',
-	penaltyType nvarchar(100) comment '处罚种类',
-	penaltyAuthority nvarchar(100) comment '处罚机关',
-	penaltyDate date comment '处理时间',
-	publicDateFrom date comment '公示期限始',
-	publicDateEnd date comment '公示期限止'  '''
+    sql = '''	projectName nvarchar(100) comment '项目名称',
+	companyName nvarchar(100) comment '建设单位, 即甲方',
+	winBiddingDate date comment '中标时间',
+	price float comment '中标金额(万元)',
+	projectManagerName nvarchar(100) comment '项目经理', '''
     # sql_to_create_info(sql)
-    sql_to_model_init_model_param(sql)
+    # sql_to_model_init_model_param(sql)
     # sql_to_model_members(sql)
     # sql_to_model_init(sql)
-    # sql_to_model_generate(sql, 'o')
-    # sql_to_generate_info(sql)
+    # sql_to_model_generate(sql, 'c')
+    sql_to_generate_info(sql)

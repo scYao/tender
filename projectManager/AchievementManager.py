@@ -31,14 +31,15 @@ class AchievementManager(Util):
         winBiddingDate = info['winBiddingDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         price = info['price'].replace('\'', '\\\'').replace('\"', '\\\"')
         projectManagerName = info['projectManagerName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        tag = info['tag'].replace('\'', '\\\'').replace('\"', '\\\"')
+        managerID = info['managerID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        tag = info['tag']
 
         achievementID = self.generateID(projectName)
 
         managerAchievement = ManagerAchievement(
             achievementID=achievementID, projectName=projectName, companyName=companyName,
             winBiddingDate=winBiddingDate, price=price, projectManagerName=projectManagerName,
-            tag=tag
+            managerID=managerID, tag=tag
         )
         try:
             db.session.add(managerAchievement)

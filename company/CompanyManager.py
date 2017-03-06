@@ -13,6 +13,7 @@ sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
 from models.flask_app import db
+from models.DelinquenentConduct import DelinquenentConduct
 from models.Company import Company
 
 from tool.Util import Util

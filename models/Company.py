@@ -45,6 +45,10 @@ class Company(db.Model):
     creditFinancialStaff = db.Column(db.String(100))
     companyBrief = db.Column(db.Text)
 
+    projectManager = db.relationship('ProjectManager', backref='Company', lazy='dynamic')
+    companyAchievement = db.relationship('CompanyAchievement', backref='Company', lazy='dynamic')
+    delinquenentConduct = db.relationship('DelinquenentConduct', backref='Company', lazy='dynamic')
+
     def __init__(self, companyID=None, companyName=None, newArchiveID=None,
                  registerArea=None, companyAreaType=None, certificateID=None,
                  certificationAuthority=None, legalRepresentative=None, enterprisePrincipal=None,
