@@ -17,7 +17,7 @@ from user.UserManager import UserManager
 from favorite.FavoriteManager import FavoriteManager
 from company.CompanyManager import CompanyManager
 from company.CompanyAchievementManager import CompanyAchievementManager
-# from company.delinquenentConductManager import DelinquenentConductManager
+from company.DelinquenentConductManager import DelinquenentConductManager
 from projectManager.PMManager import PMManager
 from projectManager.LicenseManager import LicenseManager
 from projectManager.AchievementManager import AchievementManager
@@ -481,20 +481,20 @@ def create_company_achievement():
         data['data'] = result
         return json.dumps(data)
 
-# # 创建公司不良信息表
-# @app.route('/create_delinquenent_conduct/', methods=['POST', 'GET'])
-# def create_delinquenent_conduct():
-#     delinquenentConductManager = DelinquenentConductManager()
-#     data = {}
-#     data['status'] = 'FAILED'
-#     data['data'] = 'NULL'
-#     if request.method == 'POST':
-#         paramsJson = request.form['data']
-#         (status, result) = delinquenentConductManager.createDelinquenentConduct(paramsJson)
-#         if status is not False:
-#             data['status'] = 'SUCCESS'
-#         data['data'] = result
-#         return json.dumps(data)
+# 创建公司不良信息表
+@app.route('/create_delinquenent_conduct/', methods=['POST', 'GET'])
+def create_delinquenent_conduct():
+    delinquenentConductManager = DelinquenentConductManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = delinquenentConductManager.createDelinquenentConduct(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
 
 
 
