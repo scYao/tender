@@ -21,7 +21,10 @@ from company.DelinquenentConductManager import DelinquenentConductManager
 from projectManager.PMManager import PMManager
 from projectManager.LicenseManager import LicenseManager
 from projectManager.AchievementManager import AchievementManager
-
+from certificationGrade.CertificationGrade1Manager import CertificationGrade1Manager
+from certificationGrade.CertificationGrade2Manager import CertificationGrade2Manager
+from certificationGrade.CertificationGrade3Manager import CertificationGrade3Manager
+from certificationGrade.CertificationGrade4Manager import CertificationGrade4Manager
 
 
 def allowed_file(filename):
@@ -491,6 +494,66 @@ def create_delinquenent_conduct():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = delinquenentConductManager.createDelinquenentConduct(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建一级资质等级
+@app.route('/create_certification_grade1/', methods=['POST', 'GET'])
+def create_certification_grade1():
+    certificationGrade1Manager = CertificationGrade1Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade1Manager.createCertificationGrade1(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建二级资质等级
+@app.route('/create_certification_grade2/', methods=['POST', 'GET'])
+def create_certification_grade2():
+    certificationGrade2Manager = CertificationGrade2Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade2Manager.createCertificationGrade2(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建三级资质等级
+@app.route('/create_certification_grade3/', methods=['POST', 'GET'])
+def create_certification_grade3():
+    certificationGrade3Manager = CertificationGrade3Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade3Manager.createCertificationGrade3(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建四级资质等级
+@app.route('/create_certification_grade4/', methods=['POST', 'GET'])
+def create_certification_grade4():
+    certificationGrade4Manager = CertificationGrade4Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade4Manager.createCertificationGrade4(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
