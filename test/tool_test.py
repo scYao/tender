@@ -142,14 +142,17 @@ def sql_to_generate_info(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''	projectName nvarchar(100) comment '项目名称',
-	companyName nvarchar(100) comment '建设单位, 即甲方',
-	winBiddingDate date comment '中标时间',
-	price float comment '中标金额(万元)',
-	projectManagerName nvarchar(100) comment '项目经理', '''
+    sql = '''candidateID nvarchar(100) primary key comment '候选人ID',
+	candidateName nvarchar(100) comment '候选人名称',
+	companyID nvarchar(100) default '-1' comment '候选人公司ID, 不设外键',
+	price float comment '报价',
+	ranking int comment '排名',
+	managerName nvarchar(100) comment '项目负责人',
+	managerID nvarchar(100) comment '项目负责人ID',
+	biddingID nvarchar(100) comment '中部公示ID' '''
     # sql_to_create_info(sql)
-    # sql_to_model_init_model_param(sql)
+    sql_to_model_init_model_param(sql)
     # sql_to_model_members(sql)
     # sql_to_model_init(sql)
     # sql_to_model_generate(sql, 'c')
-    sql_to_generate_info(sql)
+    # sql_to_generate_info(sql)

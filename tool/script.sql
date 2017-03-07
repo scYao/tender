@@ -155,6 +155,29 @@ create table certificationGrade4(
 );
 
 
+-- 中标公示
+create table winBiddingPub(
+	biddingID nvarchar(100) primary key comment '中标公示ID',
+	title nvarchar(100) comment '标题',
+	publicDate date comment '发布时间',
+	biddingNum nvarchar(100) comment '标段编号'
+);
+
+-- 候选人表
+-- 其中候选人ID非companyID, 因为同一个公司可能出现在多个项目候选人里面
+-- 候选公司ID, 数据爬取完后, 会进行一遍搜索, 查看是否在企业数据库中有记录, 没有记录为-1
+create table candidate(
+	candidateID nvarchar(100) primary key comment '候选人ID',
+	candidateName nvarchar(100) comment '候选人名称',
+	companyID nvarchar(100) default '-1' comment '候选人公司ID, 不设外键',
+	price float comment '报价',
+	ranking int comment '排名',
+	managerName nvarchar(100) comment '项目负责人',
+	managerID nvarchar(100) comment '项目负责人ID',
+	biddingID nvarchar(100) comment '中部公示ID'
+);
+
+
 ALTER TABLE company CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE qualificationGrade CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE companyQualification CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -167,6 +190,8 @@ ALTER TABLE certificationGrade1 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4
 ALTER TABLE certificationGrade2 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE certificationGrade3 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE certificationGrade4 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE winBiddingPub CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE candidate CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table companyQualification add constraint company_q_FK_company foreign key(companyID) references company(companyID);
 alter table companyQualification add constraint company_q_FK_qualification foreign key(qualificationID) references qualificationGrade(qualificationID);
@@ -178,3 +203,4 @@ alter table certificationGrade4 add constraint grade_4_FK_3 foreign key(superior
 alter table projectManager add constraint manager_FK_company foreign key(companyID) references company(companyID);
 alter table companyAchievement add constraint company_a_FK_company foreign key(companyID) references company(companyID);
 alter table delinquenentConduct add constraint delinquenent_FK_company foreign key(companyID) references company(companyID);
+alter table candidate add constraint candidate_FK_win foreign key(biddingID) references winBiddingPub(biddingID);
