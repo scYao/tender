@@ -25,6 +25,8 @@ from certificationGrade.CertificationGrade1Manager import CertificationGrade1Man
 from certificationGrade.CertificationGrade2Manager import CertificationGrade2Manager
 from certificationGrade.CertificationGrade3Manager import CertificationGrade3Manager
 from certificationGrade.CertificationGrade4Manager import CertificationGrade4Manager
+from winBidding.WinBiddingManager import WinBiddingManager
+from winBidding.CandidateManager import CandidateManager
 
 
 def allowed_file(filename):
@@ -554,6 +556,36 @@ def create_certification_grade4():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = certificationGrade4Manager.createCertificationGrade4(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建中标公示
+@app.route('/create_win_bidding/', methods=['POST', 'GET'])
+def create_win_bidding():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = winBiddingManager.createWinBidding(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建中标候选人
+@app.route('/create_candidate/', methods=['POST', 'GET'])
+def create_candidate():
+    candidateManager = CandidateManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = candidateManager.createCandidate(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

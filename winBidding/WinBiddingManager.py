@@ -31,10 +31,13 @@ class WinBiddingManager(Util):
         title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"')
         publicDate = info['publicDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         biddingNum = info['biddingNum'].replace('\'', '\\\'').replace('\"', '\\\"')
+        detail = info['detail'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         biddingID = self.generateID(biddingNum)
 
-        winBidding = WinBiddingPub(biddingID=biddingID, title=title, publicDate=publicDate, biddingNum=biddingNum)
+        winBidding = WinBiddingPub(biddingID=biddingID, title=title,
+                                   publicDate=publicDate, biddingNum=biddingNum,
+                                   detail=detail)
 
         try:
             db.session.add(winBidding)

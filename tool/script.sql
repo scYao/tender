@@ -160,7 +160,8 @@ create table winBiddingPub(
 	biddingID nvarchar(100) primary key comment '中标公示ID',
 	title nvarchar(100) comment '标题',
 	publicDate date comment '发布时间',
-	biddingNum nvarchar(100) comment '标段编号'
+	biddingNum nvarchar(100) comment '标段编号',
+	detail mediumtext comment '详情'
 );
 
 -- 候选人表
