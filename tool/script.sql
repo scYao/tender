@@ -72,7 +72,8 @@ create table projectManager(
 	safetyAssessment nvarchar(100) comment '安全生产考核证号',
 	safeEndDate date comment '有效期',
 	safeAuthority nvarchar(100) comment '安全生产考核证号, 发证机关',
-	safeFromDate date comment '发证时间'
+	safeFromDate date comment '发证时间',
+	companyID nvarchar(100) comment '企业ID'
 );
 
 -- 项目经理证
@@ -96,6 +97,7 @@ create table managerAchievement(
 	winBiddingDate date comment '中标时间',
 	price float comment '中标金额(万元)',
 	projectManagerName nvarchar(100) comment '项目经理',
+	managerID nvarchar(100) comment '项目经理ID',
 	tag smallint comment '0 招标网提供的信息，1 自己填写的信息'
 );
 
@@ -107,20 +109,49 @@ create table companyAchievement(
 	winBiddingDate date comment '中标时间',
 	price float comment '中标金额(万元)',
 	projectManagerName nvarchar(100) comment '项目经理',
-	projectManageID nvarchar(100) comment '项目经理ID, 此字段不设外键, 防止有项目经理不在表中',
+	managerID nvarchar(100) comment '项目经理ID, 此字段不设外键, 防止有项目经理不在表中',
+	companyID nvarchar(100) comment '企业ID',
 	tag smallint comment '0 场内项目业绩, 1 自己填写的信息' 
 );
 
 -- 不良行为
 create table delinquenentConduct(
-	conductID nvarchar(100) comment '不良行为ID',
+	conductID nvarchar(100) primary key comment '不良行为ID',
 	conductName nvarchar(100) comment '不良行为',
 	consequence nvarchar(100) comment '情节后果',
 	penaltyType nvarchar(100) comment '处罚种类',
 	penaltyAuthority nvarchar(100) comment '处罚机关',
 	penaltyDate date comment '处理时间',
 	publicDateFrom date comment '公示期限始',
-	publicDateEnd date comment '公示期限止'
+	publicDateEnd date comment '公示期限止',
+	companyID nvarchar(100) comment '企业ID'
+);
+
+-- 资质等级第一级
+create table certificationGrade1(
+	gradeID nvarchar(100) primary key comment '资质等级ID',
+	gradeName nvarchar(100) comment '资质等级名称'
+);
+
+-- 资质等级第二级
+create table certificationGrade2(
+	gradeID nvarchar(100) primary key comment '资质等级ID',
+	gradeName nvarchar(100) comment '资质等级名称',
+	superiorID nvarchar(100) comment '上一级ID'
+);
+
+-- 资质等级第三级
+create table certificationGrade3(
+	gradeID nvarchar(100) primary key comment '资质等级ID',
+	gradeName nvarchar(100) comment '资质等级名称',
+	superiorID nvarchar(100) comment '上一级ID'
+);
+
+-- 资质等级第四级
+create table certificationGrade4(
+	gradeID nvarchar(100) primary key comment '资质等级ID',
+	gradeName nvarchar(100) comment '资质等级名称',
+	superiorID nvarchar(100) comment '上一级ID'
 );
 
 
@@ -132,7 +163,18 @@ ALTER TABLE managerLicense CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unic
 ALTER TABLE managerAchievement CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE companyAchievement CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE delinquenentConduct CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE certificationGrade1 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE certificationGrade2 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE certificationGrade3 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE certificationGrade4 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table companyQualification add constraint company_q_FK_company foreign key(companyID) references company(companyID);
 alter table companyQualification add constraint company_q_FK_qualification foreign key(qualificationID) references qualificationGrade(qualificationID);
 alter table managerLicense add constraint manager_l_FK_manager foreign key(managerID) references projectManager(managerID);
+alter table managerAchievement add constraint manager_a_FK_manager foreign key(managerID) references projectManager(managerID);
+alter table certificationGrade2 add constraint grade_2_FK_1 foreign key(superiorID) references certificationGrade1(gradeID);
+alter table certificationGrade3 add constraint grade_3_FK_2 foreign key(superiorID) references certificationGrade2(gradeID);
+alter table certificationGrade4 add constraint grade_4_FK_3 foreign key(superiorID) references certificationGrade3(gradeID);
+alter table projectManager add constraint manager_FK_company foreign key(companyID) references company(companyID);
+alter table companyAchievement add constraint company_a_FK_company foreign key(companyID) references company(companyID);
+alter table delinquenentConduct add constraint delinquenent_FK_company foreign key(companyID) references company(companyID);

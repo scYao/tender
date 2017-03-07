@@ -6,20 +6,19 @@ from flask_app import app, db
 import flask_whooshalchemy as whooshalchemy
 
 
-class MerchandiseSearchKey(db.Model):
-    __tablename__ = 'MerchandiseSearchKey'
+class SearchKey(db.Model):
+    __tablename__ = 'SearchKey'
     __searchable__ = ['searchKey']
 
     joinID = db.Column(db.String(100), primary_key=True)
-    merchandiseID = db.Column(db.String(100))
-    # merchandiseID = db.Column(db.String(100), db.ForeignKey('Merchandise.merchandiseID'))
+    foreignID = db.Column(db.String(100))
     searchKey = db.Column(db.Text)
     createTime = db.Column(db.DateTime)
 
-    def __init__(self, joinID=None, merchandiseID=None,
+    def __init__(self, joinID=None, foreignID=None,
                searchKey=None, createTime=None):
         self.joinID = joinID
-        self.merchandiseID = merchandiseID
+        self.foreignID = foreignID
         self.searchKey = searchKey
         self.createTime = createTime
 
@@ -28,14 +27,14 @@ class MerchandiseSearchKey(db.Model):
 
     @staticmethod
     def createSearchInfo(info):
-        merchandiseName = info['merchandiseName']
+        searchName = info['searchName']
         # description = info['description']
-        merchandiseID = info['merchandiseID']
+        foreignID = info['foreignID']
         createTime = info['createTime']
         joinID = info['joinID']
         # 添加搜索记录
-        searchInfo = merchandiseName
-        # searchInfo = merchandiseName + ',' + description
+        searchInfo = searchName
+        # searchInfo = searchName + ',' + description
         # 汉语分词
         fenciList = jieba.cut_for_search(searchInfo)  # 搜索引擎模式
         fenci = " ".join(fenciList)
@@ -44,14 +43,14 @@ class MerchandiseSearchKey(db.Model):
         pinyin = reduce(lambda x, y: x + y, pinyinList)
         pinyinList.append(pinyin)
         pinyinList.append(fenci)
-        pinyinList.append(merchandiseName)
+        pinyinList.append(searchName)
         searchInfo = " ".join(pinyinList)
 
-        merchandiseSearchKey = MerchandiseSearchKey(
-            joinID=joinID, merchandiseID=merchandiseID,
+        searchKey = SearchKey(
+            joinID=joinID, foreignID=foreignID,
             searchKey=searchInfo, createTime=createTime)
-        db.session.add(merchandiseSearchKey)
+        db.session.add(searchKey)
         return (True, None)
 
 # db.create_all()
-whooshalchemy.whoosh_index(app, MerchandiseSearchKey)
+whooshalchemy.whoosh_index(app, SearchKey)

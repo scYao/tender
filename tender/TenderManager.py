@@ -21,7 +21,7 @@ from tool.config import ErrorInfo
 from models.Province import Province
 from models.City import City
 from models.Tender import Tender
-from models.MerchandiseSearchKey import MerchandiseSearchKey
+from models.SearchKey import SearchKey
 from models.Favorite import Favorite
 from models.Type1 import Type1
 from models.Type2 import Type2
@@ -48,15 +48,15 @@ class TenderManager(Util):
 
         try:
             db.session.add(tender)
-            info['merchandiseName'] = info['title']
+            info['searchName'] = info['title']
             info['description'] = info['detail']
-            info['merchandiseID'] = info['tenderID']
+            info['foreignID'] = info['tenderID']
             now = datetime.now()
 
             info['createTime'] = str(now)
             info['joinID'] = self.generateID(info['title'])
 
-            MerchandiseSearchKey.createSearchInfo(info=info)
+            SearchKey.createSearchInfo(info=info)
             db.session.commit()
             return (True, None)
         except Exception as e:
@@ -112,11 +112,11 @@ class TenderManager(Util):
 
         if searchKey != '-1':
             searchKey = " ".join(lazy_pinyin(searchKey))
-            searchQuery = MerchandiseSearchKey.query.whoosh_search(searchKey)
-            searchQuery = searchQuery.outerjoin(Tender, Tender.tenderID == MerchandiseSearchKey.merchandiseID)
+            searchQuery = SearchKey.query.whoosh_search(searchKey)
+            searchQuery = searchQuery.outerjoin(Tender, Tender.tenderID == SearchKey.foreignID)
 
             searchResult = searchQuery.all()
-            renderIDTuple = (item.merchandiseID for item in searchResult)
+            renderIDTuple = (item.foreignID for item in searchResult)
             query = query.filter(Tender.tenderID.in_(renderIDTuple))
 
         if cityID != '-1':
