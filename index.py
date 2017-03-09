@@ -314,8 +314,8 @@ def update_user_info():
         return json.dumps(data)
 
 # 找回密码
-@app.route('/find_password_with_sms_code/', methods=['POST', 'GET'])
-def find_password_with_sms_code():
+@app.route('/find_password/', methods=['POST', 'GET'])
+def find_password():
     userManager = UserManager()
     data = {}
     data['status'] = 'FAILED'
@@ -330,8 +330,8 @@ def find_password_with_sms_code():
 
 
 # 注册, 有短信验证码校验
-@app.route('/register_with_sms_code/', methods=['POST', 'GET'])
-def register_with_sms_code():
+@app.route('/register/', methods=['POST', 'GET'])
+def register():
     userManager = UserManager()
     data = {}
     data['status'] = 'FAILED'
@@ -339,7 +339,8 @@ def register_with_sms_code():
     if request.method == 'POST':
         params = request.form['data']
         info = json.loads(params)
-        info['ipAddress'] = request.headers['X-Forwarded-For']
+        # info['ipAddress'] = request.headers['X-Forwarded-For']
+        info['ipAddress'] = '127.0.0.1'
         jsonInfo = json.dumps(info)
         (status, userID) = userManager.register(jsonInfo)
         if status is not False:
@@ -589,6 +590,22 @@ def create_candidate():
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
+        return json.dumps(data)
+
+
+#重新生成搜索索引
+@app.route('/re_generate_search_index/', methods=['POST', 'GET'])
+def re_generate_search_index():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.reGenerateSearchIndex(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
         return json.dumps(data)
 
 

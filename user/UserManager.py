@@ -65,21 +65,20 @@ class UserManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
-        return (True, tokenID)
+        resultDic = {}
+        resultDic['tokenID'] = tokenID
+        return (True, resultDic)
 
     def register(self, jsonInfo):
         info = json.loads(jsonInfo)
         # 验证码验证
-        (status, reason) = self.checkSmsCode(info)
-        if status is not True:
-            return (False, reason)
-        # 添加用户记录
-        (status, createInfo) = self.__createUserInfo(info)
+        # (status, reason) = self.checkSmsCode(info)
         # if status is not True:
+        #     return (False, reason)
+        # 添加用户记录
+        (status, userID) = self.__createUserInfo(info)
         if status is not True:
-            return (False, createInfo)
-        # tel = resultData[3]
-        userID = createInfo['userID']
+            return (False, userID)
         tokenManager = TokenManager()
         tokenID = tokenManager.createToken(userID)
         resultData = {}
@@ -106,16 +105,12 @@ class UserManager(Util):
     # 创建用户记录(注册时候,生成)
     def __createUserInfo(self, info):
         tel = info['tel']
-        pwd = info['password']
-        # ipAddress = info['ipAddress']
-        portrait = info['portrait']
-        gender = int(info['gender'])
+        password = info['password']
         userName = info['userName']
-        deviceID = info['deviceID']
-        if portrait == '-1' and gender == 0:
-            portrait = 'ladyPortrait.png'
-        if portrait == '-1' and gender == 1:
-            portrait = 'gentlemanPortrait.png'
+        companyName = info['companyName']
+        jobPosition = info['jobPosition']
+        # portrait = 'ladyPortrait.png'
+        portrait = 'gentlemanPortrait.png'
         # 判断是否已经注册
         result = db.session.query(UserInfo).filter(
             UserInfo.tel == tel
@@ -124,22 +119,14 @@ class UserManager(Util):
             errorInfo = ErrorInfo['TENDER_07']
             errorInfo['detail'] = None
             return (False, errorInfo)
-
         # 添加用户信息
         userID = self.generateID(tel)
-        createInfo = {}
-        createInfo['userID'] = userID
-        createInfo['userName'] = userName
-        createInfo['portrait'] = portrait
-        code = self.generateCode(tel)
         createTime = datetime.now()
-        pwd = self.getMD5String(pwd)
+        password = self.getMD5String(password)
         userInfo = UserInfo(
-            userID=userID, userName=userName,
-            password=pwd, portraitPath=portrait,
-            tel=tel, createTime=createTime,
-            deviceID=deviceID, gender=gender,
-            code=code
+            userID=userID, userName=userName, password=password,
+            portraitPath=portrait, tel=tel, createTime=createTime,
+            companyName=companyName, jobPosition=jobPosition
         )
         # 添加用户注册IP地址记录
         joinID = self.generateID(userID)
@@ -158,7 +145,7 @@ class UserManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
-        return (True, createInfo)
+        return (True, userID)
 
     # 短信验证码
     def sendSMS(self, jsonInfo):
@@ -277,19 +264,20 @@ class UserManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
-        return True
+        return (True, None)
 
     # 找回密码接口, 校验验证码
     def findPasswordWithSmsCode(self, jsonInfo):
         info = json.loads(jsonInfo)
+        print info
         tel = info['tel']
-        pwd = info['password']
-
-        (status, reason) = self.checkSmsCode(info)
-        if status is not True:
-            return (False, reason)
-        pwd = self.getMD5String(pwd)
-        (status, reason) = self.__resetPassWord(tel=tel, pwd=pwd)
+        password = info['password']
+        password = self.getMD5String(password)
+        # (status, reason) = self.checkSmsCode(info)
+        # if status is not True:
+        #     return (False, reason)
+        (status, reason) = self.__resetPassWord(tel=tel, pwd=password)
+        print status, reason
         if status is not True:
             return (False, reason)
 

@@ -43,11 +43,10 @@ class ProvinceManager(Util):
     # 获取城市列表
     def getCityList(self, jsonInfo):
         info = json.loads(jsonInfo)
-        provinceID = info['provinceID']
-
+        # provinceID = info['provinceID']
+        provinceID = '10'
         allResult = db.session.query(City).filter(
             City.provinceID == provinceID
         ).all()
-
         cityList = [self.__generateCity(c=c) for c in allResult]
         return (True, cityList)
