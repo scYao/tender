@@ -67,6 +67,19 @@ ErrorInfo['TENDER_11'] = {
     'zhInfo' : '验证码无效!'
 }
 
+ErrorInfo['TENDER_12'] = {
+    'code' : 'TENDER_12',
+    'info' : 'already create favorite!',
+    'zhInfo' : '已经收藏!'
+}
+
+
+ErrorInfo['TENDER_13'] = {
+    'code' : 'TENDER_13',
+    'info' : 'name or password error!',
+    'zhInfo' : '用户名或密码错误!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
@@ -77,8 +90,8 @@ NG9zpgmLCUYuLkxpLQIDAQAB\n
 -----END PUBLIC KEY-----'''
 
 
-WHOOSH_BASE =  '../../smartsearchData/'
-# WHOOSH_BASE =  '/home/yz/work/smartsearchData/'
+# WHOOSH_BASE =  '../../smartsearchData/'
+WHOOSH_BASE =  '/home/yz/work/tenderSearchKey/'
 # WHOOSH_BASE = '/opt/smartsearchData/'
 # WHOOSH_BASE = '/Users/zhushijie/Documents/Server/smartsearchData/'
 
