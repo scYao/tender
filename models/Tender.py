@@ -39,6 +39,16 @@ class Tender(db.Model):
         res['detail'] = tender.detail
         return res
 
+    @staticmethod
+    def generateWithoutDetail(tender):
+        res = {}
+        res['tenderID'] = tender.tenderID
+        res['title'] = tender.title
+        res['location'] = tender.location
+        res['url'] = tender.url
+        res['datetime'] = str(tender.datetime)
+        return res
+
 
     def __repr__(self):
         return self.tenderID
