@@ -22,9 +22,11 @@ create table tender(
     cityID nvarchar(100) comment '城市',
     location text comment '具体地址',
     url text comment '详情链接',
-    datetime datetime comment '发布时间',
+    publicDate date comment '发布时间',
     detail mediumtext comment '详情',
-    typeID nvarchar(100) comment '招标类型, type3类型'
+    typeID nvarchar(100) comment '招标类型, type3类型',
+    -- 新增字段
+    biddingNum nvarchar(100) comment '标段编号',
 );
 
 -- 关键词库
