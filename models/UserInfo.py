@@ -20,6 +20,8 @@ class UserInfo(db.Model):
     gender = db.Column(db.Integer)
     createTime = db.Column(db.DateTime)
     code = db.Column(db.String(100))
+    companyName = db.Column(db.String(100))
+    jobPosition = db.Column(db.String(100))
     cityID = db.Column(db.String(100), db.ForeignKey('City.cityID'))
     provinceID = db.Column(db.String(100), db.ForeignKey('Province.provinceID'))
 
@@ -29,7 +31,7 @@ class UserInfo(db.Model):
                  info=None, portraitPath='default_portrait.png', account=0,
                  tel=None, email=None, gender=0,
                  createTime=None, deviceID=None, code=None,
-                 cityID=63, provinceID=10):
+                 cityID=63, provinceID=10, companyName=None, jobPosition=None):
         self.userID = userID
         self.userName = userName
         self.password = password
@@ -44,6 +46,8 @@ class UserInfo(db.Model):
         self.code = code
         self.cityID = cityID
         self.provinceID = provinceID
+        self.companyName = companyName
+        self.jobPosition = jobPosition
 
 
     def __repr__(self):

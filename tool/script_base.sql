@@ -37,6 +37,14 @@ create table MerchandiseSearchKey(
     createTime datetime comment '创建时间'
 );
 
+-- 招标公告关键词库
+create table tenderSearchKey(
+    joinID nvarchar(100) primary key comment '关键词ID',
+    searchKey text comment '关键词',
+    tenderID nvarchar(100) comment '商品ID',
+    createTime datetime comment '创建时间'
+);
+
 -- 一级分类
 create table Type1(
     typeID nvarchar(100) primary key comment '类型ID',
@@ -62,6 +70,8 @@ create table userInfo
 (
     userID nvarchar(100) primary key comment '主键',
     userName nvarchar(100) comment '用户名，昵称',
+    companyName nvarchar(100) comment '公司名称',
+    jobPosition nvarchar(100) comment '职位',
     password nvarchar(100) comment '密码',
     info text comment '个人简介，个性签名等',
     portraitPath text comment '头像路径',
@@ -122,6 +132,7 @@ ALTER TABLE province CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 ALTER TABLE city CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE MerchandiseSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE TenderSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type1 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type2 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type3 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -137,3 +148,4 @@ alter table tender add constraint tender_FK_city foreign key(cityID) references 
 alter table Type2 add constraint type2_FK_type1 foreign key(superTypeID) references Type1(typeID);
 alter table Type3 add constraint type3_FK_type2 foreign key(superTypeID) references Type2(typeID);
 alter table UserIP add constraint ip_FK_user foreign key(userID) references UserInfo(userID);
+alter table tenderSearchKey add constraint tenderSearchKey_FK_tender foreign key(tenderID) references tender(tenderID);
