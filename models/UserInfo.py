@@ -5,6 +5,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from flask_app import db
+from tool.Util import Util
 
 class UserInfo(db.Model):
     __tablename__ = 'UserInfo'
@@ -55,9 +56,15 @@ class UserInfo(db.Model):
 
     @staticmethod
     def generate(userInfo):
+        util = Util()
+        ossImgInfo = {}
+        ossImgInfo['bucket'] = 'sjsecondhand'
         res = {}
         res['userID'] = userInfo.userID
         res['userName'] = userInfo.userName
-        res['portraitPath'] = userInfo.portraitPath
+        ossImgInfo['objectKey'] = 'portrait/%s' % userInfo.portraitPath
+        res['portraitPath'] = util.getSecurityUrl(ossImgInfo)
         res['info'] = userInfo.info
+        res['companyName'] = userInfo.companyName
+        res['jobPosition'] = userInfo.jobPosition
         return res

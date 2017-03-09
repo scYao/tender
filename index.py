@@ -7,7 +7,7 @@ import sys
 sys.path.append('..')
 import json
 from models.flask_app import app, cache
-
+from user.AdminManager import AdminManager
 from tender.TenderManager import TenderManager
 from type.Type1Manager import Type1Manager
 from type.Type2Manager import Type2Manager
@@ -34,6 +34,21 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+# 管理员登录，后台管理
+@app.route('/administrator_login_background/', methods=['POST', 'GET'])
+def administrator_login_background():
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        adminManager = AdminManager()
+        (status, ret) = adminManager.adminLogin(paramsJson)
+        result = {}
+        result['status'] = 'FAILED'
+        result['data'] = 'NULL'
+        if status is True:
+            result['status'] = 'SUCCESS'
+        result['data'] = ret
+        return json.dumps(result)
+
 # 创建投标信息
 @app.route('/create_tender/', methods=['POST', 'GET'])
 def create_tender():
@@ -59,6 +74,21 @@ def get_tender_list():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = tenderManager.getTenderList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取投标信息列表,后台使用
+@app.route('/get_tender_list_background/', methods=['POST', 'GET'])
+def get_tender_list_background():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.getTenderListBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -349,6 +379,25 @@ def register():
 
     return json.dumps(data)
 
+#创建管理者
+@app.route('/create_admin_manager/', methods=['POST', 'GET'])
+def create_admin_manager():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        params = request.form['data']
+        info = json.loads(params)
+        # info['ipAddress'] = request.headers['X-Forwarded-For']
+        info['ipAddress'] = '127.0.0.1'
+        jsonInfo = json.dumps(info)
+        (status, userID) = userManager.createAdminManager(jsonInfo)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = userID
+    return json.dumps(data)
+
 # 获取收藏列表
 @app.route('/get_favorite_list/', methods=['POST', 'GET'])
 def get_favorite_list():
@@ -607,6 +656,9 @@ def re_generate_search_index():
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
         return json.dumps(data)
+
+#创建管理员
+
 
 
 

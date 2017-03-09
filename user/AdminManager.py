@@ -4,8 +4,8 @@ import urllib2
 import poster
 import requests
 
-from src.stoken.TokenManager import TokenManager
-from src.tool.config import ErrorInfo
+from stoken.TokenManager import TokenManager
+from tool.config import ErrorInfo
 
 sys.path.append("..")
 from tool.Util import Util
@@ -20,6 +20,7 @@ from sqlalchemy import desc, func, and_, or_
 from datetime import datetime
 from models.flask_app import db
 from models.AdminInfo import AdminInfo
+from stoken.TokenManager import TokenManager
 
 
 class AdminManager(Util):
@@ -37,11 +38,11 @@ class AdminManager(Util):
                                                and_(AdminInfo.tel==adminName, AdminInfo.adminPW==self.getMD5String(password)))).first()
 
         if result is None:
-            errorInfo = ErrorInfo['SPORTS_08']
+            errorInfo = ErrorInfo['TENDER_13']
             errorInfo['detail'] = result
             return (False, errorInfo)
         tokenManager = TokenManager()
-        tokenID = tokenManager.createTokenChemy(result.adminID)
+        tokenID = tokenManager.createToken(result.adminID)
         return (True, tokenID)
 
     # 创建管理员

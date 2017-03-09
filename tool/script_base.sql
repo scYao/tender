@@ -107,7 +107,8 @@ create table Favorite
 	favoriteID nvarchar(100) primary key comment '收藏的ID',
     tenderID nvarchar(100) comment '收藏商品的ID',
     userID nvarchar(100) comment '收藏者的ID',
-    createTime datetime comment '收藏的时间'
+    createTime datetime comment '收藏的时间',
+    tag nvarchar(100) comment '收藏标志,为中标还是招标',
 );
 
 -- sms code

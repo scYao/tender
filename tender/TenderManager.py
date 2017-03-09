@@ -64,12 +64,10 @@ class TenderManager(Util):
 
     def __generateTender(self, t, tag=None):
         tender = t.Tender
-        province = t.Province
         city = t.City
 
         res = {}
         res.update(Tender.generate(tender=tender))
-        res.update(Province.generate(province=province))
         res.update(City.generate(city=city))
         # 列表中不带详情
         if tag is not None:
@@ -99,6 +97,46 @@ class TenderManager(Util):
         info['tenderIDTuple'] = tenderIDTuple
         resultList = self.__doGetTenderList(info)
         return (True, resultList)
+
+    # 获取投标信息列表,后台管理
+    @cache.memoize(timeout=60 * 2)
+    def getTenderListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        #获取tenderID列表
+        query = db.session.query(Tender)
+        info['query'] = query
+        query = self.__getQueryResult(info)
+        tenderList = query.offset(startIndex).limit(pageCount).all()
+        tenderIDList = [t.tenderID for t in tenderList]
+        tenderIDTuple = tuple(tenderIDList)
+        info['tenderIDTuple'] = tenderIDTuple
+        resultList = self.__doGetTenderList(info)
+        return (True, resultList)
+
+    # 对公告进行城市,时间筛选
+    def __getQueryResult(self, info):
+        query = info['query']
+        startDate = info['startDate']
+        endDate = info['endDate']
+        cityID = info['cityID']
+        # 公告分类
+        if cityID != '-1':
+            query = query.filter(
+                Tender.cityID == info['cityID']
+            )
+        if startDate != '-1' and endDate != '-1':
+            query = query.filter(
+                Tender.datetime < endDate
+            ).filter(Tender.datetime > startDate)
+        info['query'] = query
+        return query
 
     # 对公告进行城市,时间筛选
     def getQueryResult(self, info):
@@ -152,13 +190,13 @@ class TenderManager(Util):
 
 
 
+
+
     def getTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
         tenderID = info['tenderID']
-        result = db.session.query(Tender, Province, City, Favorite).outerjoin(
+        result = db.session.query(Tender, City, Favorite).outerjoin(
             City, Tender.cityID == City.cityID
-        ).outerjoin(
-            Province, City.provinceID == Province.provinceID
         ).outerjoin(
             Favorite, Tender.tenderID == Favorite.tenderID
         ).filter(

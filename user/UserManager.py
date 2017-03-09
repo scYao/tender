@@ -14,6 +14,7 @@ from models.UserInfo import UserInfo
 from models.Token import Token
 from models.SmsCode import SmsCode
 from models.UserIP import UserIP
+from models.AdminInfo import AdminInfo
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.StringConfig import STRING_INFO_SMS_REGISTER
@@ -85,11 +86,30 @@ class UserManager(Util):
         resultData['tokenID'] = tokenID
         return (True, resultData)
 
+    def createAdminManager(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tel = info['tel']
+        # 验证码验证
+        # (status, reason) = self.checkSmsCode(info)
+        # if status is not True:
+        #     return (False, reason)
+        # 添加用户记录
+        userID = self.generateID(tel)
+        info['adminID'] = userID
+        (status, result) = AdminInfo.create(info)
+        if status is not True:
+            return (False, result)
+        db.session.commit()
+        tokenManager = TokenManager()
+        tokenID = tokenManager.createToken(userID)
+        resultData = {}
+        resultData['tokenID'] = tokenID
+        return (True, resultData)
+
     # 校验验证码
     def checkSmsCode(self, info):
         tel = info['tel']
         code = info['code']
-
         now = datetime.now()
         result = db.session.query(SmsCode).filter(
             and_(SmsCode.tel == tel, SmsCode.code == code,
