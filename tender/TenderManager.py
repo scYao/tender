@@ -34,11 +34,11 @@ class TenderManager(Util):
         cityID = info['cityID']
         location = info['location']
         url = info['url']
-        _datetime = info['datetime']
+        publicDate = info['publicDate']
         detail = info['detail']
 
         tender = Tender(tenderID=tenderID, title=title, cityID=cityID,
-                        location=location, url=url, datetime=_datetime,
+                        location=location, url=url, publicDate=publicDate,
                         detail=detail, typeID=None)
 
         try:
@@ -158,8 +158,8 @@ class TenderManager(Util):
             )
         if startDate != '0' and endDate != '0':
             query = query.filter(
-                Tender.datetime < endDate
-            ).filter(Tender.datetime > startDate)
+                Tender.publicDate < endDate
+            ).filter(Tender.publicDate > startDate)
         info['query'] = query
         return query
 
@@ -171,7 +171,7 @@ class TenderManager(Util):
             City, City.cityID == Tender.cityID
         ).filter(
             Tender.tenderID.in_(tenderIDTuple)
-        ).order_by(desc(Tender.datetime))
+        ).order_by(desc(Tender.publicDate))
         allResult = query.all()
         def generateTender(result):
             res = {}
@@ -180,7 +180,7 @@ class TenderManager(Util):
             res['tenderID'] = tender.tenderID
             res['title'] = tender.title
             res['location'] = tender.location
-            res['datetime'] = str(tender.datetime)
+            res['publicDate'] = str(tender.publicDate)
             res['cityID'] = city.cityID
             res['cityName'] = city.cityName
             return res
@@ -249,7 +249,7 @@ class TenderManager(Util):
             tenderInfo['tenderID'] = result.tenderID
             tenderInfo['title'] = result.title
             tenderInfo['location'] = result.location
-            tenderInfo['datetime'] = result.datetime
+            tenderInfo['publicDate'] = result.publicDate
             tenderInfo['joinID'] = self.generateID(tenderInfo['tenderID'])
             (status, addSearchInfo) = TenderSearchKey.createSearchInfo(tenderInfo)
         _ = [regenerateInfo(result) for result in allResult]

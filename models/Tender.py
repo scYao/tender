@@ -13,18 +13,18 @@ class Tender(db.Model):
     cityID = db.Column(db.String(100), db.ForeignKey('City.cityID'))
     location = db.Column(db.String(100))
     url = db.Column(db.String(100))
-    datetime = db.Column(db.DateTime)
+    publicDate = db.Column(db.Date)
     detail = db.Column(db.Text)
     typeID = db.Column(db.String(100))
 
     def __init__(self, tenderID=None, title=None, cityID=None, location=None,
-                 url=None, datetime=None, detail=None, typeID=None):
+                 url=None, publicDate=None, detail=None, typeID=None):
         self.tenderID = tenderID
         self.title = title
         self.cityID = cityID
         self.location = location
         self.url = url
-        self.datetime = datetime
+        self.publicDate = publicDate
         self.detail = detail
         self.typeID = typeID
 
@@ -35,7 +35,7 @@ class Tender(db.Model):
         res['title'] = tender.title
         res['location'] = tender.location
         res['url'] = tender.url
-        res['datetime'] = str(tender.datetime)
+        res['publicDate'] = str(tender.publicDate)
         res['detail'] = tender.detail
         return res
 

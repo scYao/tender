@@ -28,18 +28,20 @@ class CandidateManager(Util):
     # 创建中标公示
     def createCandidate(self, jsonInfo):
         info = json.loads(jsonInfo)
-        candidateID = info['candidateID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        # candidateID = info['candidateID'].replace('\'', '\\\'').replace('\"', '\\\"')
         candidateName = info['candidateName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        # companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
         price = info['price']
         ranking = info['ranking']
         managerName = info['managerName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        managerID = info['managerID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        # managerID = info['managerID'].replace('\'', '\\\'').replace('\"', '\\\"')
         biddingID = info['biddingID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
-        candidate = Candidate(candidateID=candidateID, candidateName=candidateName,
-                              companyID=companyID, price=price, ranking=ranking,
-                              managerName=managerName, managerID=managerID,
+        candidateID = self.generateID(candidateName)
+        candidate = Candidate(candidateID=candidateID,
+                              candidateName=candidateName,
+                              price=price, ranking=ranking,
+                              managerName=managerName,
                               biddingID=biddingID)
         try:
             db.session.add(candidate)
