@@ -27,6 +27,46 @@ class TenderManager(Util):
     def __init__(self):
         pass
 
+    #创建单条招标信息，后台
+    def createTenderBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['tenderID'] = self.generateID(info['title'])
+        (status, tenderID) = Tender.create(info)
+        db.session.commit()
+        return (True, tenderID)
+
+    #编辑招标信息，后台
+    def updateTenderBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        (status, result) = Tender.update(info)
+        db.session.commit()
+        return (True, None)
+
+    #删除招标信息，后台
+    def deleteTenderBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if not status:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        (status, result) = TenderSearchKey.delete(info)
+        if status:
+            (status, result) = Tender.delete(info)
+        db.session.commit()
+        return (True, None)
+
+
     def createTender(self, jsonInfo):
         info = json.loads(jsonInfo)
         # tenderID = info['tenderID']
@@ -138,8 +178,8 @@ class TenderManager(Util):
             )
         if startDate != '-1' and endDate != '-1':
             query = query.filter(
-                Tender.datetime < endDate
-            ).filter(Tender.datetime > startDate)
+                Tender.publicDate < endDate
+            ).filter(Tender.publicDate > startDate)
         info['query'] = query
         return query
 
@@ -192,9 +232,54 @@ class TenderManager(Util):
         tenderList = [generateTender(result) for result in allResult]
         return filter(None, tenderList)
 
+    @staticmethod
+    def getTenderListByIDTuple(tenderIDTuple):
+        query = db.session.query(
+            Tender, City
+        ).outerjoin(
+            City, City.cityID == Tender.cityID
+        ).filter(
+            Tender.tenderID.in_(tenderIDTuple)
+        ).order_by(desc(Tender.publicDate))
+        allResult = query.all()
+        def generateTender(result):
+            res = {}
+            tender = result.Tender
+            city = result.City
+            res['tenderID'] = tender.tenderID
+            res['title'] = tender.title
+            res['location'] = tender.location
+            res['publicDate'] = str(tender.publicDate)
+            res['cityID'] = city.cityID
+            res['cityName'] = city.cityName
+            return res
+        tenderList = [generateTender(result) for result in allResult]
+        return filter(None, tenderList)
+
     def getTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
         tenderID = info['tenderID']
+        result = db.session.query(Tender, City, Favorite).outerjoin(
+            City, Tender.cityID == City.cityID
+        ).outerjoin(
+            Favorite, Tender.tenderID == Favorite.tenderID
+        ).filter(
+            Tender.tenderID == tenderID
+        ).first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_04']
+            return (False, errorInfo)
+        tenderDetail = self.__generateTender(t=result)
+        return (True, tenderDetail)
+
+    def getTenderDetailBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tenderID = info['tenderID']
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
         result = db.session.query(Tender, City, Favorite).outerjoin(
             City, Tender.cityID == City.cityID
         ).outerjoin(
@@ -255,3 +340,4 @@ class TenderManager(Util):
         _ = [regenerateInfo(result) for result in allResult]
         db.session.commit()
         return (True, '111')
+

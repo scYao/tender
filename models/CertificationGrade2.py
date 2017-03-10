@@ -19,6 +19,17 @@ class CertificationGrade2(db.Model):
         self.gradeName = gradeName
         self.superiorID = superiorID
 
+
+    @staticmethod
+    def create(info):
+        certificationGrade2 = CertificationGrade2(
+            gradeID=info['gradeID'], gradeName=info['gradeName'],
+            superiorID=info['superiorID']
+        )
+        db.session.add(certificationGrade2)
+        return (True, None)
+
+
     @staticmethod
     def generate(c):
         res = {}

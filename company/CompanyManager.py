@@ -12,9 +12,10 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
-from models.flask_app import db
+from models.flask_app import db, cache
 from models.DelinquenentConduct import DelinquenentConduct
 from models.Company import Company
+from models.ImgPath import ImgPath
 
 from tool.Util import Util
 from tool.config import ErrorInfo
@@ -107,3 +108,63 @@ class CompanyManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, None)
+
+    # 获取公司列表,后台管理
+    @cache.memoize(timeout=60 * 2)
+    def getCompanyListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if not status:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        # 获取tenderID列表
+        query = self.__getQueryResult(info)
+        allResult = query.offset(startIndex).limit(pageCount).all()
+        companyList = [Company.generateBrief(result) for result in allResult]
+        return (True, companyList)
+
+    def __getQueryResult(self, info):
+        query = db.session.query(Company)
+        return query
+
+    def __generateCompanyDetail(self, allResult):
+        ossInfo = {}
+        ossInfo['bucket'] = 'sjtender'
+        directory = 'company'
+        res = {}
+        imgInfo = {'imgPathList': []}
+        for result in allResult:
+            company = result.Company
+            img = result.ImgPath
+
+            res.update(Company.generate(company))
+            imgInfo['imgPathList'].append(ImgPath.generate(img, ossInfo, directory))
+        res.update(imgInfo)
+        return res
+
+    def __getDetailQueryResult(self, info):
+        companyID = info['companyID']
+        query = db.session.query(
+            Company, ImgPath
+        ).outerjoin(
+          ImgPath, Company.companyID == ImgPath.foreignID
+        ).filter(
+            Company.companyID == companyID
+        )
+        return query
+
+    #获取企业信息详情，后台
+    def getCompanyDetailBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if not status:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        query = self.__getDetailQueryResult(info)
+        allResult = query.all()
+        companyDetail = self.__generateCompanyDetail(allResult)
+        return (True, companyDetail)

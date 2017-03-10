@@ -34,6 +34,18 @@ class Tender(db.Model):
         self.reviewType = reviewType
 
     @staticmethod
+    def create(createInfo):
+        tender = Tender(
+            tenderID=createInfo['tenderID'], title=createInfo['title'],
+            cityID=createInfo['cityID'], location=createInfo['location'],
+            url=createInfo['url'], publicDate=createInfo['publicDate'],
+            detail=createInfo['detail'], typeID=createInfo['typeID']
+        )
+        db.session.add(tender)
+        return (True, createInfo['tenderID'])
+
+
+    @staticmethod
     def generate(tender):
         res = {}
         res['tenderID'] = tender.tenderID
@@ -56,6 +68,28 @@ class Tender(db.Model):
         res['publicDate'] = str(tender.publicDate)
         return res
 
+    @staticmethod
+    def update(tenderInfo):
+        tenderID = tenderInfo['tenderID']
+        updateInfo = {
+            Tender.title: tenderInfo['title'],
+            Tender.location: tenderInfo['location'],
+            Tender.url: tenderInfo['url']
+        }
+        db.session.query(Tender).filter(
+            Tender.tenderID == tenderID).update(
+            updateInfo, synchronize_session = False
+        )
+        return (True, None)
+
+    @staticmethod
+    def delete(tenderInfo):
+        tenderID = tenderInfo['tenderID']
+        db.session.query(Tender).filter(
+            Tender.tenderID == tenderID).delete(
+            synchronize_session = False
+        )
+        return (True, None)
 
     def __repr__(self):
         return self.tenderID

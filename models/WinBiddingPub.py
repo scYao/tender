@@ -35,4 +35,35 @@ class WinBiddingPub(db.Model):
         res['detail'] = b.detail
         return res
 
+    @staticmethod
+    def generateBrief(result):
+        bidInfo = {}
+        bidInfo['biddingID'] = result.biddingID
+        bidInfo['title'] = result.title
+        bidInfo['publicDate'] = result.publicDate
+        bidInfo['biddingNum'] = result.biddingNum
+        return bidInfo
+
+    @staticmethod
+    def update(bidInfo):
+        biddingID = bidInfo['biddingID']
+        updateInfo = {
+            WinBiddingPub.title: bidInfo['title'],
+            WinBiddingPub.biddingNum: bidInfo['biddingNum']
+        }
+        db.session.query(WinBiddingPub).filter(
+            WinBiddingPub.biddingID == biddingID).update(
+            updateInfo, synchronize_session=False
+        )
+        return (True, None)
+
+    @staticmethod
+    def delete(bidInfo):
+        biddingID = bidInfo['biddingID']
+        db.session.query(WinBiddingPub).filter(
+            WinBiddingPub.biddingID == biddingID).delete(
+            synchronize_session=False
+        )
+        return (True, None)
+
 

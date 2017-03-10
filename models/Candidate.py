@@ -43,4 +43,13 @@ class Candidate(db.Model):
         res['biddingID'] = c.biddingID
         return res
 
+    @staticmethod
+    def delete(bidInfo):
+        biddingID = bidInfo['biddingID']
+        db.session.query(Candidate).filter(
+            Candidate.biddingID == biddingID).delete(
+            synchronize_session=False
+        )
+        return (True, None)
+
 

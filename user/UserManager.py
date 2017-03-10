@@ -7,7 +7,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from datetime import datetime
-from sqlalchemy import and_, text, func
+from sqlalchemy import and_, text, func, desc
 
 from models.flask_app import db
 from models.UserInfo import UserInfo
@@ -15,6 +15,7 @@ from models.Token import Token
 from models.SmsCode import SmsCode
 from models.UserIP import UserIP
 from models.AdminInfo import AdminInfo
+from models.UserInfoSearchKey import UserInfoSearchKey
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.StringConfig import STRING_INFO_SMS_REGISTER
@@ -24,6 +25,45 @@ from stoken.TokenManager import TokenManager
 class UserManager(Util):
     def __init__(self):
         pass
+
+    #重新生成所有招标检索
+    def reGenerateUserSearchIndex(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        query = db.session.query(UserInfo)
+        allResult = query.all()
+        # allResult
+        # 生成搜索记录
+        def regenerateInfo(result):
+            searchInfo = {}
+            searchInfo['joinID'] = self.generateID(result.userID)
+            searchInfo['companyName'] = result.companyName
+            searchInfo['userID'] = result.userID
+            searchInfo['tel'] = result.tel
+            searchInfo['jobPosition'] = result.jobPosition
+            searchInfo['userName'] = result.userName
+            searchInfo['createTime'] = result.createTime
+            (status, addSearchInfo) = UserInfoSearchKey.createSearchInfo(searchInfo)
+        _ = [regenerateInfo(result) for result in allResult]
+        db.session.commit()
+        return (True, '111')
+
+    def getUserListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        #获取tenderID列表
+        query = db.session.query(UserInfo)
+        info['query'] = query
+        allResult = query.offset(startIndex).limit(pageCount).all()
+        userInfoList = [UserInfo.generate(result) for result in allResult]
+        return (True, userInfoList)
+
+
 
     def login(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -260,6 +300,33 @@ class UserManager(Util):
             return (False, errorInfo)
         return (True, userDetail)
 
+    # 获取用户详情,后台
+    def getUserInfoDetailBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        userID = info['userID']
+        (status, myUserID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        try:
+            result = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+
+            if result is None:
+                errorInfo = ErrorInfo['TENDER_09']
+                return (False, errorInfo)
+
+            userDetail = UserInfo.generate(userInfo=result)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+        return (True, userDetail)
+
     # 找回密码接口, 不校验验证码
     def __resetPassWord(self, tel, pwd):
         userQuery = db.session.query(UserInfo).filter(
@@ -302,3 +369,12 @@ class UserManager(Util):
             return (False, reason)
 
         return (True, None)
+
+    @staticmethod
+    def getUserInfoListByIDTuple(userIDTuple):
+        query = db.session.query(UserInfo).filter(
+            UserInfo.userID.in_(userIDTuple)
+        ).order_by(desc(UserInfo.createTime))
+        allResult = query.all()
+        userInfoList = [UserInfo.generate(result) for result in allResult]
+        return filter(None, userInfoList)
