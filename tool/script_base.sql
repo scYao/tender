@@ -31,20 +31,22 @@ create table tender(
 );
 
 -- 关键词库
-create table MerchandiseSearchKey(
+create table searchKey(
     joinID nvarchar(100) primary key comment '关键词ID',
     searchKey text comment '关键词',
-    merchandiseID nvarchar(100) comment '商品ID',
-    createTime datetime comment '创建时间'
+    foreign nvarchar(100) comment '商品ID',
+    createTime datetime comment '创建时间',
+    tag int comment '招标1, 中标 2, 企业数据库 3'
 );
 
 -- 招标公告关键词库
-create table tenderSearchKey(
-    joinID nvarchar(100) primary key comment '关键词ID',
-    searchKey text comment '关键词',
-    tenderID nvarchar(100) comment '商品ID',
-    createTime datetime comment '创建时间'
-);
+-- create table tenderSearchKey(
+--     joinID nvarchar(100) primary key comment '关键词ID',
+--     searchKey text comment '关键词',
+--     tenderID nvarchar(100) comment '商品ID',
+--     createTime datetime comment '创建时间',
+--     tag int comment '招标1, 中标 2, 企业数据库 3'
+-- );
 
 -- 一级分类
 create table Type1(
@@ -133,8 +135,8 @@ create table UserIP(
 ALTER TABLE province CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE city CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE MerchandiseSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE TenderSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE searchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- ALTER TABLE TenderSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type1 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type2 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type3 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -150,4 +152,4 @@ alter table tender add constraint tender_FK_city foreign key(cityID) references 
 alter table Type2 add constraint type2_FK_type1 foreign key(superTypeID) references Type1(typeID);
 alter table Type3 add constraint type3_FK_type2 foreign key(superTypeID) references Type2(typeID);
 alter table UserIP add constraint ip_FK_user foreign key(userID) references UserInfo(userID);
-alter table tenderSearchKey add constraint tenderSearchKey_FK_tender foreign key(tenderID) references tender(tenderID);
+-- alter table tenderSearchKey add constraint tenderSearchKey_FK_tender foreign key(tenderID) references tender(tenderID);

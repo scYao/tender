@@ -87,7 +87,7 @@ class FavoriteManager(Util):
 
     def __generate(self, t):
         res = {}
-        res.update(Tender.generateWithoutDetail(t.Tender))
+        res.update(Tender.generateBrief(t.Tender))
         res.update(Favorite.generate(t.Favorite))
         return res
 

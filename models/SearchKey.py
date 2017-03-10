@@ -14,13 +14,15 @@ class SearchKey(db.Model):
     foreignID = db.Column(db.String(100))
     searchKey = db.Column(db.Text)
     createTime = db.Column(db.DateTime)
+    tag = db.Column(db.Integer)
 
     def __init__(self, joinID=None, foreignID=None,
-               searchKey=None, createTime=None):
+               searchKey=None, createTime=None, tag=0):
         self.joinID = joinID
         self.foreignID = foreignID
         self.searchKey = searchKey
         self.createTime = createTime
+        self.tag = tag
 
     def __repr__(self):
         return self.joinID
