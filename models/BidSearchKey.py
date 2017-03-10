@@ -4,19 +4,19 @@ from pypinyin import lazy_pinyin
 
 from flask_app import app, db
 import flask_whooshalchemy as whooshalchemy
-class TenderSearchKey(db.Model):
-    __tablename__ = 'TenderSearchKey'
+class BidSearchKey(db.Model):
+    __tablename__ = 'BidSearchKey'
     __searchable__ = ['searchKey']
 
     joinID = db.Column(db.String(100), primary_key=True)
-    tenderID = db.Column(db.String(100))
+    biddingID = db.Column(db.String(100))
     searchKey = db.Column(db.Text)
     createTime = db.Column(db.DateTime)
 
-    def __init__(self, joinID=None, tenderID=None,
+    def __init__(self, joinID=None, biddingID=None,
                searchKey=None, createTime=None):
         self.joinID = joinID
-        self.tenderID = tenderID
+        self.biddingID = biddingID
         self.searchKey = searchKey
         self.createTime = createTime
 
@@ -26,12 +26,12 @@ class TenderSearchKey(db.Model):
     @staticmethod
     def createSearchInfo(info):
         title = info['title']
-        tenderID = info['tenderID']
-        createTime = info['datetime']
+        biddingID = info['biddingID']
+        createTime = info['publicDate']
+        biddingNum = info['biddingNum']
         joinID = info['joinID']
-        location = info['location']
         # 添加搜索记录
-        searchInfo = title + ',' + location
+        searchInfo = title +  ',' + biddingNum
         # 汉语分词
         fenciList = jieba.cut_for_search(searchInfo)  # 搜索引擎模式
         fenci = " ".join(fenciList)
@@ -42,18 +42,18 @@ class TenderSearchKey(db.Model):
         pinyinList.append(fenci)
         pinyinList.append(title)
         searchInfo = " ".join(pinyinList)
-
-        tenderSearchKey = TenderSearchKey(
-            joinID=joinID, tenderID=tenderID,
+        bidSearchKey = BidSearchKey(
+            joinID=joinID, biddingID=biddingID,
             searchKey=searchInfo, createTime=createTime)
-        db.session.add(tenderSearchKey)
+        db.session.add(bidSearchKey)
         return (True, None)
 
+
     @staticmethod
-    def delete(tenderInfo):
-        tenderID = tenderInfo['tenderID']
-        db.session.query(TenderSearchKey).filter(
-            TenderSearchKey.tenderID == tenderID).delete(
+    def delete(bidInfo):
+        biddingID = bidInfo['biddingID']
+        db.session.query(BidSearchKey).filter(
+            BidSearchKey.biddingID == biddingID).delete(
             synchronize_session = False
         )
         return (True, None)
@@ -61,4 +61,4 @@ class TenderSearchKey(db.Model):
 
 
 # db.create_all()
-whooshalchemy.whoosh_index(app, TenderSearchKey)
+whooshalchemy.whoosh_index(app, BidSearchKey)

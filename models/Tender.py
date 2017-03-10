@@ -29,6 +29,18 @@ class Tender(db.Model):
         self.typeID = typeID
 
     @staticmethod
+    def create(createInfo):
+        tender = Tender(
+            tenderID=createInfo['tenderID'], title=createInfo['title'],
+            cityID=createInfo['cityID'], location=createInfo['location'],
+            url=createInfo['url'], publicDate=createInfo['publicDate'],
+            detail=createInfo['detail'], typeID=createInfo['typeID']
+        )
+        db.session.add(tender)
+        return (True, createInfo['tenderID'])
+
+
+    @staticmethod
     def generate(tender):
         res = {}
         res['tenderID'] = tender.tenderID
@@ -40,15 +52,37 @@ class Tender(db.Model):
         return res
 
     @staticmethod
-    def generateWithoutDetail(tender):
+    def generateBrief(tender):
         res = {}
         res['tenderID'] = tender.tenderID
         res['title'] = tender.title
         res['location'] = tender.location
         res['url'] = tender.url
-        res['datetime'] = str(tender.datetime)
+        res['publicDate'] = str(tender.publicDate)
         return res
 
+    @staticmethod
+    def update(tenderInfo):
+        tenderID = tenderInfo['tenderID']
+        updateInfo = {
+            Tender.title: tenderInfo['title'],
+            Tender.location: tenderInfo['location'],
+            Tender.url: tenderInfo['url']
+        }
+        db.session.query(Tender).filter(
+            Tender.tenderID == tenderID).update(
+            updateInfo, synchronize_session = False
+        )
+        return (True, None)
+
+    @staticmethod
+    def delete(tenderInfo):
+        tenderID = tenderInfo['tenderID']
+        db.session.query(Tender).filter(
+            Tender.tenderID == tenderID).delete(
+            synchronize_session = False
+        )
+        return (True, None)
 
     def __repr__(self):
         return self.tenderID

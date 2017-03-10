@@ -25,6 +25,7 @@ class Company(db.Model):
     companyType = db.Column(db.String(100))
     foundingTime = db.Column(db.Date)
     businessTermFrom = db.Column(db.Date)
+    businessTermEnd = db.Column(db.Date)
     safetyProductionPermitID = db.Column(db.String(100))
     safePrincipal = db.Column(db.String(100))
     businessScope = db.Column(db.String(100))
@@ -53,7 +54,7 @@ class Company(db.Model):
                  registerArea=None, companyAreaType=None, certificateID=None,
                  certificationAuthority=None, legalRepresentative=None, enterprisePrincipal=None,
                  technologyDirector=None, remarks=None, licenseID=None, registeredCapital=0,
-                 companyType=None, foundingTime=None, businessTermFrom=None,
+                 companyType=None, foundingTime=None, businessTermFrom=None, businessTermEnd=None,
                  safetyProductionPermitID=None, safePrincipal=None, businessScope=None,
                  safeAuthority=None, safeFromDate=None, safeEndDate=None, creditBookID=None,
                  creditScore1=0, creditScore2=0, creditEndDate=None, creditAuthority=None,
@@ -75,6 +76,7 @@ class Company(db.Model):
         self.companyType = companyType
         self.foundingTime = foundingTime
         self.businessTermFrom = businessTermFrom
+        self.businessTermEnd = businessTermEnd
         self.safetyProductionPermitID = safetyProductionPermitID
         self.safePrincipal = safePrincipal
         self.businessScope = businessScope
@@ -113,18 +115,19 @@ class Company(db.Model):
         res['licenseID'] = c.licenseID
         res['registeredCapital'] = c.registeredCapital
         res['companyType'] = c.companyType
-        res['foundingTime'] = c.foundingTime
-        res['businessTermFrom'] = c.businessTermFrom
+        res['foundingTime'] = str(c.foundingTime)
+        res['businessTermFrom'] = str(c.businessTermFrom)
+        res['businessTermEnd'] = str(c.businessTermEnd)
         res['safetyProductionPermitID'] = c.safetyProductionPermitID
         res['safePrincipal'] = c.safePrincipal
         res['businessScope'] = c.businessScope
         res['safeAuthority'] = c.safeAuthority
-        res['safeFromDate'] = c.safeFromDate
-        res['safeEndDate'] = c.safeEndDate
+        res['safeFromDate'] = str(c.safeFromDate)
+        res['safeEndDate'] = str(c.safeEndDate)
         res['creditBookID'] = c.creditBookID
         res['creditScore1'] = c.creditScore1
         res['creditScore2'] = c.creditScore2
-        res['creditEndDate'] = c.creditEndDate
+        res['creditEndDate'] = str(c.creditEndDate)
         res['creditAuthority'] = c.creditAuthority
         res['creditAddress'] = c.creditAddress
         res['creditWebSet'] = c.creditWebSet
@@ -134,6 +137,13 @@ class Company(db.Model):
         res['creditNjTech'] = c.creditNjTech
         res['creditFinancialStaff'] = c.creditFinancialStaff
         res['companyBrief'] = c.companyBrief
+        return res
+
+    @staticmethod
+    def generateBrief(c):
+        res = {}
+        res['companyID'] = c.companyID
+        res['companyName'] = c.companyName
         return res
 
     def __repr__(self):

@@ -27,6 +27,7 @@ from certificationGrade.CertificationGrade3Manager import CertificationGrade3Man
 from certificationGrade.CertificationGrade4Manager import CertificationGrade4Manager
 from winBidding.WinBiddingManager import WinBiddingManager
 from winBidding.CandidateManager import CandidateManager
+from search.SearchManager import SearchManager
 
 
 def allowed_file(filename):
@@ -64,6 +65,51 @@ def create_tender():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 创建投标信息，后台
+@app.route('/create_tender_background/', methods=['POST', 'GET'])
+def create_tender_background():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.createTender(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 编辑招标信息，后台
+@app.route('/update_tender_background/', methods=['POST', 'GET'])
+def update_tender_background():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.updateTenderBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 删除招标信息，后台
+@app.route('/delete_tender_background/', methods=['POST', 'GET'])
+def delete_tender_background():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.deleteTenderBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 # 获取投标信息列表
 @app.route('/get_tender_list/', methods=['POST', 'GET'])
 def get_tender_list():
@@ -94,6 +140,36 @@ def get_tender_list_background():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 获取中标信息列表,后台使用
+@app.route('/get_bid_list_background/', methods=['POST', 'GET'])
+def get_bid_list_background():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBidListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取公司列表,后台使用
+@app.route('/get_company_list_background/', methods=['POST', 'GET'])
+def get_company_list_background():
+    companyManager = CompanyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = companyManager.getCompanyListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 # 获取投标信息详情
 @app.route('/get_tender_detail/', methods=['POST', 'GET'])
 def get_tender_detail():
@@ -104,6 +180,51 @@ def get_tender_detail():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = tenderManager.getTenderDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取投标信息详情,后台
+@app.route('/get_tender_detail_background/', methods=['POST', 'GET'])
+def get_tender_detail_background():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.getTenderDetailBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取中标信息详情,后台
+@app.route('/get_bid_detail_background/', methods=['POST', 'GET'])
+def get_bid_detail_background():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBidDetailBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取企业详情,后台
+@app.route('/get_company_detail_background/', methods=['POST', 'GET'])
+def get_company_detail_background():
+    companyManager = CompanyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = companyManager.getCompanyDetailBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -276,6 +397,7 @@ def get_city_list():
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
+        print paramsJson
         (status, jsonlist) = provinceManager.getCityList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
@@ -323,6 +445,21 @@ def get_user_info_detail():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = userManager.getUserInfoDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取用户详情,后台
+@app.route('/get_user_info_detail_background/', methods=['POST', 'GET'])
+def get_user_info_detail_background():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = userManager.getUserInfoDetailBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -657,7 +794,97 @@ def re_generate_search_index():
         data['data'] = jsonlist
         return json.dumps(data)
 
-#创建管理员
+# 重新生成搜索索引，中标
+@app.route('/re_generate_bid_search_index/', methods=['POST', 'GET'])
+def re_generate_bid_search_index():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.reGenerateBidSearchIndex(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 重新生成搜索索引
+@app.route('/re_generate_user_search_index/', methods=['POST', 'GET'])
+def re_generate_user_search_index():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = userManager.reGenerateUserSearchIndex(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+
+# 获取用户信息列表，后台
+@app.route('/get_user_list_background/', methods=['POST', 'GET'])
+def get_user_list_background():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = userManager.getUserListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 搜索，后台
+@app.route('/search_background/', methods=['POST', 'GET'])
+def search_background():
+    searchManager = SearchManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = searchManager.searchBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 编辑中标信息，后台
+@app.route('/update_bid_background/', methods=['POST', 'GET'])
+def update_bid_background():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.updateBidBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 删除中标信息，后台
+@app.route('/delete_bid_background/', methods=['POST', 'GET'])
+def delete_bid_background():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.deleteBidBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
 
 
 

@@ -4,6 +4,7 @@ import sys
 import urllib
 import types
 import xmltodict
+import datetime
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
@@ -100,6 +101,35 @@ def get_tender_list_background():
     result = resultManager.getResult(params, upload_url)
     print result
 
+#获取招标公告列表，后台管理
+def get_bid_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_bid_list_background/' % LOCALHOST
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = YZTOKENID
+    info['startDate'] = '-1'
+    info['endDate'] = '-1'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+#获取公司列表，后台管理
+def get_company_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_company_list_background/' % LOCALHOST
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = YZTOKENID
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
 #找回密码
 def findPassword():
     opener = poster.streaminghttp.register_openers()
@@ -132,6 +162,28 @@ def re_generate_search_index():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 重新生成中标搜索索引
+def re_generate_bid_search_index():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/re_generate_bid_search_index/' % LOCALHOST
+    info = {}
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 重新生成搜索索引,用户信息
+def re_generate_user_search_index():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/re_generate_user_search_index/' % LOCALHOST
+    info = {}
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
 #获取招标内容
 def getTenderDetail():
     opener = poster.streaminghttp.register_openers()
@@ -142,6 +194,71 @@ def getTenderDetail():
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
     print result
+
+#获取招标内容,后台
+def get_tender_detail_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_tender_detail_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['tenderID'] = '1b0335ca-7132-4771-8df4-e392a06015d2'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 获取中标详情,后台
+def get_bid_detail_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_bid_detail_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['biddingID'] = '2017-03-09090748b3690e054504d3adb05fe7bf81753459'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 获取公司详情,后台
+def get_company_detail_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_company_detail_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['companyID'] = '2017-03-10145520d255ca48668fd6efa22911543af0df92'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+# 编辑中标,后台
+def update_bid_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/update_bid_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['biddingID'] = '2017-03-09090748b3690e054504d3adb05fe7bf81753459'
+    info['title'] = '泰山路小学新建工程无锡市泰山路小学新建工程室外市政、体育场地设施以及景观绿化工程'
+    info['biddingNum'] = '111'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 删除中标详情,后台
+def delete_bid_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/delete_bid_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['biddingID'] = '2017-03-09090748b3690e054504d3adb05fe7bf81753459'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
 
 #创建收藏
 def createFavorite():
@@ -193,6 +310,33 @@ def getUserInfoDetail():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 获取用户信息,后台
+def get_user_info_detail_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_user_info_detail_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['userID'] = '2016-12-14124727f7d8e1b0af5314e6f1ef43b773f28a73'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
+#获取用户信息
+def get_user_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_user_list_background/' % LOCALHOST
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = YZTOKENID
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
 #创建管理员
 def create_admin_manager():
     opener = poster.streaminghttp.register_openers()
@@ -207,34 +351,130 @@ def create_admin_manager():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 搜索，后台
+def search_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/search_background/' % LOCALHOST
+    info = {}
+    info['tag'] = 3
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = YZTOKENID
+    info['searchKey'] = '无锡'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 编辑招标信息,后台
+def update_tender_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/update_tender_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['tenderID'] = '1b0335ca-7132-4771-8df4-e392a06015d2'
+    info['title'] = '（南京化学工业园）新庄东村环境整治施工'
+    info['location'] = '南京化学工业园'
+    info['url'] = ''
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 删除招标信息,后台
+def delete_tender_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/delete_tender_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['tenderID'] = '1b0335ca-7132-4771-8df4-e392a06015d2'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
 def formatDic(info):
     for (key, value) in info.items():
         print '{:<20}'.format(key), '{:^20}'.format('string'), '{:<20}'.format(value)
 
 
-def common():
-    gender = 'male'
-    if gender == 'male':
-        text = '男'
-    else:
-        text = '女'
 
+
+
+def common():
+    data = [
+        {'bar', 10}, {'foo', 20}, {'foo', 30}
+    ]
+    groups = {}
+    for (key, value) in data:
+        if key in groups:
+            groups[key].append(value)
+        else:
+            groups[key] = [value]
+    print groups
+
+from collections import defaultdict
 def pythonic():
-    gender = 'male'
-    text = '男' if gender == 'male' else '女'
+    data = [
+        {'bar', 10}, {'foo', 20}, {'foo', 30}
+    ]
+    #第一种方法
+    groups = {}
+    for (key, value) in data:
+        groups.setdefault(key, []).append(value)
+    print groups
+    #第二种方法
+    groups = defaultdict(list)
+    for (key, value) in data:
+        groups[key].append(value)
+    print groups
+
 
 if __name__ == '__main__':
-    get_tender_list_background()
+
+    common()
+    pythonic()
+
+
+    # get_company_detail_background()
+    # get_company_list_background()
+
+
+
+
+
+    # get_bid_detail_background()
+    # update_bid_background()
+    # delete_bid_background()
+    # get_tender_detail_background()
+    # delete_tender_background()
+    # update_tender_background()
+    # re_generate_bid_search_index()
+    # search_background()
+
+    # get_bid_list_background()
+
+    # print datetime.date.today()
+
+
+
+
+
+    # get_user_info_detail_background()
+    # get_user_list_background()
+    # get_tender_list_background()
     # administrator_login_background()
     # create_admin_manager()
-    # common()
-    # pythonic()
+
     # register()
     # sendSmsCode()
     # logIn()
     # findPassword()
     # getTenderList()
     # re_generate_search_index()
+    # re_generate_user_search_index()
     # getCityList()
     # getTenderDetail()
     # createFavorite()
@@ -242,6 +482,8 @@ if __name__ == '__main__':
     # getFavoriteList()
     # getUserInfoDetail()
     # info = {}
-    #
-    # info['tokenID'] = '2017-03-09093919b788c302127d8e2c04ab50c2721cc5bb'
+    # info['tokenID'] = YZTOKENID
+    # info['biddingID'] = '2017-03-09090748b3690e054504d3adb05fe7bf81753459'
+    # info['title'] = '泰山路小学新建工程无锡市泰山路小学新建工程室外市政、体育场地设施以及景观绿化工程'
+    # info['biddingNum'] = '111'
     # formatDic(info)
