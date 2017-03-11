@@ -31,20 +31,22 @@ create table tender(
 );
 
 -- 关键词库
-create table MerchandiseSearchKey(
+create table searchKey(
     joinID nvarchar(100) primary key comment '关键词ID',
     searchKey text comment '关键词',
-    merchandiseID nvarchar(100) comment '商品ID',
-    createTime datetime comment '创建时间'
+    foreign nvarchar(100) comment '商品ID',
+    createTime datetime comment '创建时间',
+    tag int comment '招标1, 中标 2, 企业数据库 3'
 );
 
 -- 招标公告关键词库
-create table tenderSearchKey(
-    joinID nvarchar(100) primary key comment '关键词ID',
-    searchKey text comment '关键词',
-    tenderID nvarchar(100) comment '商品ID',
-    createTime datetime comment '创建时间'
-);
+-- create table tenderSearchKey(
+--     joinID nvarchar(100) primary key comment '关键词ID',
+--     searchKey text comment '关键词',
+--     tenderID nvarchar(100) comment '商品ID',
+--     createTime datetime comment '创建时间',
+--     tag int comment '招标1, 中标 2, 企业数据库 3'
+-- );
 
 -- 中标公告关键词库
 create table bidSearchKey(
@@ -149,7 +151,8 @@ create table UserIP(
 ALTER TABLE province CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE city CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE MerchandiseSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE searchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- ALTER TABLE TenderSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE TenderSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE bidSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type1 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -161,7 +164,6 @@ ALTER TABLE UserInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 ALTER TABLE Token CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE SmsCode CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE adminInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE userInfoSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table city add constraint city_FK_province foreign key(provinceID) references province(provinceID);
 alter table tender add constraint tender_FK_city foreign key(cityID) references city(cityID);

@@ -69,18 +69,23 @@ class TenderManager(Util):
 
     def createTender(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tenderID = info['tenderID']
+        # tenderID = info['tenderID']
         title = info['title']
         cityID = info['cityID']
         location = info['location']
         url = info['url']
         publicDate = info['publicDate']
         detail = info['detail']
+        biddingNum = info['biddingNum']
+        reviewType = info['reviewType']
+
+        tenderID = self.generateID(title)
 
         tender = Tender(tenderID=tenderID, title=title, cityID=cityID,
                         location=location, url=url, publicDate=publicDate,
-                        detail=detail, typeID=None)
-
+                        detail=detail, typeID=None, biddingNum=biddingNum,
+                        reviewType=reviewType)
+        info['tenderID'] = tenderID
         try:
             db.session.add(tender)
             info['searchName'] = info['title']
@@ -91,13 +96,13 @@ class TenderManager(Util):
             info['createTime'] = str(now)
             info['joinID'] = self.generateID(info['title'])
 
-            TenderSearchKey.createSearchInfo(info=info)
+            SearchKey.createSearchInfo(info=info)
             db.session.commit()
             return (True, None)
         except Exception as e:
+            print str(e)
             # traceback.print_stack()
             db.session.rollback()
-            print e
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
@@ -158,7 +163,6 @@ class TenderManager(Util):
         tenderIDTuple = tuple(tenderIDList)
         info['tenderIDTuple'] = tenderIDTuple
         resultList = self.__doGetTenderList(info)
-        print resultList
         return (True, resultList)
 
     # 对公告进行城市,时间筛选

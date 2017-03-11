@@ -27,7 +27,7 @@ class TenderSearchKey(db.Model):
     def createSearchInfo(info):
         title = info['title']
         tenderID = info['tenderID']
-        createTime = info['datetime']
+        createTime = info['createTime']
         joinID = info['joinID']
         location = info['location']
         # 添加搜索记录
