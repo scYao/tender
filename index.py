@@ -125,6 +125,7 @@ def get_tender_list():
         data['data'] = jsonlist
         return json.dumps(data)
 
+
 # 获取投标信息列表,后台使用
 @app.route('/get_tender_list_background/', methods=['POST', 'GET'])
 def get_tender_list_background():
@@ -139,6 +140,22 @@ def get_tender_list_background():
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
         return json.dumps(data)
+
+# 获取中标信息列表
+@app.route('/get_bid_list/', methods=['POST', 'GET'])
+def get_bid_list():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBidList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 
 # 获取中标信息列表,后台使用
 @app.route('/get_bid_list_background/', methods=['POST', 'GET'])
@@ -210,6 +227,21 @@ def get_bid_detail_background():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = winBiddingManager.getBidDetailBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取中标信息详情
+@app.route('/get_bid_detail/', methods=['POST', 'GET'])
+def get_bid_detail():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBidDetail(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist

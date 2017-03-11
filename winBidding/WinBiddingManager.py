@@ -54,6 +54,22 @@ class WinBiddingManager(Util):
             return (False, errorInfo)
         return (True, biddingID)
 
+
+    # 获取中标信息列表
+    @cache.memoize(timeout=60 * 2)
+    def getBidList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        # 获取tenderID列表
+        query = db.session.query(WinBiddingPub)
+        info['query'] = query
+        query = self.__getQueryResult(info)
+        allResult = query.offset(startIndex).limit(pageCount).all()
+        bidList = [WinBiddingPub.generateBrief(result) for result in allResult]
+        return (True, bidList)
+
+
     # 获取中标信息列表,后台管理
     @cache.memoize(timeout=60 * 2)
     def getBidListBackground(self, jsonInfo):
@@ -95,6 +111,20 @@ class WinBiddingManager(Util):
         if not status:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
+        result = db.session.query(WinBiddingPub
+        ).filter(
+            WinBiddingPub.biddingID == biddingID
+        ).first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_04']
+            return (False, errorInfo)
+        tenderDetail = WinBiddingPub.generate(result)
+        return (True, tenderDetail)
+
+    #获取中标信息详情
+    def getBidDetail(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        biddingID = info['biddingID']
         result = db.session.query(WinBiddingPub
         ).filter(
             WinBiddingPub.biddingID == biddingID

@@ -40,7 +40,7 @@ class WinBiddingPub(db.Model):
         bidInfo = {}
         bidInfo['biddingID'] = result.biddingID
         bidInfo['title'] = result.title
-        bidInfo['publicDate'] = result.publicDate
+        bidInfo['publicDate'] = str(result.publicDate)
         bidInfo['biddingNum'] = result.biddingNum
         return bidInfo
 

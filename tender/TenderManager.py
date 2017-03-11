@@ -184,20 +184,13 @@ class TenderManager(Util):
         query = info['query']
         startDate = info['startDate']
         endDate = info['endDate']
-        searchKey = info['searchKey']
         cityID = info['cityID']
-        if len(searchKey) == 1:
-            searchKey = " ".join(lazy_pinyin(searchKey))
-        if searchKey != '0':
-            query = TenderSearchKey.query.whoosh_search(searchKey).outerjoin(
-                Tender, Tender.tenderID == TenderSearchKey.tenderID
-            )
         # 公告分类
-        if cityID != '0':
+        if cityID != '-1':
             query = query.filter(
                 Tender.cityID == info['cityID']
             )
-        if startDate != '0' and endDate != '0':
+        if startDate != '-1' and endDate != '-1':
             query = query.filter(
                 Tender.publicDate < endDate
             ).filter(Tender.publicDate > startDate)

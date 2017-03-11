@@ -76,10 +76,9 @@ def getTenderList():
     info = {}
     info['startIndex'] = 0
     info['pageCount'] = 10
-    info['cityID'] = '0'
-    info['searchKey'] = '化学工业园'
-    info['startDate'] = '2016-07-24 00:00:00'
-    info['endDate'] = '2016-08-18 00:00:00'
+    info['cityID'] = '-1'
+    info['startDate'] = '-1'
+    info['endDate'] = '-1'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -109,6 +108,20 @@ def get_bid_list_background():
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['tokenID'] = YZTOKENID
+    info['startDate'] = '-1'
+    info['endDate'] = '-1'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+#获取招标公告列表
+def get_bid_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_bid_list/' % LOCALHOST
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
     info['startDate'] = '-1'
     info['endDate'] = '-1'
     params = {'data': json.dumps(info)}
@@ -214,6 +227,17 @@ def get_bid_detail_background():
     info = {}
     info['tokenID'] = YZTOKENID
     info['biddingID'] = '2017-03-09090748b3690e054504d3adb05fe7bf81753459'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 获取中标详情
+def get_bid_detail():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_bid_detail/' % LOCALHOST
+    info = {}
+    info['biddingID'] = '2017-03-09090752a0c0f4eb7358cf8d3654a8d2407d5865'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -404,38 +428,23 @@ def formatDic(info):
 
 
 def common():
-    data = [
-        {'bar', 10}, {'foo', 20}, {'foo', 30}
-    ]
-    groups = {}
-    for (key, value) in data:
-        if key in groups:
-            groups[key].append(value)
-        else:
-            groups[key] = [value]
-    print groups
+    numbers = [1, 2, 3]
+    my_dict = dict([(number, number * 2) for number in numbers])
+    print (my_dict)
 
-from collections import defaultdict
 def pythonic():
-    data = [
-        {'bar', 10}, {'foo', 20}, {'foo', 30}
-    ]
-    #第一种方法
-    groups = {}
-    for (key, value) in data:
-        groups.setdefault(key, []).append(value)
-    print groups
-    #第二种方法
-    groups = defaultdict(list)
-    for (key, value) in data:
-        groups[key].append(value)
-    print groups
+    numbers = [1, 2, 3]
+    my_dict = {number: number * 2 for number in numbers}
+    print my_dict
+    #还可以指定过滤条件
+    my_dict = {number: number * 2 for number in numbers if number > 1}
+    print (my_dict)
 
 
 if __name__ == '__main__':
 
-    common()
-    pythonic()
+    # common()
+    # pythonic()
 
 
     # get_company_detail_background()
@@ -446,6 +455,7 @@ if __name__ == '__main__':
 
 
     # get_bid_detail_background()
+    get_bid_detail()
     # update_bid_background()
     # delete_bid_background()
     # get_tender_detail_background()
@@ -455,6 +465,7 @@ if __name__ == '__main__':
     # search_background()
 
     # get_bid_list_background()
+    # get_bid_list()
 
     # print datetime.date.today()
 
