@@ -21,6 +21,7 @@ from models.Candidate import Candidate
 from tool.Util import Util
 from tool.config import ErrorInfo
 from sqlalchemy import func
+from favorite.FavoriteManager import FavoriteManager
 
 
 class WinBiddingManager(Util):
@@ -72,7 +73,7 @@ class WinBiddingManager(Util):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
-        if not status:
+        if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         return self.getBiddingList(jsonInfo=jsonInfo)
@@ -93,10 +94,9 @@ class WinBiddingManager(Util):
     #获取中标信息详情，后台
     def getBiddingDetailBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
-        biddingID = info['biddingID']
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
-        if not status:
+        if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         return self.getBiddingDetail(jsonInfo=jsonInfo)
@@ -114,6 +114,18 @@ class WinBiddingManager(Util):
             errorInfo = ErrorInfo['TENDER_04']
             return (False, errorInfo)
         biddingDetail = WinBiddingPub.generate(result)
+
+        if info.has_key('admin'):
+            tokenID = info['tokenID']
+            (status, userID) = self.isTokenValid(tokenID)
+            if status is not True:
+                userID = '-1'
+            info['userID'] = userID
+            (status, favorite) = FavoriteManager.doesItemFavorite(info=info)
+            if status is True:
+                biddingDetail['favorite'] = True
+            else:
+                biddingDetail['favorite'] = False
         return (True, biddingDetail)
 
     #重新生成所有中标检索
@@ -158,7 +170,7 @@ class WinBiddingManager(Util):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
-        if not status:
+        if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         (status, result) = WinBiddingPub.update(info)
@@ -170,7 +182,7 @@ class WinBiddingManager(Util):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
-        if not status:
+        if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         # (status, result) = BidSearchKey.delete(info)

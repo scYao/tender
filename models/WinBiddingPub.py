@@ -30,7 +30,7 @@ class WinBiddingPub(db.Model):
         res = {}
         res['biddingID'] = b.biddingID
         res['title'] = b.title
-        res['publishDate'] = b.publishDate
+        res['publishDate'] = str(b.publishDate)
         res['biddingNum'] = b.biddingNum
         res['detail'] = b.detail
         return res
@@ -40,7 +40,7 @@ class WinBiddingPub(db.Model):
         bidInfo = {}
         bidInfo['biddingID'] = result.biddingID
         bidInfo['title'] = result.title
-        bidInfo['publishDate'] = result.publishDate
+        bidInfo['publishDate'] = str(result.publishDate)
         bidInfo['biddingNum'] = result.biddingNum
         return bidInfo
 
