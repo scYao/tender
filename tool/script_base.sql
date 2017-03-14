@@ -22,7 +22,7 @@ create table tender(
     cityID nvarchar(100) comment '城市',
     location text comment '具体地址',
     url text comment '详情链接',
-    publicDate date comment '发布时间',
+    publishDate date comment '发布时间',
     detail mediumtext comment '详情',
     typeID nvarchar(100) comment '招标类型, type3类型',
     -- 新增字段
@@ -34,7 +34,7 @@ create table tender(
 create table searchKey(
     joinID nvarchar(100) primary key comment '关键词ID',
     searchKey text comment '关键词',
-    foreign nvarchar(100) comment '商品ID',
+    foreignID nvarchar(100) comment '外键ID',
     createTime datetime comment '创建时间',
     tag int comment '招标1, 中标 2, 企业数据库 3'
 );
@@ -47,22 +47,6 @@ create table searchKey(
 --     createTime datetime comment '创建时间',
 --     tag int comment '招标1, 中标 2, 企业数据库 3'
 -- );
-
--- 中标公告关键词库
-create table bidSearchKey(
-    joinID nvarchar(100) primary key comment '关键词ID',
-    searchKey text comment '关键词',
-    biddingID nvarchar(100) comment '中标ID',
-    createTime datetime comment '创建时间'
-);
-
--- 用户信息关键词库
-create table userInfoSearchKey(
-    joinID nvarchar(100) primary key comment '关键词ID',
-    searchKey text comment '关键词',
-    userID nvarchar(100) comment '用户ID',
-    createTime datetime comment '创建时间'
-);
 
 -- 一级分类
 create table Type1(
@@ -153,8 +137,6 @@ ALTER TABLE city CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE searchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- ALTER TABLE TenderSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE TenderSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE bidSearchKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type1 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type2 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE Type3 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -170,6 +152,4 @@ alter table tender add constraint tender_FK_city foreign key(cityID) references 
 alter table Type2 add constraint type2_FK_type1 foreign key(superTypeID) references Type1(typeID);
 alter table Type3 add constraint type3_FK_type2 foreign key(superTypeID) references Type2(typeID);
 alter table UserIP add constraint ip_FK_user foreign key(userID) references UserInfo(userID);
-alter table tenderSearchKey add constraint tenderSearchKey_FK_tender foreign key(tenderID) references tender(tenderID);
-alter table bidSearchKey add constraint bidSearchKey_FK_winbid foreign key(biddingID) references winbiddingPub(biddingID);
-alter table userInfoSearchKey add constraint userInfoSearchKey_FK_userInfo foreign key(userID) references UserInfo(userID);
+-- alter table tenderSearchKey add constraint tenderSearchKey_FK_tender foreign key(tenderID) references tender(tenderID);

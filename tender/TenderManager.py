@@ -19,9 +19,9 @@ from tool.config import ErrorInfo
 from models.Province import Province
 from models.City import City
 from models.Tender import Tender
-from models.SearchKey import SearchKey
 from models.Favorite import Favorite
-from models.TenderSearchKey import TenderSearchKey
+from models.SearchKey import SearchKey
+from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
 
 class TenderManager(Util):
     def __init__(self):
@@ -36,8 +36,12 @@ class TenderManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         info['tenderID'] = self.generateID(info['title'])
-        (status, tenderID) = Tender.create(info)
-        db.session.commit()
+            # (status, tenderID) = Tender.create(info)
+            # db.session.commit()
+        (status, tenderID) = self.createTender(jsonInfo=json.dumps(info))
+        if status is not True:
+            return (False, tenderID)
+
         return (True, tenderID)
 
     #编辑招标信息，后台
@@ -48,8 +52,16 @@ class TenderManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        (status, result) = Tender.update(info)
-        db.session.commit()
+        try:
+            (status, result) = Tender.update(info)
+            db.session.commit()
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
         return (True, None)
 
     #删除招标信息，后台
@@ -60,10 +72,19 @@ class TenderManager(Util):
         if not status:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        (status, result) = TenderSearchKey.delete(info)
-        if status:
-            (status, result) = Tender.delete(info)
-        db.session.commit()
+        try:
+            (status, result) = SearchKey.deleteSearchKey(info)
+            if status:
+                (status, result) = Tender.delete(info)
+            db.session.commit()
+
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
         return (True, None)
 
 
@@ -74,16 +95,17 @@ class TenderManager(Util):
         cityID = info['cityID']
         location = info['location']
         url = info['url']
-        publicDate = info['publicDate']
+        publishDate = info['publishDate']
         detail = info['detail']
         biddingNum = info['biddingNum']
         reviewType = info['reviewType']
+        typeID = info['typeID']
 
         tenderID = self.generateID(title)
 
         tender = Tender(tenderID=tenderID, title=title, cityID=cityID,
-                        location=location, url=url, publicDate=publicDate,
-                        detail=detail, typeID=None, biddingNum=biddingNum,
+                        location=location, url=url, publishDate=publishDate,
+                        detail=detail, typeID=typeID, biddingNum=biddingNum,
                         reviewType=reviewType)
         info['tenderID'] = tenderID
         try:
@@ -91,6 +113,7 @@ class TenderManager(Util):
             info['searchName'] = info['title']
             info['description'] = info['detail']
             info['foreignID'] = info['tenderID']
+            info['tag'] = SEARCH_KEY_TAG_TENDRE
             now = datetime.now()
 
             info['createTime'] = str(now)
@@ -98,7 +121,6 @@ class TenderManager(Util):
 
             SearchKey.createSearchInfo(info=info)
             db.session.commit()
-            return (True, None)
         except Exception as e:
             print str(e)
             # traceback.print_stack()
@@ -106,6 +128,7 @@ class TenderManager(Util):
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
+        return (True, None)
 
     def __generateTender(self, t, tag=None):
         tender = t.Tender
@@ -178,8 +201,8 @@ class TenderManager(Util):
             )
         if startDate != '-1' and endDate != '-1':
             query = query.filter(
-                Tender.publicDate < endDate
-            ).filter(Tender.publicDate > startDate)
+                Tender.publishDate < endDate
+            ).filter(Tender.publishDate > startDate)
         info['query'] = query
         return query
 
@@ -188,23 +211,24 @@ class TenderManager(Util):
         query = info['query']
         startDate = info['startDate']
         endDate = info['endDate']
-        searchKey = info['searchKey']
         cityID = info['cityID']
-        if len(searchKey) == 1:
-            searchKey = " ".join(lazy_pinyin(searchKey))
-        if searchKey != '0':
-            query = TenderSearchKey.query.whoosh_search(searchKey).outerjoin(
-                Tender, Tender.tenderID == TenderSearchKey.tenderID
-            )
+        if info.has_key('searchKey'):
+            searchKey = info['searchKey']
+            if len(searchKey) == 1:
+                searchKey = " ".join(lazy_pinyin(searchKey))
+            if searchKey != '':
+                query = SearchKey.query.whoosh_search(searchKey).outerjoin(
+                    Tender, Tender.tenderID == SearchKey.tenderID
+                )
         # 公告分类
-        if cityID != '0':
+        if cityID != '-1':
             query = query.filter(
                 Tender.cityID == info['cityID']
             )
-        if startDate != '0' and endDate != '0':
+        if startDate != '-1' and endDate != '-1':
             query = query.filter(
-                Tender.publicDate < endDate
-            ).filter(Tender.publicDate > startDate)
+                Tender.publishDate < endDate
+            ).filter(Tender.publishDate > startDate)
         info['query'] = query
         return query
 
@@ -216,20 +240,20 @@ class TenderManager(Util):
             City, City.cityID == Tender.cityID
         ).filter(
             Tender.tenderID.in_(tenderIDTuple)
-        ).order_by(desc(Tender.publicDate))
+        ).order_by(desc(Tender.publishDate))
         allResult = query.all()
-        def generateTender(result):
-            res = {}
-            tender = result.Tender
-            city = result.City
-            res['tenderID'] = tender.tenderID
-            res['title'] = tender.title
-            res['location'] = tender.location
-            res['publicDate'] = str(tender.publicDate)
-            res['cityID'] = city.cityID
-            res['cityName'] = city.cityName
-            return res
-        tenderList = [generateTender(result) for result in allResult]
+        # def generateTender(result):
+        #     res = {}
+        #     tender = result.Tender
+        #     city = result.City
+        #     res['tenderID'] = tender.tenderID
+        #     res['title'] = tender.title
+        #     res['location'] = tender.location
+        #     res['publishDate'] = str(tender.publishDate)
+        #     res['cityID'] = city.cityID
+        #     res['cityName'] = city.cityName
+        #     return res
+        tenderList = [TenderManager.generateBrief(tender=result) for result in allResult]
         return filter(None, tenderList)
 
     @staticmethod
@@ -240,20 +264,20 @@ class TenderManager(Util):
             City, City.cityID == Tender.cityID
         ).filter(
             Tender.tenderID.in_(tenderIDTuple)
-        ).order_by(desc(Tender.publicDate))
+        ).order_by(desc(Tender.publishDate))
         allResult = query.all()
-        def generateTender(result):
-            res = {}
-            tender = result.Tender
-            city = result.City
-            res['tenderID'] = tender.tenderID
-            res['title'] = tender.title
-            res['location'] = tender.location
-            res['publicDate'] = str(tender.publicDate)
-            res['cityID'] = city.cityID
-            res['cityName'] = city.cityName
-            return res
-        tenderList = [generateTender(result) for result in allResult]
+        # def generateTender(result):
+        #     res = {}
+        #     tender = result.Tender
+        #     city = result.City
+        #     res['tenderID'] = tender.tenderID
+        #     res['title'] = tender.title
+        #     res['location'] = tender.location
+        #     res['publishDate'] = str(tender.publishDate)
+        #     res['cityID'] = city.cityID
+        #     res['cityName'] = city.cityName
+        #     return res
+        tenderList = [TenderManager.generateBrief(tender=result) for result in allResult]
         return filter(None, tenderList)
 
     def getTenderDetail(self, jsonInfo):
@@ -334,10 +358,17 @@ class TenderManager(Util):
             tenderInfo['tenderID'] = result.tenderID
             tenderInfo['title'] = result.title
             tenderInfo['location'] = result.location
-            tenderInfo['publicDate'] = result.publicDate
+            tenderInfo['publishDate'] = result.publishDate
             tenderInfo['joinID'] = self.generateID(tenderInfo['tenderID'])
-            (status, addSearchInfo) = TenderSearchKey.createSearchInfo(tenderInfo)
+            tenderInfo['tag'] = SEARCH_KEY_TAG_TENDRE
+            (status, addSearchInfo) = SearchKey.createSearchInfo(tenderInfo)
         _ = [regenerateInfo(result) for result in allResult]
         db.session.commit()
         return (True, '111')
 
+    @staticmethod
+    def generateBrief(tender):
+        res = {}
+        res.update(Tender.generateBrief(tender=tender))
+        res.update(City.generate(city=tender))
+        return res

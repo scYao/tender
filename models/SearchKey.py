@@ -34,6 +34,7 @@ class SearchKey(db.Model):
         foreignID = info['foreignID']
         createTime = info['createTime']
         joinID = info['joinID']
+        tag = info['tag']
         # 添加搜索记录
         searchInfo = searchName
         # searchInfo = searchName + ',' + description
@@ -50,8 +51,17 @@ class SearchKey(db.Model):
 
         searchKey = SearchKey(
             joinID=joinID, foreignID=foreignID,
-            searchKey=searchInfo, createTime=createTime)
+            searchKey=searchInfo, createTime=createTime,
+            tag=tag)
         db.session.add(searchKey)
+        return (True, None)
+
+    @staticmethod
+    def deleteSearchKey(info):
+        foreignID = info['foreignID']
+        db.session.query(
+            SearchKey.foreignID == foreignID
+        ).delete(synchronize_session=False)
         return (True, None)
 
 # db.create_all()

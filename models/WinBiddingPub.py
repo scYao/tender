@@ -11,17 +11,17 @@ class WinBiddingPub(db.Model):
 
     biddingID = db.Column(db.String(100), primary_key=True)
     title = db.Column(db.String(100))
-    publicDate = db.Column(db.Date)
+    publishDate = db.Column(db.Date)
     biddingNum = db.Column(db.String(100))
     detail = db.Column(db.Text)
 
     delinquenentConduct = db.relationship('Candidate', backref='WinBiddingPub', lazy='dynamic')
 
-    def __init__(self, biddingID=None, title=None, publicDate=None,
+    def __init__(self, biddingID=None, title=None, publishDate=None,
                  biddingNum=None, detail=None):
         self.biddingID = biddingID
         self.title = title
-        self.publicDate = publicDate
+        self.publishDate = publishDate
         self.biddingNum = biddingNum
         self.detail = detail
 
@@ -30,7 +30,7 @@ class WinBiddingPub(db.Model):
         res = {}
         res['biddingID'] = b.biddingID
         res['title'] = b.title
-        res['publicDate'] = b.publicDate
+        res['publishDate'] = b.publishDate
         res['biddingNum'] = b.biddingNum
         res['detail'] = b.detail
         return res
@@ -40,7 +40,7 @@ class WinBiddingPub(db.Model):
         bidInfo = {}
         bidInfo['biddingID'] = result.biddingID
         bidInfo['title'] = result.title
-        bidInfo['publicDate'] = result.publicDate
+        bidInfo['publishDate'] = result.publishDate
         bidInfo['biddingNum'] = result.biddingNum
         return bidInfo
 

@@ -397,7 +397,6 @@ def get_city_list():
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        print paramsJson
         (status, jsonlist) = provinceManager.getCityList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'

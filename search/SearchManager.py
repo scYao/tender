@@ -18,9 +18,7 @@ from models.flask_app import db, cache
 from models.WinBiddingPub import WinBiddingPub
 from models.Tender import Tender
 from models.Favorite import Favorite
-from models.TenderSearchKey import TenderSearchKey
-from models.UserInfoSearchKey import UserInfoSearchKey
-from models.BidSearchKey import BidSearchKey
+from models.SearchKey import SearchKey
 from models.UserInfo import UserInfo
 from tender.TenderManager import TenderManager
 from user.UserManager import UserManager
@@ -49,12 +47,10 @@ class SearchManager(Util):
             return (False, errorInfo)
         (status, query) = self.__query(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
-        print allResult
+
         if tag == 1:
             userIDList = [result.userID for result in allResult]
-            print userIDList
             userIDTuple = tuple(userIDList)
-            print userIDTuple
             userInfoList = UserManager.getUserInfoListByIDTuple(userIDTuple)
             return (True, userInfoList)
 
@@ -73,24 +69,26 @@ class SearchManager(Util):
     def __query(self, info):
         searchKey = info['searchKey']
         tag = int(info['tag'])
-        query = ''
         if len(searchKey) == 1:
             searchKey = " ".join(lazy_pinyin(searchKey))
         if tag == 1:
-            query = UserInfoSearchKey.query.whoosh_search(
+            query = SearchKey.query.whoosh_search(
                 searchKey).outerjoin(
-                UserInfo, UserInfo.userID == UserInfoSearchKey.userID
+                UserInfo, UserInfo.userID == SearchKey.foreignID
             )
         elif tag == 2:
-            query = TenderSearchKey.query.whoosh_search(
+            query = SearchKey.query.whoosh_search(
                 searchKey).outerjoin(
-                Tender, Tender.tenderID == TenderSearchKey.tenderID
+                Tender, Tender.tenderID == SearchKey.foreignID
             )
         elif tag == 3:
-            query = BidSearchKey.query.whoosh_search(
+            query = SearchKey.query.whoosh_search(
                 searchKey).outerjoin(
-                WinBiddingPub, WinBiddingPub.biddingID == BidSearchKey.biddingID
+                WinBiddingPub, WinBiddingPub.biddingID == SearchKey.foreignID
             )
+        query.filter(
+            SearchKey.tag == tag
+        )
         return (True, query)
 
 

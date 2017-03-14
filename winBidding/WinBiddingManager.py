@@ -15,7 +15,7 @@ from datetime import datetime
 from models.flask_app import db, cache
 from models.WinBiddingPub import WinBiddingPub
 from models.Favorite import Favorite
-from models.BidSearchKey import BidSearchKey
+from models.SearchKey import SearchKey
 from models.Candidate import Candidate
 
 from tool.Util import Util
@@ -32,14 +32,14 @@ class WinBiddingManager(Util):
     def createWinBidding(self, jsonInfo):
         info = json.loads(jsonInfo)
         title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"')
-        publicDate = info['publicDate'].replace('\'', '\\\'').replace('\"', '\\\"')
+        publishDate = info['publishDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         biddingNum = info['biddingNum'].replace('\'', '\\\'').replace('\"', '\\\"')
         detail = info['detail'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         biddingID = self.generateID(biddingNum)
 
         winBidding = WinBiddingPub(biddingID=biddingID, title=title,
-                                   publicDate=publicDate, biddingNum=biddingNum,
+                                   publishDate=publishDate, biddingNum=biddingNum,
                                    detail=detail)
 
         try:
@@ -81,8 +81,8 @@ class WinBiddingManager(Util):
         # 公告分类
         if startDate != '-1' and endDate != '-1':
             query = query.filter(
-                WinBiddingPub.publicDate < endDate
-            ).filter(WinBiddingPub.publicDate > startDate)
+                WinBiddingPub.publishDate < endDate
+            ).filter(WinBiddingPub.publishDate > startDate)
         info['query'] = query
         return query
 
@@ -117,9 +117,9 @@ class WinBiddingManager(Util):
             bidInfo['biddingID'] = result.biddingID
             bidInfo['title'] = result.title
             bidInfo['biddingNum'] = result.biddingNum
-            bidInfo['publicDate'] = result.publicDate
+            bidInfo['publishDate'] = result.publishDate
             bidInfo['joinID'] = self.generateID(bidInfo['biddingID'])
-            (status, addSearchInfo) = BidSearchKey.createSearchInfo(bidInfo)
+            (status, addSearchInfo) = SearchKey.createSearchInfo(bidInfo)
         _ = [regenerateInfo(result) for result in allResult]
         db.session.commit()
         return (True, '111')
@@ -129,13 +129,13 @@ class WinBiddingManager(Util):
         query = db.session.query(
             WinBiddingPub).filter(
             WinBiddingPub.biddingID.in_(bidIDTuple)
-        ).order_by(desc(WinBiddingPub.publicDate))
+        ).order_by(desc(WinBiddingPub.publishDate))
         allResult = query.all()
         def generateBid(result):
             res = {}
             res['biddingID'] = result.biddingID
             res['title'] = result.title
-            res['publicDate'] = result.publicDate
+            res['publishDate'] = result.publishDate
             res['biddingNum'] = result.biddingNum
             return res
         tenderList = [generateBid(result) for result in allResult]
@@ -162,7 +162,7 @@ class WinBiddingManager(Util):
         if not status:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        (status, result) = BidSearchKey.delete(info)
+        # (status, result) = BidSearchKey.delete(info)
         if status:
             (status, result) = Candidate.delete(info)
             if status:
