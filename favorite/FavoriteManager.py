@@ -19,6 +19,7 @@ from datetime import datetime
 
 from tool.Util import Util
 from tool.config import ErrorInfo
+from tool.tagconfig import FAVORITE_TAG_TENDER
 
 from sqlalchemy import func
 
@@ -91,7 +92,7 @@ class FavoriteManager(Util):
         res.update(Favorite.generate(t.Favorite))
         return res
 
-    def getFavoriteList(self, jsonInfo):
+    def getFavoriteTenderList(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         tag = info['tag']
@@ -103,12 +104,13 @@ class FavoriteManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         query = ''
-        if tag == 'tender':
-            query = db.session.query(Tender, Favorite).outerjoin(
-                Favorite, Tender.tenderID == Favorite.tenderID
-            ).filter(
-                Favorite.userID == userID
-            ).offset(startIndex).limit(pageCount)
+        # if tag == FAVORITE_TAG_TENDER:
+        query = db.session.query(Tender, Favorite).outerjoin(
+            Favorite, Tender.tenderID == Favorite.tenderID
+        ).filter(
+            and_(Favorite.userID == userID,
+                 Favorite.tag == FAVORITE_TAG_TENDER)
+        ).offset(startIndex).limit(pageCount)
         allResult = query.all()
         tenderList = [self.__generate(t=t) for t in allResult]
         count = db.session.query(func.count(Favorite.favoriteID)).filter(

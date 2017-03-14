@@ -535,15 +535,15 @@ def create_admin_manager():
     return json.dumps(data)
 
 # 获取收藏列表
-@app.route('/get_favorite_list/', methods=['POST', 'GET'])
-def get_favorite_list():
+@app.route('/get_favorite_tender_list/', methods=['POST', 'GET'])
+def get_favorite_tender_list():
     favoriteManager = FavoriteManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = favoriteManager.getFavoriteList(paramsJson)
+        (status, result) = favoriteManager.getFavoriteTenderList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
