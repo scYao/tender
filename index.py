@@ -155,6 +155,21 @@ def get_bidding_list_background():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 获取中标信息列表
+@app.route('/get_bidding_list/', methods=['POST', 'GET'])
+def get_bidding_list():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBiddingList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 # 获取公司列表,后台使用
 @app.route('/get_company_list_background/', methods=['POST', 'GET'])
 def get_company_list_background():
@@ -210,6 +225,21 @@ def get_bidding_detail_background():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = winBiddingManager.getBiddingDetailBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取中标信息详情
+@app.route('/get_bidding_detail/', methods=['POST', 'GET'])
+def get_bidding_detail():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBiddingDetail(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist

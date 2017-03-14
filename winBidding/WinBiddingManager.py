@@ -54,24 +54,28 @@ class WinBiddingManager(Util):
             return (False, errorInfo)
         return (True, biddingID)
 
-    # 获取中标信息列表,后台管理
-    @cache.memoize(timeout=60 * 2)
-    def getBiddingListBackground(self, jsonInfo):
+    def getBiddingList(self, jsonInfo):
         info = json.loads(jsonInfo)
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        # tokenID = info['tokenID']
-        # (status, userID) = self.isTokenValid(tokenID)
-        # if not status:
-        #     errorInfo = ErrorInfo['TENDER_01']
-        #     return (False, errorInfo)
         # 获取tenderID列表
         query = db.session.query(WinBiddingPub)
         info['query'] = query
         query = self.__getQueryResult(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
-        bidList = [WinBiddingPub.generateBrief(result) for result in allResult]
-        return (True, bidList)
+        biddingList = [WinBiddingPub.generateBrief(result) for result in allResult]
+        return (True, biddingList)
+
+    # 获取中标信息列表,后台管理
+    @cache.memoize(timeout=60 * 2)
+    def getBiddingListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if not status:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        return self.getBiddingList(jsonInfo=jsonInfo)
 
     # 对公告进行城市,时间筛选
     def __getQueryResult(self, info):
@@ -95,6 +99,13 @@ class WinBiddingManager(Util):
         if not status:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
+        return self.getBiddingDetail(jsonInfo=jsonInfo)
+
+    #获取中标信息详情
+    def getBiddingDetail(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        biddingID = info['biddingID']
+
         result = db.session.query(WinBiddingPub
         ).filter(
             WinBiddingPub.biddingID == biddingID
@@ -102,8 +113,8 @@ class WinBiddingManager(Util):
         if result is None:
             errorInfo = ErrorInfo['TENDER_04']
             return (False, errorInfo)
-        tenderDetail = WinBiddingPub.generate(result)
-        return (True, tenderDetail)
+        biddingDetail = WinBiddingPub.generate(result)
+        return (True, biddingDetail)
 
     #重新生成所有中标检索
     def reGenerateBiddingSearchIndex(self, jsonInfo):
