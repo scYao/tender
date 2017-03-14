@@ -93,7 +93,6 @@ class FavoriteManager(Util):
 
     def getFavoriteList(self, jsonInfo):
         info = json.loads(jsonInfo)
-        print info
         tokenID = info['tokenID']
         tag = info['tag']
         (status, userID) = self.isTokenValid(tokenID)

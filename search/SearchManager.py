@@ -63,7 +63,7 @@ class SearchManager(Util):
         if tag == 3:
             bidIDList = [result.biddingID for result in allResult]
             bidIDTuple = tuple(bidIDList)
-            bidList = WinBiddingManager.getBidListByIDTuple(bidIDTuple)
+            bidList = WinBiddingManager.getBiddingListByIDTuple(bidIDTuple)
             return (True, bidList)
 
     def __query(self, info):

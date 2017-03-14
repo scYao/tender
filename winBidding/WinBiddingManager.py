@@ -56,15 +56,15 @@ class WinBiddingManager(Util):
 
     # 获取中标信息列表,后台管理
     @cache.memoize(timeout=60 * 2)
-    def getBidListBackground(self, jsonInfo):
+    def getBiddingListBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if not status:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+        # tokenID = info['tokenID']
+        # (status, userID) = self.isTokenValid(tokenID)
+        # if not status:
+        #     errorInfo = ErrorInfo['TENDER_01']
+        #     return (False, errorInfo)
         # 获取tenderID列表
         query = db.session.query(WinBiddingPub)
         info['query'] = query
@@ -87,7 +87,7 @@ class WinBiddingManager(Util):
         return query
 
     #获取中标信息详情，后台
-    def getBidDetailBackground(self, jsonInfo):
+    def getBiddingDetailBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         biddingID = info['biddingID']
         tokenID = info['tokenID']
@@ -106,7 +106,7 @@ class WinBiddingManager(Util):
         return (True, tenderDetail)
 
     #重新生成所有中标检索
-    def reGenerateBidSearchIndex(self, jsonInfo):
+    def reGenerateBiddingSearchIndex(self, jsonInfo):
         info = json.loads(jsonInfo)
         query = db.session.query(WinBiddingPub)
         allResult = query.all()
@@ -125,7 +125,7 @@ class WinBiddingManager(Util):
         return (True, '111')
 
     @staticmethod
-    def getBidListByIDTuple(bidIDTuple):
+    def getBiddingListByIDTuple(bidIDTuple):
         query = db.session.query(
             WinBiddingPub).filter(
             WinBiddingPub.biddingID.in_(bidIDTuple)
@@ -143,7 +143,7 @@ class WinBiddingManager(Util):
 
 
     # 编辑信息，后台
-    def updateBidBackground(self, jsonInfo):
+    def updateBiddingBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
@@ -155,7 +155,7 @@ class WinBiddingManager(Util):
         return (True, None)
 
     # 删除招标信息，后台
-    def deleteBidBackground(self, jsonInfo):
+    def deleteBiddingBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)

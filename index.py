@@ -141,15 +141,15 @@ def get_tender_list_background():
         return json.dumps(data)
 
 # 获取中标信息列表,后台使用
-@app.route('/get_bid_list_background/', methods=['POST', 'GET'])
-def get_bid_list_background():
+@app.route('/get_bidding_list_background/', methods=['POST', 'GET'])
+def get_bidding_list_background():
     winBiddingManager = WinBiddingManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, jsonlist) = winBiddingManager.getBidListBackground(paramsJson)
+        (status, jsonlist) = winBiddingManager.getBiddingListBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -201,15 +201,15 @@ def get_tender_detail_background():
         return json.dumps(data)
 
 # 获取中标信息详情,后台
-@app.route('/get_bid_detail_background/', methods=['POST', 'GET'])
-def get_bid_detail_background():
+@app.route('/get_bidding_detail_background/', methods=['POST', 'GET'])
+def get_bidding_detail_background():
     winBiddingManager = WinBiddingManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, jsonlist) = winBiddingManager.getBidDetailBackground(paramsJson)
+        (status, jsonlist) = winBiddingManager.getBiddingDetailBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -794,15 +794,15 @@ def re_generate_search_index():
         return json.dumps(data)
 
 # 重新生成搜索索引，中标
-@app.route('/re_generate_bid_search_index/', methods=['POST', 'GET'])
-def re_generate_bid_search_index():
+@app.route('/re_generate_bidding_search_index/', methods=['POST', 'GET'])
+def re_generate_bidding_search_index():
     winBiddingManager = WinBiddingManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, jsonlist) = winBiddingManager.reGenerateBidSearchIndex(paramsJson)
+        (status, jsonlist) = winBiddingManager.reGenerateBiddingSearchIndex(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -856,30 +856,30 @@ def search_background():
 
 
 # 编辑中标信息，后台
-@app.route('/update_bid_background/', methods=['POST', 'GET'])
-def update_bid_background():
+@app.route('/update_bidding_background/', methods=['POST', 'GET'])
+def update_bidding_background():
     winBiddingManager = WinBiddingManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, jsonlist) = winBiddingManager.updateBidBackground(paramsJson)
+        (status, jsonlist) = winBiddingManager.updateBiddingBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
         return json.dumps(data)
 
 # 删除中标信息，后台
-@app.route('/delete_bid_background/', methods=['POST', 'GET'])
-def delete_bid_background():
+@app.route('/delete_bidding_background/', methods=['POST', 'GET'])
+def delete_bidding_background():
     winBiddingManager = WinBiddingManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, jsonlist) = winBiddingManager.deleteBidBackground(paramsJson)
+        (status, jsonlist) = winBiddingManager.deleteBiddingBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
