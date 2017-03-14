@@ -253,7 +253,7 @@ class TenderManager(Util):
         #     res['cityID'] = city.cityID
         #     res['cityName'] = city.cityName
         #     return res
-        tenderList = [TenderManager.generateBrief(tender=result) for result in allResult]
+        tenderList = [TenderManager.generateBrief(t=result) for result in allResult]
         return filter(None, tenderList)
 
     @staticmethod
@@ -277,7 +277,7 @@ class TenderManager(Util):
         #     res['cityID'] = city.cityID
         #     res['cityName'] = city.cityName
         #     return res
-        tenderList = [TenderManager.generateBrief(tender=result) for result in allResult]
+        tenderList = [TenderManager.generateBrief(t=result) for result in allResult]
         return filter(None, tenderList)
 
     def getTenderDetail(self, jsonInfo):
@@ -367,8 +367,10 @@ class TenderManager(Util):
         return (True, '111')
 
     @staticmethod
-    def generateBrief(tender):
+    def generateBrief(t):
         res = {}
+        tender = t.Tender
+        city = t.City
         res.update(Tender.generateBrief(tender=tender))
-        res.update(City.generate(city=tender))
+        res.update(City.generate(city=city))
         return res
