@@ -17,11 +17,13 @@ from models.WinBiddingPub import WinBiddingPub
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from models.Candidate import Candidate
+from models.City import City
 
 from tool.Util import Util
 from tool.config import ErrorInfo
 from sqlalchemy import func
 from favorite.FavoriteManager import FavoriteManager
+from user.AdminManager import AdminManager
 
 
 class WinBiddingManager(Util):
@@ -36,12 +38,13 @@ class WinBiddingManager(Util):
         publishDate = info['publishDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         biddingNum = info['biddingNum'].replace('\'', '\\\'').replace('\"', '\\\"')
         detail = info['detail'].replace('\'', '\\\'').replace('\"', '\\\"')
+        cityID = info['cityID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         biddingID = self.generateID(biddingNum)
 
         winBidding = WinBiddingPub(biddingID=biddingID, title=title,
                                    publishDate=publishDate, biddingNum=biddingNum,
-                                   detail=detail)
+                                   detail=detail, cityID=cityID)
 
         try:
             db.session.add(winBidding)
@@ -55,27 +58,34 @@ class WinBiddingManager(Util):
             return (False, errorInfo)
         return (True, biddingID)
 
+    def __generateBrief(self, w):
+        res = {}
+        res.update(WinBiddingPub.generateBrief(result=w.WinBiddingPub))
+        res.update(City.generate(city=w.City))
+        return res
+
     def getBiddingList(self, jsonInfo):
         info = json.loads(jsonInfo)
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         # 获取tenderID列表
-        query = db.session.query(WinBiddingPub)
+        query = db.session.query(WinBiddingPub, City).outerjoin(
+            City, WinBiddingPub.cityID == City.cityID
+        )
         info['query'] = query
         query = self.__getQueryResult(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
-        biddingList = [WinBiddingPub.generateBrief(result) for result in allResult]
+        biddingList = [self.__generateBrief(w=result) for result in allResult]
         return (True, biddingList)
 
     # 获取中标信息列表,后台管理
-    @cache.memoize(timeout=60 * 2)
+    # @cache.memoize(timeout=60 * 2)
     def getBiddingListBackground(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+            return (False, reason)
         return self.getBiddingList(jsonInfo=jsonInfo)
 
     # 对公告进行城市,时间筛选
@@ -83,22 +93,27 @@ class WinBiddingManager(Util):
         query = info['query']
         startDate = info['startDate']
         endDate = info['endDate']
+        cityID = info['cityID']
         # 公告分类
         if startDate != '-1' and endDate != '-1':
             query = query.filter(
                 WinBiddingPub.publishDate < endDate
             ).filter(WinBiddingPub.publishDate > startDate)
+
+        if cityID != '-1':
+            query = query.filter(
+                WinBiddingPub.cityID == cityID
+            )
         info['query'] = query
         return query
 
     #获取中标信息详情，后台
     def getBiddingDetailBackground(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+            return (False, reason)
         return self.getBiddingDetail(jsonInfo=jsonInfo)
 
     #获取中标信息详情
@@ -168,27 +183,44 @@ class WinBiddingManager(Util):
     # 编辑信息，后台
     def updateBiddingBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
+            return (False, reason)
+        try:
+            (status, result) = WinBiddingPub.update(info)
+            db.session.commit()
+        except Exception as e:
+            # traceback.print_stack()
+            db.session.rollback()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
             return (False, errorInfo)
-        (status, result) = WinBiddingPub.update(info)
-        db.session.commit()
+
         return (True, None)
 
     # 删除招标信息，后台
     def deleteBiddingBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+            return (False, reason)
         # (status, result) = BidSearchKey.delete(info)
-        if status:
-            (status, result) = Candidate.delete(info)
-            if status:
-                (status, result) = WinBiddingPub.delete(info)
-        db.session.commit()
+        if status is True:
+            try:
+                (status, result) = Candidate.delete(info)
+                if status:
+                    (status, result) = WinBiddingPub.delete(info)
+                db.session.commit()
+            except Exception as e:
+                # traceback.print_stack()
+                db.session.rollback()
+                print e
+                errorInfo = ErrorInfo['TENDER_02']
+                errorInfo['detail'] = str(e)
+                return (False, errorInfo)
         return (True, None)

@@ -14,16 +14,18 @@ class WinBiddingPub(db.Model):
     publishDate = db.Column(db.Date)
     biddingNum = db.Column(db.String(100))
     detail = db.Column(db.Text)
+    cityID = db.Column(db.String(100), db.ForeignKey('City.cityID'))
 
     delinquenentConduct = db.relationship('Candidate', backref='WinBiddingPub', lazy='dynamic')
 
     def __init__(self, biddingID=None, title=None, publishDate=None,
-                 biddingNum=None, detail=None):
+                 biddingNum=None, detail=None, cityID=None):
         self.biddingID = biddingID
         self.title = title
         self.publishDate = publishDate
         self.biddingNum = biddingNum
         self.detail = detail
+        self.cityID = cityID
 
     @staticmethod
     def generate(b):
