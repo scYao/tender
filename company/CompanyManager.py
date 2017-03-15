@@ -20,6 +20,7 @@ from models.ImgPath import ImgPath
 from tool.Util import Util
 from tool.config import ErrorInfo
 from image.ImageManager import ImageManager
+from user.AdminManager import AdminManager
 
 from sqlalchemy import func
 
@@ -110,21 +111,29 @@ class CompanyManager(Util):
         return (True, None)
 
     # 获取公司列表,后台管理
-    @cache.memoize(timeout=60 * 2)
+    # @cache.memoize(timeout=60 * 2)
     def getCompanyListBackground(self, jsonInfo):
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        return self.getCompanyList(jsonInfo=jsonInfo)
+
+    def getCompanyList(self, jsonInfo):
         info = json.loads(jsonInfo)
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if not status:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+        # (status, userID) = self.isTokenValid(tokenID)
+        # if not status:
+        #     errorInfo = ErrorInfo['TENDER_01']
+        #     return (False, errorInfo)
         # 获取tenderID列表
         query = self.__getQueryResult(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
         companyList = [Company.generateBrief(result) for result in allResult]
         return (True, companyList)
+
 
     def __getQueryResult(self, info):
         query = db.session.query(Company)

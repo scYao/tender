@@ -185,6 +185,21 @@ def get_company_list_background():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 获取公司列表
+@app.route('/get_company_list/', methods=['POST', 'GET'])
+def get_company_list():
+    companyManager = CompanyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = companyManager.getCompanyList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 # 获取投标信息详情
 @app.route('/get_tender_detail/', methods=['POST', 'GET'])
 def get_tender_detail():

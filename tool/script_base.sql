@@ -36,7 +36,7 @@ create table searchKey(
     searchKey text comment '关键词',
     foreignID nvarchar(100) comment '外键ID',
     createTime datetime comment '创建时间',
-    tag int comment '招标1, 中标 2, 企业数据库 3'
+    tag int comment '用户1, 招标 2, 中标 3, 企业数据库 4'
 );
 
 -- 招标公告关键词库
