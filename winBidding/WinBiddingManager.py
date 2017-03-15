@@ -37,7 +37,7 @@ class WinBiddingManager(Util):
         title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"')
         publishDate = info['publishDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         biddingNum = info['biddingNum'].replace('\'', '\\\'').replace('\"', '\\\"')
-        detail = info['detail'].replace('\'', '\\\'').replace('\"', '\\\"')
+        detail = info['detail']
         cityID = info['cityID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         biddingID = self.generateID(biddingNum)
