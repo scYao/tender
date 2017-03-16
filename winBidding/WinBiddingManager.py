@@ -18,6 +18,7 @@ from models.SearchKey import SearchKey
 from models.Candidate import Candidate
 from models.City import City
 
+from tool.tagconfig import SEARCH_KEY_TAG_WIN_BIDDING
 from tool.Util import Util
 from tool.config import ErrorInfo
 from sqlalchemy import func
@@ -48,6 +49,16 @@ class WinBiddingManager(Util):
 
         try:
             db.session.add(winBidding)
+            info['searchName'] = title
+            info['description'] = detail
+            info['foreignID'] = biddingID
+            info['tag'] = SEARCH_KEY_TAG_WIN_BIDDING
+            now = datetime.now()
+
+            info['createTime'] = str(now)
+            info['joinID'] = self.generateID(info['title'])
+
+            SearchKey.createSearchInfo(info=info)
             db.session.commit()
         except Exception as e:
             # traceback.print_stack()
@@ -118,7 +129,7 @@ class WinBiddingManager(Util):
 
     def __generateBiddingDetail(self, b):
         res = {}
-        res.update(WinBiddingPub.generateBrief(result=b.WinBiddingPub))
+        res.update(WinBiddingPub.generate(b=b.WinBiddingPub))
         res.update(City.generate(city=b.City))
         return res
 

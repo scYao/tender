@@ -190,7 +190,7 @@ class TenderManager(Util):
         return (True, resultList)
 
     # 获取投标信息列表,后台管理
-    @cache.memoize(timeout=60 * 2)
+    # @cache.memoize(timeout=60 * 2)
     def getTenderListBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         startIndex = info['startIndex']

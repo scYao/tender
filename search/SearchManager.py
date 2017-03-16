@@ -1,5 +1,6 @@
 # coding=utf8
 import sys
+
 sys.path.append("..")
 import os
 reload(sys)
@@ -22,6 +23,7 @@ from models.SearchKey import SearchKey
 from models.UserInfo import UserInfo
 from tender.TenderManager import TenderManager
 from user.UserManager import UserManager
+from user.AdminManager import AdminManager
 from winBidding.WinBiddingManager import WinBiddingManager
 from tool.Util import Util
 from tool.config import ErrorInfo
@@ -36,33 +38,37 @@ class SearchManager(Util):
     # 搜索，后台，tag=1，表示用户，2,表示招标，３，表示中标
     def searchBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
-        searchKey = info['searchKey']
         tag = int(info['tag'])
-        tokenID = info['tokenID']
+        # tokenID = info['tokenID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        (status, userID) = self.isTokenValid(tokenID)
+        # (status, userID) = self.isTokenValid(tokenID)
+        # if status is not True:
+        #     errorInfo = ErrorInfo['TENDER_01']
+        #     return (False, errorInfo)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+            return (False, reason)
         (status, query) = self.__query(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
 
         if tag == 1:
-            userIDList = [result.userID for result in allResult]
+            userIDList = [result.foreignID for result in allResult]
             userIDTuple = tuple(userIDList)
             userInfoList = UserManager.getUserInfoListByIDTuple(userIDTuple)
             return (True, userInfoList)
 
         if tag == 2:
-            tenderIDList = [result.tenderID for result in allResult]
+            tenderIDList = [result.foreignID for result in allResult]
             tenderIDTuple = tuple(tenderIDList)
             tenderManager = TenderManager()
             tenderList = tenderManager.getTenderListByIDTuple(tenderIDTuple)
             return (True, tenderList)
 
         if tag == 3:
-            bidIDList = [result.biddingID for result in allResult]
+            bidIDList = [result.foreignID for result in allResult]
             bidIDTuple = tuple(bidIDList)
             bidList = WinBiddingManager.getBiddingListByIDTuple(bidIDTuple)
             return (True, bidList)
