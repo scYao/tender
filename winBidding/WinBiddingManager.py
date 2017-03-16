@@ -148,7 +148,7 @@ class WinBiddingManager(Util):
                 and_(Favorite.userID == userID,
                      Favorite.tenderID == biddingID)
             ).first()
-            if favoriteResult is None:
+            if favoriteResult is not None:
                 biddingDetail['favorite'] = True
 
 
