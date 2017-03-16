@@ -74,8 +74,8 @@ class UserManager(Util):
             UserInfo.tel == tel
         )
         result = query.first()
-        if not result:
-            errorInfo = ErrorInfo['TENDER_01']
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_10']
             return (False, errorInfo)
         # 验证登录密码正确
         password = self.getMD5String(password)
@@ -83,7 +83,7 @@ class UserManager(Util):
             and_(UserInfo.tel == tel,
                  UserInfo.password == password)
         ).first()
-        if not passwordResult:
+        if passwordResult is None:
             errorInfo = ErrorInfo['TENDER_05']
             return (False, errorInfo)
         # 生成新的Token记录

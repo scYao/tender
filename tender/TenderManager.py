@@ -4,7 +4,6 @@ import traceback
 import urllib2
 import poster
 import requests
-from sqlalchemy import desc
 
 sys.path.append("..")
 import os
@@ -22,6 +21,7 @@ from models.Tender import Tender
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
+from sqlalchemy import desc, and_
 
 class TenderManager(Util):
     def __init__(self):
@@ -87,6 +87,25 @@ class TenderManager(Util):
             return (False, errorInfo)
         return (True, None)
 
+    # 通过title判断改标段是否存在, 存在为True
+    def doesTenderExists(self, info):
+        title = info['title']
+        try:
+            result = db.session.query(Tender).filter(
+                Tender.title == title
+            ).first()
+            if result is not None:
+                return (True, result.tenderID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
 
     def createTender(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -102,6 +121,10 @@ class TenderManager(Util):
         typeID = info['typeID']
 
         tenderID = self.generateID(title)
+
+        (status, reason) = self.doesTenderExists(info=info)
+        if status is True:
+            return (False, ErrorInfo['TENDER_15'])
 
         tender = Tender(tenderID=tenderID, title=title, cityID=cityID,
                         location=location, url=url, publishDate=publishDate,
@@ -130,23 +153,23 @@ class TenderManager(Util):
             return (False, errorInfo)
         return (True, None)
 
-    def __generateTender(self, t, tag=None):
+    def __generateTender(self, t):
         tender = t.Tender
         city = t.City
 
         res = {}
         res.update(Tender.generate(tender=tender))
         res.update(City.generate(city=city))
-        # 列表中不带详情
-        if tag is not None:
-            del res['detail']
-        else:
-            # 详情中的情况
-            favorite = t.Favorite
-            if favorite is not None:
-                res['favorite'] = True
-            else:
-                res['favorite'] = False
+        # # 列表中不带详情
+        # if tag is not None:
+        #     del res['detail']
+        # else:
+        #     # 详情中的情况
+        #     favorite = t.Favorite
+        #     if favorite is not None:
+        #         res['favorite'] = True
+        #     else:
+        #         res['favorite'] = False
         return res
 
     # 获取投标信息列表
@@ -253,11 +276,10 @@ class TenderManager(Util):
         #     res['cityID'] = city.cityID
         #     res['cityName'] = city.cityName
         #     return res
-        tenderList = [TenderManager.generateBrief(t=result) for result in allResult]
+        tenderList = [self.__generateBrief(t=result) for result in allResult]
         return filter(None, tenderList)
 
-    @staticmethod
-    def getTenderListByIDTuple(tenderIDTuple):
+    def getTenderListByIDTuple(self, tenderIDTuple):
         query = db.session.query(
             Tender, City
         ).outerjoin(
@@ -277,16 +299,20 @@ class TenderManager(Util):
         #     res['cityID'] = city.cityID
         #     res['cityName'] = city.cityName
         #     return res
-        tenderList = [TenderManager.generateBrief(t=result) for result in allResult]
+        tenderList = [self.__generateBrief(t=result) for result in allResult]
         return filter(None, tenderList)
 
     def getTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
         tenderID = info['tenderID']
-        result = db.session.query(Tender, City, Favorite).outerjoin(
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        login = False
+        if status is True:
+            login = True
+
+        result = db.session.query(Tender, City).outerjoin(
             City, Tender.cityID == City.cityID
-        ).outerjoin(
-            Favorite, Tender.tenderID == Favorite.tenderID
         ).filter(
             Tender.tenderID == tenderID
         ).first()
@@ -294,6 +320,14 @@ class TenderManager(Util):
             errorInfo = ErrorInfo['TENDER_04']
             return (False, errorInfo)
         tenderDetail = self.__generateTender(t=result)
+        tenderDetail['favorite'] = False
+        if login is True:
+            favoriteResult = db.session.query(Favorite).filter(
+                and_(Favorite.userID == userID,
+                     Favorite.tenderID == tenderID)
+            ).first()
+            if favoriteResult is None:
+                tenderDetail['favorite'] = True
         return (True, tenderDetail)
 
     def getTenderDetailBackground(self, jsonInfo):
@@ -304,10 +338,8 @@ class TenderManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        result = db.session.query(Tender, City, Favorite).outerjoin(
+        result = db.session.query(Tender, City).outerjoin(
             City, Tender.cityID == City.cityID
-        ).outerjoin(
-            Favorite, Tender.tenderID == Favorite.tenderID
         ).filter(
             Tender.tenderID == tenderID
         ).first()
@@ -366,8 +398,7 @@ class TenderManager(Util):
         db.session.commit()
         return (True, '111')
 
-    @staticmethod
-    def generateBrief(t):
+    def __generateBrief(self, t):
         res = {}
         tender = t.Tender
         city = t.City

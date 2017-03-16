@@ -67,7 +67,7 @@ class FavoriteManager(Util):
     # 删除收藏
     def deleteFavorite(self, jsonInfo):
         info = json.loads(jsonInfo)
-        favoriteID = info['favoriteID']
+        tenderID = info['tenderID']
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
         if status is not True:
@@ -76,7 +76,10 @@ class FavoriteManager(Util):
 
         try:
             db.session.query(Favorite).filter(
-                Favorite.favoriteID == favoriteID
+                and_(
+                    Favorite.tenderID == tenderID,
+                    Favorite.userID == userID
+                )
             ).delete(synchronize_session=False)
             db.session.commit()
         except Exception as e:

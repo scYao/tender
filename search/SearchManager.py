@@ -57,7 +57,8 @@ class SearchManager(Util):
         if tag == 2:
             tenderIDList = [result.tenderID for result in allResult]
             tenderIDTuple = tuple(tenderIDList)
-            tenderList = TenderManager.getTenderListByIDTuple(tenderIDTuple)
+            tenderManager = TenderManager()
+            tenderList = tenderManager.getTenderListByIDTuple(tenderIDTuple)
             return (True, tenderList)
 
         if tag == 3:

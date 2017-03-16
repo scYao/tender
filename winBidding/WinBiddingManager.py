@@ -4,7 +4,6 @@ import traceback
 import urllib2
 import poster
 import requests
-from sqlalchemy import desc
 
 sys.path.append("..")
 import os
@@ -24,6 +23,7 @@ from tool.config import ErrorInfo
 from sqlalchemy import func
 from favorite.FavoriteManager import FavoriteManager
 from user.AdminManager import AdminManager
+from sqlalchemy import desc, and_
 
 
 class WinBiddingManager(Util):
@@ -116,31 +116,53 @@ class WinBiddingManager(Util):
             return (False, reason)
         return self.getBiddingDetail(jsonInfo=jsonInfo)
 
+    def __generateBiddingDetail(self, b):
+        res = {}
+        res.update(WinBiddingPub.generateBrief(result=b.WinBiddingPub))
+        res.update(City.generate(city=b.City))
+        return res
+
     #获取中标信息详情
     def getBiddingDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
         biddingID = info['biddingID']
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        login = False
+        if status is True:
+            login = True
 
-        result = db.session.query(WinBiddingPub
+        result = db.session.query(WinBiddingPub, City
+        ).outerjoin(
+            City, WinBiddingPub.cityID == City.cityID
         ).filter(
             WinBiddingPub.biddingID == biddingID
         ).first()
         if result is None:
             errorInfo = ErrorInfo['TENDER_04']
             return (False, errorInfo)
-        biddingDetail = WinBiddingPub.generate(result)
-
-        if info.has_key('admin'):
-            tokenID = info['tokenID']
-            (status, userID) = self.isTokenValid(tokenID)
-            if status is not True:
-                userID = '-1'
-            info['userID'] = userID
-            (status, favorite) = FavoriteManager.doesItemFavorite(info=info)
-            if status is True:
+        biddingDetail = self.__generateBiddingDetail(b=result)
+        biddingDetail['favorite'] = False
+        if login is True:
+            favoriteResult = db.session.query(Favorite).filter(
+                and_(Favorite.userID == userID,
+                     Favorite.tenderID == biddingID)
+            ).first()
+            if favoriteResult is None:
                 biddingDetail['favorite'] = True
-            else:
-                biddingDetail['favorite'] = False
+
+
+        # if info.has_key('admin'):
+        #     tokenID = info['tokenID']
+        #     (status, userID) = self.isTokenValid(tokenID)
+        #     if status is not True:
+        #         userID = '-1'
+        #     info['userID'] = userID
+        #     (status, favorite) = FavoriteManager.doesItemFavorite(info=info)
+        #     if status is True:
+        #         biddingDetail['favorite'] = True
+        #     else:
+        #         biddingDetail['favorite'] = False
         return (True, biddingDetail)
 
     #重新生成所有中标检索
