@@ -15,7 +15,6 @@ from datetime import datetime
 from models.flask_app import db, cache
 from models.WinBiddingPub import WinBiddingPub
 from models.Favorite import Favorite
-from models.BidSearchKey import BidSearchKey
 from models.Candidate import Candidate
 
 from tool.Util import Util

@@ -21,7 +21,6 @@ from models.City import City
 from models.Tender import Tender
 from models.SearchKey import SearchKey
 from models.Favorite import Favorite
-from models.TenderSearchKey import TenderSearchKey
 
 class TenderManager(Util):
     def __init__(self):

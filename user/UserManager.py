@@ -15,7 +15,6 @@ from models.Token import Token
 from models.SmsCode import SmsCode
 from models.UserIP import UserIP
 from models.AdminInfo import AdminInfo
-from models.UserInfoSearchKey import UserInfoSearchKey
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.StringConfig import STRING_INFO_SMS_REGISTER

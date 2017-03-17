@@ -380,11 +380,26 @@ def search_background():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/search_background/' % LOCALHOST
     info = {}
-    info['tag'] = 3
+    info['tag'] = 1
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['tokenID'] = YZTOKENID
-    info['searchKey'] = '无锡'
+    info['searchKey'] = 'jian gong'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 搜索，后台
+def search():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/search/' % LOCALHOST
+    info = {}
+    info['tag'] = 1
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = YZTOKENID
+    info['searchKey'] = 'jian gong'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -432,30 +447,61 @@ def common():
     my_dict = dict([(number, number * 2) for number in numbers])
     print (my_dict)
 
-def pythonic():
-    numbers = [1, 2, 3]
-    my_dict = {number: number * 2 for number in numbers}
-    print my_dict
-    #还可以指定过滤条件
-    my_dict = {number: number * 2 for number in numbers if number > 1}
-    print (my_dict)
+# def pythonic():
+#     numbers = [1, 2, 3]
+#     my_dict = {number: number * 2 for number in numbers}
+#     print my_dict
+#     #还可以指定过滤条件
+#     my_dict = {number: number * 2 for number in numbers if number > 1}
+#     print (my_dict)
 
+# class Fib:
+#
+#     def __init__(self, n):
+#         self.prev = 0
+#         self.cur = 1
+#         self.n = n
+#
+#     def __iter__(self):
+#         return self
+#
+#     def next(self):
+#         if self.n > 0:
+#             value = self.cur
+#             self.cur = self.cur + self.prev
+#             self.prev = value
+#             self.n = self.n - 1
+#             return value
+#         else:
+#             raise StopIteration()
+#
+# def fun(n):
+#     yield n*2
+
+# def fib(n):
+#     prev, curr = 0, 1
+#     while n > 0:
+#         n = n - 1
+#         yield curr
+#         prev, curr = curr, curr + prev
 
 if __name__ == '__main__':
 
+    assert 1 in [0, 2, 3], 'test assert error'
+
+
+
+
+    #
+    # f = Fib(10)
+    # print ([i for i in f])
+
     # common()
     # pythonic()
-
-
     # get_company_detail_background()
     # get_company_list_background()
-
-
-
-
-
     # get_bid_detail_background()
-    get_bid_detail()
+    # get_bid_detail()
     # update_bid_background()
     # delete_bid_background()
     # get_tender_detail_background()
@@ -463,22 +509,15 @@ if __name__ == '__main__':
     # update_tender_background()
     # re_generate_bid_search_index()
     # search_background()
-
+    # search()
     # get_bid_list_background()
     # get_bid_list()
-
     # print datetime.date.today()
-
-
-
-
-
     # get_user_info_detail_background()
     # get_user_list_background()
     # get_tender_list_background()
     # administrator_login_background()
     # create_admin_manager()
-
     # register()
     # sendSmsCode()
     # logIn()

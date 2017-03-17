@@ -887,6 +887,20 @@ def search_background():
         data['data'] = result
         return json.dumps(data)
 
+# 搜索
+@app.route('/search/', methods=['POST', 'GET'])
+def search():
+    searchManager = SearchManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = searchManager.search(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
 
 # 编辑中标信息，后台
 @app.route('/update_bid_background/', methods=['POST', 'GET'])
