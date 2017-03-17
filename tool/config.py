@@ -80,6 +80,19 @@ ErrorInfo['TENDER_13'] = {
     'zhInfo' : '用户名或密码错误!'
 }
 
+ErrorInfo['TENDER_14'] = {
+    'code' : 'TENDER_14',
+    'info' : 'admin auth error!',
+    'zhInfo' : '管理员身份验证错误!'
+}
+
+ErrorInfo['TENDER_15'] = {
+    'code' : 'TENDER_15',
+    'info' : 'tender already exists!',
+    'zhInfo' : '该标段已存在!'
+}
+
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
@@ -90,8 +103,8 @@ NG9zpgmLCUYuLkxpLQIDAQAB\n
 -----END PUBLIC KEY-----'''
 
 
-# WHOOSH_BASE =  '../../smartsearchData/'
-WHOOSH_BASE =  '/home/yz/work/tenderSearchKey/'
+WHOOSH_BASE = '../../smartsearchData/'
+# WHOOSH_BASE = '/home/yz/work/tenderSearchKey/'
 # WHOOSH_BASE = '/opt/smartsearchData/'
 # WHOOSH_BASE = '/Users/zhushijie/Documents/Server/smartsearchData/'
 
