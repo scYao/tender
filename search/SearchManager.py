@@ -52,26 +52,31 @@ class SearchManager(Util):
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
-        (status, query) = self.__query(info)
-        allResult = query.offset(startIndex).limit(pageCount).all()
+        (status, foreignIDTuple) = self.__query(info)
+        # allResult = query.offset(startIndex).limit(pageCount).all()
+        params = {}
+        params['foreignIDTuple'] = foreignIDTuple
+        params['startIndex'] = startIndex
+        params['pageCount'] = pageCount
+
 
         if tag == 1:
-            userIDList = [result.foreignID for result in allResult]
-            userIDTuple = tuple(userIDList)
-            userInfoList = UserManager.getUserInfoListByIDTuple(userIDTuple)
+            # userIDList = [result.foreignID for result in allResult]
+            # userIDTuple = tuple(userIDList)
+            userInfoList = UserManager.getUserInfoListByIDTuple(info=params)
             return (True, userInfoList)
 
         if tag == 2:
-            tenderIDList = [result.foreignID for result in allResult]
-            tenderIDTuple = tuple(tenderIDList)
+            # tenderIDList = [result.foreignID for result in allResult]
+            # tenderIDTuple = tuple(tenderIDList)
             tenderManager = TenderManager()
-            tenderList = tenderManager.getTenderListByIDTuple(tenderIDTuple)
+            tenderList = tenderManager.getTenderListByIDTuple(info=params)
             return (True, tenderList)
 
         if tag == 3:
-            bidIDList = [result.foreignID for result in allResult]
-            bidIDTuple = tuple(bidIDList)
-            bidList = WinBiddingManager.getBiddingListByIDTuple(bidIDTuple)
+            # bidIDList = [result.foreignID for result in allResult]
+            # bidIDTuple = tuple(bidIDList)
+            bidList = WinBiddingManager.getBiddingListByIDTuple(info=params)
             return (True, bidList)
 
     def __query(self, info):
@@ -83,25 +88,34 @@ class SearchManager(Util):
 
         if len(searchKey) == 1:
             searchKey = " ".join(lazy_pinyin(searchKey))
-        if tag == 1:
-            query = SearchKey.query.whoosh_search(
-                searchKey).outerjoin(
-                UserInfo, UserInfo.userID == SearchKey.foreignID
-            )
-        elif tag == 2:
-            query = SearchKey.query.whoosh_search(
-                searchKey).outerjoin(
-                Tender, Tender.tenderID == SearchKey.foreignID
-            )
-        elif tag == 3:
-            query = SearchKey.query.whoosh_search(
-                searchKey).outerjoin(
-                WinBiddingPub, WinBiddingPub.biddingID == SearchKey.foreignID
-            )
-        query.filter(
+
+        searchResult = SearchKey.query.whoosh_search(
+                searchKey).filter(
             SearchKey.tag == tag
-        )
-        return (True, query)
+        ).all()
+        foreignIDTuple = (s.foreignID for s in searchResult)
+        return (True, foreignIDTuple)
+
+        # if tag == 1:
+        #     query = SearchKey.query.whoosh_search(
+        #         searchKey).outerjoin(
+        #         UserInfo, UserInfo.userID == SearchKey.foreignID
+        #     )
+        #
+        # elif tag == 2:
+        #     query = SearchKey.query.whoosh_search(
+        #         searchKey).outerjoin(
+        #         Tender, Tender.tenderID == SearchKey.foreignID
+        #     )
+        # elif tag == 3:
+        #     query = SearchKey.query.whoosh_search(
+        #         searchKey).outerjoin(
+        #         WinBiddingPub, WinBiddingPub.biddingID == SearchKey.foreignID
+        #     )
+        # query.filter(
+        #     SearchKey.tag == tag
+        # )
+        # return (True, query)
 
 
     # 对公告进行城市,时间筛选

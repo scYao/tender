@@ -4,7 +4,6 @@ import traceback
 import urllib2
 import poster
 import requests
-from sqlalchemy import desc
 
 sys.path.append("..")
 import os
@@ -12,8 +11,11 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
+from pypinyin import lazy_pinyin
+from sqlalchemy import desc
 from models.flask_app import db
 from models.ProjectManager import ProjectManager
+from models.SearchKey import SearchKey
 
 from tool.Util import Util
 from tool.config import ErrorInfo
@@ -56,3 +58,19 @@ class PMManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, managerID)
+
+    def getProjectManagerList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        companyID = info['companyID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+
+        query = db.session.query(ProjectManager)
+        if info.has_key('searchKey'):
+            searchKey = info['searchKey']
+            if len(searchKey) == 1:
+                searchKey = " ".join(lazy_pinyin(searchKey))
+            if searchKey != '':
+                query = SearchKey.query.whoosh_search(searchKey).outerjoin(
+                    ProjectManager, ProjectManager.managerID == SearchKey.tenderID
+                )

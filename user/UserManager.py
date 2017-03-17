@@ -356,7 +356,6 @@ class UserManager(Util):
     # 找回密码接口, 校验验证码
     def findPasswordWithSmsCode(self, jsonInfo):
         info = json.loads(jsonInfo)
-        print info
         tel = info['tel']
         password = info['password']
         password = self.getMD5String(password)
@@ -371,10 +370,13 @@ class UserManager(Util):
         return (True, None)
 
     @staticmethod
-    def getUserInfoListByIDTuple(userIDTuple):
+    def getUserInfoListByIDTuple(info):
+        foreignIDTuple = info['foreignIDTuple']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
         query = db.session.query(UserInfo).filter(
-            UserInfo.userID.in_(userIDTuple)
-        ).order_by(desc(UserInfo.createTime))
+            UserInfo.userID.in_(foreignIDTuple)
+        ).order_by(desc(UserInfo.createTime)).offset(startIndex).limit(pageCount)
         allResult = query.all()
         userInfoList = [UserInfo.generate(result) for result in allResult]
         return filter(None, userInfoList)
