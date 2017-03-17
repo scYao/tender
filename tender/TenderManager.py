@@ -387,12 +387,13 @@ class TenderManager(Util):
         # 生成搜索记录
         def regenerateInfo(result):
             tenderInfo = {}
-            tenderInfo['tenderID'] = result.tenderID
-            tenderInfo['title'] = result.title
+            tenderInfo['foreignID'] = result.tenderID
+            tenderInfo['searchName'] = result.title
             tenderInfo['location'] = result.location
             tenderInfo['publishDate'] = result.publishDate
-            tenderInfo['joinID'] = self.generateID(tenderInfo['tenderID'])
+            tenderInfo['joinID'] = self.generateID(result.tenderID)
             tenderInfo['tag'] = SEARCH_KEY_TAG_TENDRE
+            tenderInfo['createTime'] = datetime.now()
             (status, addSearchInfo) = SearchKey.createSearchInfo(tenderInfo)
         _ = [regenerateInfo(result) for result in allResult]
         db.session.commit()

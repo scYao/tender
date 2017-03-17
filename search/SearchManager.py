@@ -8,6 +8,7 @@ sys.setdefaultencoding('utf-8')
 import traceback
 import urllib2
 import poster
+import jieba
 import requests
 from sqlalchemy import desc
 
@@ -76,6 +77,10 @@ class SearchManager(Util):
     def __query(self, info):
         searchKey = info['searchKey']
         tag = int(info['tag'])
+
+        fenciList = jieba.cut_for_search(searchKey)
+        searchKey = ' '.join(fenciList)
+
         if len(searchKey) == 1:
             searchKey = " ".join(lazy_pinyin(searchKey))
         if tag == 1:

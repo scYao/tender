@@ -393,6 +393,25 @@ def delete_tender_background():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 创建tender
+def create_tender():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/create_tender/' % LOCALHOST
+    info = {}
+    info['title'] = '2016年零星工程无锡高新区C区B74-A地块淤泥整治'
+    info['cityID'] = '64'
+    info['location'] = ''
+    info['url'] = ''
+    info['publishDate'] = str(datetime.datetime.now())
+    info['detail'] = ''
+    info['biddingNum'] = ''
+    info['reviewType'] = ''
+    info['typeID'] = 1
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
 
 
 def formatDic(info):
@@ -433,9 +452,10 @@ def pythonic():
 
 
 if __name__ == '__main__':
+    create_tender()
 
-    common()
-    pythonic()
+    # common()
+    # pythonic()
 
 
     # get_company_detail_background()
