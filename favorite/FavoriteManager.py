@@ -90,10 +90,16 @@ class FavoriteManager(Util):
             return (False, errorInfo)
         return (True, None)
 
-    def __generate(self, t):
+    def __generateTender(self, t):
         res = {}
-        res.update(Tender.generateBrief(t.Tender))
-        res.update(Favorite.generate(t.Favorite))
+        res.update(Tender.generateBrief(tender=t.Tender))
+        res.update(Favorite.generate(f=t.Favorite))
+        return res
+
+    def __generateBidding(self, b):
+        res = {}
+        res.update(WinBiddingPub.generateBrief(result=b.WinBiddingPub))
+        res.update(Favorite.generate(f=b.Favorite))
         return res
 
     def getFavoriteTenderList(self, jsonInfo):
@@ -115,7 +121,7 @@ class FavoriteManager(Util):
                      Favorite.tag == FAVORITE_TAG_TENDER)
             ).offset(startIndex).limit(pageCount)
             allResult = query.all()
-            tenderList = [self.__generate(t=t) for t in allResult]
+            tenderList = [self.__generateTender(t=t) for t in allResult]
             count = db.session.query(func.count(Favorite.favoriteID)).filter(
                 and_(Favorite.userID == userID,
                      Favorite.tag == FAVORITE_TAG_TENDER)
@@ -154,7 +160,7 @@ class FavoriteManager(Util):
                      Favorite.tag == FAVORITE_TAG_WIN_BIDDING)
             ).offset(startIndex).limit(pageCount)
             allResult = query.all()
-            biddingList = [self.__generate(t=t) for t in allResult]
+            biddingList = [self.__generateBidding(b=b) for b in allResult]
             count = db.session.query(func.count(Favorite.favoriteID)).filter(
                 and_(Favorite.userID == userID,
                      Favorite.tag == FAVORITE_TAG_WIN_BIDDING)

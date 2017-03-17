@@ -12,7 +12,7 @@ sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
 from pypinyin import lazy_pinyin
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from models.flask_app import db
 from models.ProjectManager import ProjectManager
 from models.SearchKey import SearchKey
@@ -59,18 +59,28 @@ class PMManager(Util):
             return (False, errorInfo)
         return (True, managerID)
 
-    def getProjectManagerList(self, jsonInfo):
+    def getProjectManagerListBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         companyID = info['companyID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
 
-        query = db.session.query(ProjectManager)
-        if info.has_key('searchKey'):
-            searchKey = info['searchKey']
-            if len(searchKey) == 1:
-                searchKey = " ".join(lazy_pinyin(searchKey))
-            if searchKey != '':
-                query = SearchKey.query.whoosh_search(searchKey).outerjoin(
-                    ProjectManager, ProjectManager.managerID == SearchKey.tenderID
-                )
+        try:
+            managerResult = {}
+            allResult = db.session.query(ProjectManager).filter(
+                ProjectManager.companyID == companyID
+            ).offset(startIndex).limit(pageCount).all()
+            managerList = [ProjectManager.generate(c=p) for p in allResult]
+            managerResult['managerList'] = managerList
+            count = db.session.query(func.count(ProjectManager.managerID)).filter(
+                ProjectManager.companyID == companyID
+            ).first()
+            managerResult['count'] = count
+
+        except Exception as e:
+            db.session.rollback()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+        return (True, managerResult)
