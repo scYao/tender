@@ -15,10 +15,12 @@ from sqlalchemy import and_
 from models.flask_app import db
 from models.Favorite import Favorite
 from models.Tender import Tender
+from models.WinBiddingPub import WinBiddingPub
 from datetime import datetime
 
 from tool.Util import Util
 from tool.config import ErrorInfo
+from tool.tagconfig import FAVORITE_TAG_TENDER, FAVORITE_TAG_WIN_BIDDING
 
 from sqlalchemy import func
 
@@ -65,7 +67,7 @@ class FavoriteManager(Util):
     # 删除收藏
     def deleteFavorite(self, jsonInfo):
         info = json.loads(jsonInfo)
-        favoriteID = info['favoriteID']
+        tenderID = info['tenderID']
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
         if status is not True:
@@ -74,7 +76,10 @@ class FavoriteManager(Util):
 
         try:
             db.session.query(Favorite).filter(
-                Favorite.favoriteID == favoriteID
+                and_(
+                    Favorite.tenderID == tenderID,
+                    Favorite.userID == userID
+                )
             ).delete(synchronize_session=False)
             db.session.commit()
         except Exception as e:
@@ -91,11 +96,9 @@ class FavoriteManager(Util):
         res.update(Favorite.generate(t.Favorite))
         return res
 
-    def getFavoriteList(self, jsonInfo):
+    def getFavoriteTenderList(self, jsonInfo):
         info = json.loads(jsonInfo)
-        print info
         tokenID = info['tokenID']
-        tag = info['tag']
         (status, userID) = self.isTokenValid(tokenID)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
@@ -103,18 +106,25 @@ class FavoriteManager(Util):
 
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        query = ''
-        if tag == 'tender':
+        # if tag == FAVORITE_TAG_TENDER:
+        try:
             query = db.session.query(Tender, Favorite).outerjoin(
                 Favorite, Tender.tenderID == Favorite.tenderID
             ).filter(
-                Favorite.userID == userID
+                and_(Favorite.userID == userID,
+                     Favorite.tag == FAVORITE_TAG_TENDER)
             ).offset(startIndex).limit(pageCount)
-        allResult = query.all()
-        tenderList = [self.__generate(t=t) for t in allResult]
-        count = db.session.query(func.count(Favorite.favoriteID)).filter(
-            Favorite.userID == userID
-        ).first()
+            allResult = query.all()
+            tenderList = [self.__generate(t=t) for t in allResult]
+            count = db.session.query(func.count(Favorite.favoriteID)).filter(
+                Favorite.userID == userID
+            ).first()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
         if count is None:
             count = 0
@@ -123,3 +133,65 @@ class FavoriteManager(Util):
         result['tenderList'] = tenderList
         result['count'] = count
         return (True, result)
+
+    def getFavoriteWinBiddingList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        # if tag == FAVORITE_TAG_TENDER:
+        try:
+            query = db.session.query(WinBiddingPub, Favorite).outerjoin(
+                Favorite, WinBiddingPub.biddingID == Favorite.tenderID
+            ).filter(
+                and_(Favorite.userID == userID,
+                     Favorite.tag == FAVORITE_TAG_WIN_BIDDING)
+            ).offset(startIndex).limit(pageCount)
+            allResult = query.all()
+            biddingList = [self.__generate(t=t) for t in allResult]
+            count = db.session.query(func.count(Favorite.favoriteID)).filter(
+                Favorite.userID == userID
+            ).first()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+        if count is None:
+            count = 0
+
+        result = {}
+        result['biddingList'] = biddingList
+        result['count'] = count
+        return (True, result)
+
+    # 判断招标或中标是否被收藏
+    @staticmethod
+    def doesItemFavorite(info):
+        itemID = info['item']
+        userID = info['userID']
+
+        try:
+            result = db.session.query(Favorite).filter(
+                and_(
+                    Favorite.userID == userID,
+                    Favorite.tenderID == itemID
+                )
+            ).first()
+            if result is None:
+                return (False, None)
+            else:
+                return (True, result.favoriteID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

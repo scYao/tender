@@ -28,7 +28,6 @@ class ImgPath(db.Model):
         res['imgPathID'] = img.imgPathID
         ossInfo['objectKey'] = '%s/%s@!constrain-300h' % (directory, img.path)
         util = Util()
-        print ossInfo
         res['imgPath'] = util.getSecurityUrl(ossInfo)
         res['tag'] = img.tag
         return res

@@ -76,9 +76,10 @@ def getTenderList():
     info = {}
     info['startIndex'] = 0
     info['pageCount'] = 10
-    info['cityID'] = '-1'
-    info['startDate'] = '-1'
-    info['endDate'] = '-1'
+    info['cityID'] = '0'
+    info['searchKey'] = '化学工业园'
+    info['startDate'] = '2016-07-24 00:00:00'
+    info['endDate'] = '2016-08-18 00:00:00'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -108,20 +109,6 @@ def get_bid_list_background():
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['tokenID'] = YZTOKENID
-    info['startDate'] = '-1'
-    info['endDate'] = '-1'
-    params = {'data': json.dumps(info)}
-    resultManager = ResultManager()
-    result = resultManager.getResult(params, upload_url)
-    print result
-
-#获取招标公告列表
-def get_bid_list():
-    opener = poster.streaminghttp.register_openers()
-    upload_url = 'http://%s:5007/get_bid_list/' % LOCALHOST
-    info = {}
-    info['startIndex'] = 0
-    info['pageCount'] = 10
     info['startDate'] = '-1'
     info['endDate'] = '-1'
     params = {'data': json.dumps(info)}
@@ -227,17 +214,6 @@ def get_bid_detail_background():
     info = {}
     info['tokenID'] = YZTOKENID
     info['biddingID'] = '2017-03-09090748b3690e054504d3adb05fe7bf81753459'
-    params = {'data': json.dumps(info)}
-    resultManager = ResultManager()
-    result = resultManager.getResult(params, upload_url)
-    print result
-
-# 获取中标详情
-def get_bid_detail():
-    opener = poster.streaminghttp.register_openers()
-    upload_url = 'http://%s:5007/get_bid_detail/' % LOCALHOST
-    info = {}
-    info['biddingID'] = '2017-03-09090752a0c0f4eb7358cf8d3654a8d2407d5865'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -380,26 +356,11 @@ def search_background():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/search_background/' % LOCALHOST
     info = {}
-    info['tag'] = 1
+    info['tag'] = 3
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['tokenID'] = YZTOKENID
-    info['searchKey'] = 'jian gong'
-    params = {'data': json.dumps(info)}
-    resultManager = ResultManager()
-    result = resultManager.getResult(params, upload_url)
-    print result
-
-# 搜索，后台
-def search():
-    opener = poster.streaminghttp.register_openers()
-    upload_url = 'http://%s:5007/search/' % LOCALHOST
-    info = {}
-    info['tag'] = 1
-    info['startIndex'] = 0
-    info['pageCount'] = 10
-    info['tokenID'] = YZTOKENID
-    info['searchKey'] = 'jian gong'
+    info['searchKey'] = '无锡'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -432,6 +393,25 @@ def delete_tender_background():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 创建tender
+def create_tender():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/create_tender/' % LOCALHOST
+    info = {}
+    info['title'] = '2016年零星工程无锡高新区C区B74-A地块淤泥整治'
+    info['cityID'] = '64'
+    info['location'] = ''
+    info['url'] = ''
+    info['publishDate'] = str(datetime.datetime.now())
+    info['detail'] = ''
+    info['biddingNum'] = ''
+    info['reviewType'] = ''
+    info['typeID'] = 1
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
 
 
 def formatDic(info):
@@ -443,65 +423,49 @@ def formatDic(info):
 
 
 def common():
-    numbers = [1, 2, 3]
-    my_dict = dict([(number, number * 2) for number in numbers])
-    print (my_dict)
+    data = [
+        {'bar', 10}, {'foo', 20}, {'foo', 30}
+    ]
+    groups = {}
+    for (key, value) in data:
+        if key in groups:
+            groups[key].append(value)
+        else:
+            groups[key] = [value]
+    print groups
 
-# def pythonic():
-#     numbers = [1, 2, 3]
-#     my_dict = {number: number * 2 for number in numbers}
-#     print my_dict
-#     #还可以指定过滤条件
-#     my_dict = {number: number * 2 for number in numbers if number > 1}
-#     print (my_dict)
+from collections import defaultdict
+def pythonic():
+    data = [
+        {'bar', 10}, {'foo', 20}, {'foo', 30}
+    ]
+    #第一种方法
+    groups = {}
+    for (key, value) in data:
+        groups.setdefault(key, []).append(value)
+    print groups
+    #第二种方法
+    groups = defaultdict(list)
+    for (key, value) in data:
+        groups[key].append(value)
+    print groups
 
-# class Fib:
-#
-#     def __init__(self, n):
-#         self.prev = 0
-#         self.cur = 1
-#         self.n = n
-#
-#     def __iter__(self):
-#         return self
-#
-#     def next(self):
-#         if self.n > 0:
-#             value = self.cur
-#             self.cur = self.cur + self.prev
-#             self.prev = value
-#             self.n = self.n - 1
-#             return value
-#         else:
-#             raise StopIteration()
-#
-# def fun(n):
-#     yield n*2
-
-# def fib(n):
-#     prev, curr = 0, 1
-#     while n > 0:
-#         n = n - 1
-#         yield curr
-#         prev, curr = curr, curr + prev
 
 if __name__ == '__main__':
-
-    assert 1 in [0, 2, 3], 'test assert error'
-
-
-
-
-    #
-    # f = Fib(10)
-    # print ([i for i in f])
+    create_tender()
 
     # common()
     # pythonic()
+
+
     # get_company_detail_background()
     # get_company_list_background()
+
+
+
+
+
     # get_bid_detail_background()
-    # get_bid_detail()
     # update_bid_background()
     # delete_bid_background()
     # get_tender_detail_background()
@@ -509,15 +473,21 @@ if __name__ == '__main__':
     # update_tender_background()
     # re_generate_bid_search_index()
     # search_background()
-    # search()
+
     # get_bid_list_background()
-    # get_bid_list()
+
     # print datetime.date.today()
+
+
+
+
+
     # get_user_info_detail_background()
     # get_user_list_background()
     # get_tender_list_background()
     # administrator_login_background()
     # create_admin_manager()
+
     # register()
     # sendSmsCode()
     # logIn()

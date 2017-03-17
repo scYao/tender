@@ -13,21 +13,21 @@ class Tender(db.Model):
     cityID = db.Column(db.String(100), db.ForeignKey('City.cityID'))
     location = db.Column(db.String(100))
     url = db.Column(db.String(100))
-    publicDate = db.Column(db.Date)
+    publishDate = db.Column(db.Date)
     detail = db.Column(db.Text)
     typeID = db.Column(db.String(100))
     biddingNum = db.Column(db.String(100))
     reviewType = db.Column(db.String(100))
 
     def __init__(self, tenderID=None, title=None, cityID=None, location=None,
-                 url=None, publicDate=None, detail=None, typeID=None, biddingNum=None,
+                 url=None, publishDate=None, detail=None, typeID=None, biddingNum=None,
                  reviewType=None):
         self.tenderID = tenderID
         self.title = title
         self.cityID = cityID
         self.location = location
         self.url = url
-        self.publicDate = publicDate
+        self.publishDate = publishDate
         self.detail = detail
         self.typeID = typeID
         self.biddingNum = biddingNum
@@ -38,7 +38,7 @@ class Tender(db.Model):
         tender = Tender(
             tenderID=createInfo['tenderID'], title=createInfo['title'],
             cityID=createInfo['cityID'], location=createInfo['location'],
-            url=createInfo['url'], publicDate=createInfo['publicDate'],
+            url=createInfo['url'], publishDate=createInfo['publishDate'],
             detail=createInfo['detail'], typeID=createInfo['typeID']
         )
         db.session.add(tender)
@@ -52,7 +52,7 @@ class Tender(db.Model):
         res['title'] = tender.title
         res['location'] = tender.location
         res['url'] = tender.url
-        res['publicDate'] = str(tender.publicDate)
+        res['publishDate'] = str(tender.publishDate)
         res['detail'] = tender.detail
         res['biddingNum'] = tender.biddingNum
         res['reviewType'] = tender.reviewType
@@ -65,20 +65,20 @@ class Tender(db.Model):
         res['title'] = tender.title
         res['location'] = tender.location
         res['url'] = tender.url
-        res['publicDate'] = str(tender.publicDate)
+        res['publishDate'] = str(tender.publishDate)
         return res
 
     @staticmethod
     def update(tenderInfo):
         tenderID = tenderInfo['tenderID']
         updateInfo = {
-            Tender.title: tenderInfo['title'],
-            Tender.location: tenderInfo['location'],
-            Tender.url: tenderInfo['url']
+            Tender.title : tenderInfo['title'],
+            Tender.location : tenderInfo['location'],
+            Tender.url : tenderInfo['url']
         }
         db.session.query(Tender).filter(
             Tender.tenderID == tenderID).update(
-            updateInfo, synchronize_session = False
+            updateInfo, synchronize_session=False
         )
         return (True, None)
 
@@ -87,7 +87,7 @@ class Tender(db.Model):
         tenderID = tenderInfo['tenderID']
         db.session.query(Tender).filter(
             Tender.tenderID == tenderID).delete(
-            synchronize_session = False
+            synchronize_session=False
         )
         return (True, None)
 

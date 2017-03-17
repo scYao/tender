@@ -86,7 +86,7 @@ class AdminManager(Util):
         # 该userID是否是管理员
         result = db.session.query(AdminInfo).filter(AdminInfo.adminID==userID).first()
         if result is None:
-            errorInfo = ErrorInfo['SPORTS_10']
+            errorInfo = ErrorInfo['TENDER_14']
             errorInfo['detail'] = result
             return (False, errorInfo)
 

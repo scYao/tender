@@ -1,5 +1,6 @@
 # coding=utf8
 import sys
+
 sys.path.append("..")
 import os
 reload(sys)
@@ -7,6 +8,7 @@ sys.setdefaultencoding('utf-8')
 import traceback
 import urllib2
 import poster
+import jieba
 import requests
 from sqlalchemy import desc
 
@@ -18,60 +20,41 @@ from models.flask_app import db, cache
 from models.WinBiddingPub import WinBiddingPub
 from models.Tender import Tender
 from models.Favorite import Favorite
-from models.UserInfo import UserInfo
 from models.SearchKey import SearchKey
+from models.UserInfo import UserInfo
 from tender.TenderManager import TenderManager
 from user.UserManager import UserManager
+from user.AdminManager import AdminManager
 from winBidding.WinBiddingManager import WinBiddingManager
 from tool.Util import Util
 from tool.config import ErrorInfo
 from sqlalchemy import func
+
 
 class SearchManager(Util):
 
     def __init__(self):
         pass
 
-    # 搜索，tag=1，表示用户，2,表示招标，３，表示中标
-    def search(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        tag = int(info['tag'])
-        startIndex = info['startIndex']
-        pageCount = info['pageCount']
-        (status, query) = self.__query(info)
-        allResult = query.offset(startIndex).limit(pageCount).all()
-        if tag == 1:
-            userIDList = [result.foreignID for result in allResult]
-            userIDTuple = tuple(userIDList)
-            userInfoList = UserManager.getUserInfoListByIDTuple(userIDTuple)
-            return (True, userInfoList)
-
-        if tag == 2:
-            tenderIDList = [result.foreignID for result in allResult]
-            tenderIDTuple = tuple(tenderIDList)
-            tenderList = TenderManager.getTenderListByIDTuple(tenderIDTuple)
-            return (True, tenderList)
-
-        if tag == 3:
-            bidIDList = [result.foreignID for result in allResult]
-            bidIDTuple = tuple(bidIDList)
-            bidList = WinBiddingManager.getBidListByIDTuple(bidIDTuple)
-            return (True, bidList)
-
     # 搜索，后台，tag=1，表示用户，2,表示招标，３，表示中标
     def searchBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
-        searchKey = info['searchKey']
         tag = int(info['tag'])
-        tokenID = info['tokenID']
+        # tokenID = info['tokenID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        (status, userID) = self.isTokenValid(tokenID)
+        # (status, userID) = self.isTokenValid(tokenID)
+        # if status is not True:
+        #     errorInfo = ErrorInfo['TENDER_01']
+        #     return (False, errorInfo)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+            return (False, reason)
         (status, query) = self.__query(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
+
         if tag == 1:
             userIDList = [result.foreignID for result in allResult]
             userIDTuple = tuple(userIDList)
@@ -81,23 +64,43 @@ class SearchManager(Util):
         if tag == 2:
             tenderIDList = [result.foreignID for result in allResult]
             tenderIDTuple = tuple(tenderIDList)
-            tenderList = TenderManager.getTenderListByIDTuple(tenderIDTuple)
+            tenderManager = TenderManager()
+            tenderList = tenderManager.getTenderListByIDTuple(tenderIDTuple)
             return (True, tenderList)
 
         if tag == 3:
             bidIDList = [result.foreignID for result in allResult]
             bidIDTuple = tuple(bidIDList)
-            bidList = WinBiddingManager.getBidListByIDTuple(bidIDTuple)
+            bidList = WinBiddingManager.getBiddingListByIDTuple(bidIDTuple)
             return (True, bidList)
 
     def __query(self, info):
         searchKey = info['searchKey']
         tag = int(info['tag'])
+
+        fenciList = jieba.cut_for_search(searchKey)
+        searchKey = ' '.join(fenciList)
+
         if len(searchKey) == 1:
             searchKey = " ".join(lazy_pinyin(searchKey))
-        query = SearchKey.query.filter(
+        if tag == 1:
+            query = SearchKey.query.whoosh_search(
+                searchKey).outerjoin(
+                UserInfo, UserInfo.userID == SearchKey.foreignID
+            )
+        elif tag == 2:
+            query = SearchKey.query.whoosh_search(
+                searchKey).outerjoin(
+                Tender, Tender.tenderID == SearchKey.foreignID
+            )
+        elif tag == 3:
+            query = SearchKey.query.whoosh_search(
+                searchKey).outerjoin(
+                WinBiddingPub, WinBiddingPub.biddingID == SearchKey.foreignID
+            )
+        query.filter(
             SearchKey.tag == tag
-        ).whoosh_search(searchKey)
+        )
         return (True, query)
 
 
