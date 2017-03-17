@@ -762,6 +762,21 @@ def create_delinquenent_conduct():
         data['data'] = result
         return json.dumps(data)
 
+# 获取公司不良信息列表, 后台管理
+@app.route('/get_delinquenent_conduct_list_background/', methods=['POST', 'GET'])
+def get_delinquenent_conduct_list_background():
+    delinquenentConductManager = DelinquenentConductManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = delinquenentConductManager.getDelinquenentConductListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 创建一级资质等级
 @app.route('/create_certification_grade1/', methods=['POST', 'GET'])
 def create_certification_grade1():
