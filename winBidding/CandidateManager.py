@@ -40,7 +40,7 @@ class CandidateManager(Util):
         candidateID = self.generateID(candidateName)
         (status, reason) = self.doesCandidateExists(info=info)
         if status is True:
-            return (False, ErrorInfo['TENDER_15'])
+            return (False, ErrorInfo['TENDER_16'])
         candidate = Candidate(candidateID=candidateID,
                               candidateName=candidateName,
                               price=price, ranking=ranking,

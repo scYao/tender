@@ -92,6 +92,18 @@ ErrorInfo['TENDER_15'] = {
     'zhInfo' : '该标段已存在!'
 }
 
+ErrorInfo['TENDER_16'] = {
+    'code' : 'TENDER_16',
+    'info' : 'candidate already exists!',
+    'zhInfo' : '该候选人已存在!'
+}
+
+ErrorInfo['TENDER_17'] = {
+    'code' : 'TENDER_17',
+    'info' : 'win bidding already exists!',
+    'zhInfo' : '该中标已存在!'
+}
+
 
 
 #支付宝公钥
