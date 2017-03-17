@@ -4,7 +4,6 @@ import traceback
 import urllib2
 import poster
 import requests
-from sqlalchemy import desc
 
 sys.path.append("..")
 import os
@@ -12,6 +11,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
+from sqlalchemy import desc, and_
 from models.flask_app import db
 from models.Candidate import Candidate
 
@@ -38,6 +38,9 @@ class CandidateManager(Util):
         biddingID = info['biddingID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         candidateID = self.generateID(candidateName)
+        (status, reason) = self.doesCandidateExists(info=info)
+        if status is True:
+            return (False, ErrorInfo['TENDER_16'])
         candidate = Candidate(candidateID=candidateID,
                               candidateName=candidateName,
                               price=price, ranking=ranking,
@@ -54,3 +57,24 @@ class CandidateManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, biddingID)
+
+    # 通过title判断改标段是否存在, 存在为True
+    def doesCandidateExists(self, info):
+        candidateName = info['candidateName']
+        biddingID = info['biddingID']
+        try:
+            result = db.session.query(Candidate).filter(
+                and_(Candidate.candidateName == candidateName,
+                     Candidate.biddingID == biddingID)
+            ).first()
+            if result is not None:
+                return (True, result.candidateID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)

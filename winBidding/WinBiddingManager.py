@@ -42,7 +42,9 @@ class WinBiddingManager(Util):
         cityID = info['cityID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         biddingID = self.generateID(biddingNum)
-
+        (status, reason) = self.doesBiddingExists(info=info)
+        if status is True:
+            return (False, ErrorInfo['TENDER_17'])
         winBidding = WinBiddingPub(biddingID=biddingID, title=title,
                                    publishDate=publishDate, biddingNum=biddingNum,
                                    detail=detail, cityID=cityID)
@@ -68,6 +70,25 @@ class WinBiddingManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, biddingID)
+
+    # 通过title判断改标段是否存在, 存在为True
+    def doesBiddingExists(self, info):
+        title = info['title']
+        try:
+            result = db.session.query(WinBiddingPub).filter(
+                WinBiddingPub.title == title
+            ).first()
+            if result is not None:
+                return (True, result.biddingID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
 
     def __generateBrief(self, w):
         res = {}

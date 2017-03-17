@@ -117,7 +117,8 @@ class FavoriteManager(Util):
             allResult = query.all()
             tenderList = [self.__generate(t=t) for t in allResult]
             count = db.session.query(func.count(Favorite.favoriteID)).filter(
-                Favorite.userID == userID
+                and_(Favorite.userID == userID,
+                     Favorite.tag == FAVORITE_TAG_TENDER)
             ).first()
         except Exception as e:
             print e
@@ -155,7 +156,8 @@ class FavoriteManager(Util):
             allResult = query.all()
             biddingList = [self.__generate(t=t) for t in allResult]
             count = db.session.query(func.count(Favorite.favoriteID)).filter(
-                Favorite.userID == userID
+                and_(Favorite.userID == userID,
+                     Favorite.tag == FAVORITE_TAG_WIN_BIDDING)
             ).first()
         except Exception as e:
             print e

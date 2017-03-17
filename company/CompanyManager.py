@@ -139,27 +139,27 @@ class CompanyManager(Util):
         query = db.session.query(Company)
         return query
 
-    def __generateCompanyDetail(self, allResult):
-        ossInfo = {}
-        ossInfo['bucket'] = 'sjtender'
-        directory = 'company'
+    def __generateCompanyDetail(self, result):
+        # ossInfo = {}
+        # ossInfo['bucket'] = 'sjtender'
+        # directory = 'company'
+        # res = {}
+        # imgInfo = {'imgPathList': []}
+        # for result in allResult:
+        #     company = result.Company
+        #     img = result.ImgPath
+        #
+        #     res.update(Company.generate(company))
+        #     imgInfo['imgPathList'].append(ImgPath.generate(img, ossInfo, directory))
+        # res.update(imgInfo)
         res = {}
-        imgInfo = {'imgPathList': []}
-        for result in allResult:
-            company = result.Company
-            img = result.ImgPath
-
-            res.update(Company.generate(company))
-            imgInfo['imgPathList'].append(ImgPath.generate(img, ossInfo, directory))
-        res.update(imgInfo)
+        res.update(Company.generate(c=result))
         return res
 
     def __getDetailQueryResult(self, info):
         companyID = info['companyID']
         query = db.session.query(
-            Company, ImgPath
-        ).outerjoin(
-          ImgPath, Company.companyID == ImgPath.foreignID
+            Company
         ).filter(
             Company.companyID == companyID
         )
@@ -174,6 +174,6 @@ class CompanyManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         query = self.__getDetailQueryResult(info)
-        allResult = query.all()
-        companyDetail = self.__generateCompanyDetail(allResult)
+        result = query.first()
+        companyDetail = self.__generateCompanyDetail(result=result)
         return (True, companyDetail)
