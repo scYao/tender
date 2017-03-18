@@ -14,7 +14,7 @@ from test_by_yz_config import ResultManager
 
 LOCALHOST = '127.0.0.1'
 REMOTE = '121.41.56.218'
-YZTOKENID = '2017-03-0915221385c6c4d8009564a1b7a6a44fa38742ff'
+YZTOKENID = '2017-03-17145344588f6f132ddf7ccead74dcf06134ad63'
 
 #注册
 def register():
@@ -413,6 +413,20 @@ def create_tender():
     print result
 
 
+# 获取公司图片
+def get_company_img_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_company_img_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['companyID'] = '2017-03-10162147bbd4e62a521b35e887a75b310b6c87b8'
+    info['tag'] = 4
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
 
 def formatDic(info):
     for (key, value) in info.items():
@@ -452,8 +466,8 @@ def pythonic():
 
 
 if __name__ == '__main__':
-    create_tender()
-
+    # create_tender()
+    # get_company_img_background()
     # common()
     # pythonic()
 
@@ -501,9 +515,8 @@ if __name__ == '__main__':
     # deleteFavorite()
     # getFavoriteList()
     # getUserInfoDetail()
-    # info = {}
-    # info['tokenID'] = YZTOKENID
-    # info['biddingID'] = '2017-03-09090748b3690e054504d3adb05fe7bf81753459'
-    # info['title'] = '泰山路小学新建工程无锡市泰山路小学新建工程室外市政、体育场地设施以及景观绿化工程'
-    # info['biddingNum'] = '111'
-    # formatDic(info)
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['companyID'] = '2017-03-10162147bbd4e62a521b35e887a75b310b6c87b8'
+    info['tag'] = 4
+    formatDic(info)

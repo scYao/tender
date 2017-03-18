@@ -12,6 +12,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
+from sqlalchemy import desc, and_
 from models.flask_app import db, cache
 from models.DelinquenentConduct import DelinquenentConduct
 from models.Company import Company
@@ -177,3 +178,26 @@ class CompanyManager(Util):
         result = query.first()
         companyDetail = self.__generateCompanyDetail(result=result)
         return (True, companyDetail)
+
+
+    #获取企业图片，根据不同的tag
+    def getCompanyImgBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if not status:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        companyID = info['companyID']
+        tag = info['tag']
+        query = db.session.query(ImgPath).filter(
+            and_(
+                ImgPath.foreignID == companyID,
+                ImgPath.tag == tag
+            )
+        )
+        allResult = query.all()
+        ossInfo = {}
+        ossInfo['bucket'] = 'sjtender'
+        imgList = [ImgPath.generate(result, ossInfo, 'company') for result in allResult]
+        return (True, imgList)
