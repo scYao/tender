@@ -86,7 +86,9 @@ create table userInfo
     deviceID nvarchar(100) comment '设备号',
     code nvarchar(100) comment '邀请码',
     provinceID nvarchar(100) default '-1' comment '省份ID',
-    cityID nvarchar(100) default '-1' comment '城市ID'
+    cityID nvarchar(100) default '-1' comment '城市ID',
+    companyName nvarchar(100) comment '公司名称',
+    jobPosition nvarchar(100) comment '职位',
 );
 
 -- 管理员信息

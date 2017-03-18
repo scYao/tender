@@ -67,7 +67,9 @@ class DelinquenentConductManager(Util):
             ).offset(startIndex).limit(pageCount).all()
             conductList = [DelinquenentConduct.generate(o=d) for d in allResult]
             conductListResult['conductListList'] = conductList
-            count = db.session.query(func(DelinquenentConduct.conductID)).first()
+            count = db.session.query(func.count(DelinquenentConduct.conductID)).filter(
+                DelinquenentConduct.companyID == companyID
+            ).first()
             conductListResult['count'] = count
 
         except Exception as e:
