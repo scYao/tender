@@ -41,9 +41,9 @@ class DelinquenentConduct(db.Model):
         res['consequence'] = o.consequence
         res['penaltyType'] = o.penaltyType
         res['penaltyAuthority'] = o.penaltyAuthority
-        res['penaltyDate'] = o.penaltyDate
-        res['publicDateFrom'] = o.publicDateFrom
-        res['publicDateEnd'] = o.publicDateEnd
+        res['penaltyDate'] = str(o.penaltyDate)
+        res['publicDateFrom'] = str(o.publicDateFrom)
+        res['publicDateEnd'] = str(o.publicDateEnd)
         res['companyID'] = o.companyID
         return res
 

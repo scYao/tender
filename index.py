@@ -718,6 +718,21 @@ def create_project_manager():
         data['data'] = result
         return json.dumps(data)
 
+# 获取项目经理列表,  后台管理
+@app.route('/get_project_manager_list_background/', methods=['POST', 'GET'])
+def get_project_manager_list_background():
+    pMManager = PMManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = pMManager.getProjectManagerListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 创建项目经理证件表
 @app.route('/create_manager_license/', methods=['POST', 'GET'])
@@ -774,6 +789,21 @@ def create_delinquenent_conduct():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = delinquenentConductManager.createDelinquenentConduct(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取公司不良信息列表, 后台管理
+@app.route('/get_delinquenent_conduct_list_background/', methods=['POST', 'GET'])
+def get_delinquenent_conduct_list_background():
+    delinquenentConductManager = DelinquenentConductManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = delinquenentConductManager.getDelinquenentConductListBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

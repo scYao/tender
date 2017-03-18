@@ -4,13 +4,13 @@ import traceback
 import urllib2
 import poster
 import requests
-from sqlalchemy import desc
 
 sys.path.append("..")
 import os
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
+from sqlalchemy import desc, func
 from datetime import datetime
 from models.flask_app import db
 from models.DelinquenentConduct import DelinquenentConduct
@@ -52,3 +52,30 @@ class DelinquenentConductManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, conductID)
+
+
+    def getDelinquenentConductListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        companyID = info['companyID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+
+        try:
+            conductListResult = {}
+            allResult = db.session.query(DelinquenentConduct).filter(
+                DelinquenentConduct.companyID == companyID
+            ).offset(startIndex).limit(pageCount).all()
+            conductList = [DelinquenentConduct.generate(o=d) for d in allResult]
+            conductListResult['conductListList'] = conductList
+            count = db.session.query(func.count(DelinquenentConduct.conductID)).filter(
+                DelinquenentConduct.companyID == companyID
+            ).first()
+            conductListResult['count'] = count
+
+        except Exception as e:
+            db.session.rollback()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+        return (True, conductListResult)

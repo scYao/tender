@@ -54,3 +54,19 @@ class CompanyAchievementManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, achievementID)
+
+    def getCompanyAchievementListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        companyID = info['companyID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            achievementResult = {}
+
+        except Exception as e:
+            db.session.rollback()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+        return (True, achievementResult)

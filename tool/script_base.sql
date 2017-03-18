@@ -36,7 +36,7 @@ create table searchKey(
     searchKey text comment '关键词',
     foreignID nvarchar(100) comment '外键ID',
     createTime datetime comment '创建时间',
-    tag int comment '用户1, 招标 2, 中标 3, 企业数据库 4'
+    tag int comment '用户1, 招标 2, 中标 3, 企业数据库 4, 项目经理 5'
 );
 
 -- 招标公告关键词库
@@ -86,7 +86,9 @@ create table userInfo
     deviceID nvarchar(100) comment '设备号',
     code nvarchar(100) comment '邀请码',
     provinceID nvarchar(100) default '-1' comment '省份ID',
-    cityID nvarchar(100) default '-1' comment '城市ID'
+    cityID nvarchar(100) default '-1' comment '城市ID',
+    companyName nvarchar(100) comment '公司名称',
+    jobPosition nvarchar(100) comment '职位',
 );
 
 -- 管理员信息

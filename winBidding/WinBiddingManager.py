@@ -217,11 +217,14 @@ class WinBiddingManager(Util):
         return (True, '111')
 
     @staticmethod
-    def getBiddingListByIDTuple(bidIDTuple):
+    def getBiddingListByIDTuple(info):
+        foreignIDTuple = info['foreignIDTuple']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
         query = db.session.query(
             WinBiddingPub).filter(
-            WinBiddingPub.biddingID.in_(bidIDTuple)
-        ).order_by(desc(WinBiddingPub.publishDate))
+            WinBiddingPub.biddingID.in_(foreignIDTuple)
+        ).order_by(desc(WinBiddingPub.publishDate)).offset(startIndex).limit(pageCount)
         allResult = query.all()
         def generateBid(result):
             res = {}

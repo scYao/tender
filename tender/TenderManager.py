@@ -22,6 +22,7 @@ from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
 from sqlalchemy import desc, and_
+from user.AdminManager import AdminManager
 
 class TenderManager(Util):
     def __init__(self):
@@ -195,11 +196,11 @@ class TenderManager(Util):
         info = json.loads(jsonInfo)
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+            return (False, reason)
         #获取tenderID列表
         query = db.session.query(Tender)
         info['query'] = query
@@ -235,14 +236,20 @@ class TenderManager(Util):
         startDate = info['startDate']
         endDate = info['endDate']
         cityID = info['cityID']
-        if info.has_key('searchKey'):
-            searchKey = info['searchKey']
-            if len(searchKey) == 1:
-                searchKey = " ".join(lazy_pinyin(searchKey))
-            if searchKey != '':
-                query = SearchKey.query.whoosh_search(searchKey).outerjoin(
-                    Tender, Tender.tenderID == SearchKey.tenderID
-                )
+        # if info.has_key('searchKey'):
+        #     searchKey = info['searchKey']
+        #     if len(searchKey) == 1:
+        #         searchKey = " ".join(lazy_pinyin(searchKey))
+        #     if searchKey != '':
+        #         searchResult = SearchKey.query.whoosh_search(searchKey).filter(
+        #             SearchKey.tag == SEARCH_KEY_TAG_TENDRE
+        #         ).all()
+        #         print len(searchResult)
+        #         tenderIDTuple = (s.foreignID for s in searchResult)
+        #         query = query.filter(
+        #             Tender.tenderID.in_(tenderIDTuple)
+        #         )
+
         # 公告分类
         if cityID != '-1':
             query = query.filter(
@@ -279,14 +286,17 @@ class TenderManager(Util):
         tenderList = [self.__generateBrief(t=result) for result in allResult]
         return filter(None, tenderList)
 
-    def getTenderListByIDTuple(self, tenderIDTuple):
+    def getTenderListByIDTuple(self, info):
+        foreignIDTuple = info['foreignIDTuple']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
         query = db.session.query(
             Tender, City
         ).outerjoin(
             City, City.cityID == Tender.cityID
         ).filter(
-            Tender.tenderID.in_(tenderIDTuple)
-        ).order_by(desc(Tender.publishDate))
+            Tender.tenderID.in_(foreignIDTuple)
+        ).order_by(desc(Tender.publishDate)).offset(startIndex).limit(pageCount)
         allResult = query.all()
         # def generateTender(result):
         #     res = {}

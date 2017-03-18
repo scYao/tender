@@ -46,9 +46,9 @@ class ProjectManager(db.Model):
         res['positionalTitles'] = c.positionalTitles
         res['post'] = c.post
         res['safetyAssessment'] = c.safetyAssessment
-        res['safeEndDate'] = c.safeEndDate
+        res['safeEndDate'] = str(c.safeEndDate)
         res['safeAuthority'] = c.safeAuthority
-        res['safeFromDate'] = c.safeFromDate
+        res['safeFromDate'] = str(c.safeFromDate)
         res['companyID'] = c.companyID
         return res
 
