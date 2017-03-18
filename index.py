@@ -126,6 +126,7 @@ def get_tender_list():
         data['data'] = jsonlist
         return json.dumps(data)
 
+
 # 获取投标信息列表,后台使用
 @app.route('/get_tender_list_background/', methods=['POST', 'GET'])
 def get_tender_list_background():
@@ -140,6 +141,22 @@ def get_tender_list_background():
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
         return json.dumps(data)
+
+# 获取中标信息列表
+@app.route('/get_bid_list/', methods=['POST', 'GET'])
+def get_bid_list():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBidList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 
 # 获取中标信息列表,后台使用
 @app.route('/get_bidding_list_background/', methods=['POST', 'GET'])
@@ -256,6 +273,21 @@ def get_bidding_detail():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = winBiddingManager.getBiddingDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取中标信息详情
+@app.route('/get_bid_detail/', methods=['POST', 'GET'])
+def get_bid_detail():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBidDetail(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -945,6 +977,20 @@ def search_background():
         data['data'] = result
         return json.dumps(data)
 
+# 搜索
+@app.route('/search/', methods=['POST', 'GET'])
+def search():
+    searchManager = SearchManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = searchManager.search(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
 
 # 编辑中标信息，后台
 @app.route('/update_bidding_background/', methods=['POST', 'GET'])
@@ -975,6 +1021,24 @@ def delete_bidding_background():
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
         return json.dumps(data)
+
+# 获取公司图片，后台
+@app.route('/get_company_img_background/', methods=['POST', 'GET'])
+def get_company_img_background():
+    companyManager = CompanyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = companyManager.getCompanyImgBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+
+
 
 
 # 删除中标信息，后台
