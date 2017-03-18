@@ -205,21 +205,40 @@ class CompanyManager(Util):
     #获取企业图片，根据不同的tag
     def getCompanyImgBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if not status:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
         companyID = info['companyID']
-        tag = info['tag']
-        query = db.session.query(ImgPath).filter(
-            and_(
-                ImgPath.foreignID == companyID,
-                ImgPath.tag == tag
-            )
-        )
-        allResult = query.all()
+        tag = int(info['tag'])
+
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        try:
+            query = db.session.query(ImgPath).filter(
+                and_(
+                    ImgPath.foreignID == companyID,
+                    ImgPath.tag == tag
+                )
+            ).offset(startIndex).limit(pageCount)
+            allResult = query.all()
+            count = db.session.query(func.count(ImgPath.imgPathID)).filter(
+                and_(
+                    ImgPath.foreignID == companyID,
+                    ImgPath.tag == tag
+                )
+            ).first()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
         ossInfo = {}
         ossInfo['bucket'] = 'sjtender'
-        imgList = [ImgPath.generate(result, ossInfo, 'company') for result in allResult]
-        return (True, imgList)
+        imgList = [ImgPath.generate(result, ossInfo, 'company', True) for result in allResult]
+        imgResult = {}
+        imgResult['imgList'] = imgList
+        imgResult['count'] = count[0]
+        return (True, imgResult)
