@@ -39,7 +39,7 @@ class CompanyManager(Util):
                 Company.companyName == companyName
             ).first()
             if result is not None:
-                return (True, result.tenderID)
+                return (True, result.companyID)
             else:
                 return (False, None)
         except Exception as e:
@@ -91,7 +91,9 @@ class CompanyManager(Util):
         companyID = self.generateID(companyName)
         (status, reason) = self.doesCompanyExists(info=info)
         if status is True:
-            return (False, ErrorInfo['TENDER_18'])
+            errorInfo = ErrorInfo['TENDER_18']
+            errorInfo['detail'] = reason
+            return (False, errorInfo)
 
         company = Company(companyID=companyID, companyName=companyName, newArchiveID=newArchiveID,
                           registerArea=registerArea, companyAreaType=companyAreaType,
@@ -151,7 +153,7 @@ class CompanyManager(Util):
         # if not status:
         #     errorInfo = ErrorInfo['TENDER_01']
         #     return (False, errorInfo)
-        # 获取tenderID列表
+        # 获取company列表
         query = self.__getQueryResult(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
         companyList = [Company.generateBrief(result) for result in allResult]

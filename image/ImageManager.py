@@ -30,14 +30,12 @@ class ImageManager(Util):
         else:
             tag = 0
 
-        if info.has_key('imgNum'):
-            imgNum = info['imgNum']
-        else:
-            imgNum = ''
         index = 0
         for img in imgList:
-            imgID = self.generateID(str(index) + img)
-            imagePath = ImgPath(imgPathID=imgID, path=img, foreignID=foreignID,
+            imgName = img['imgName']
+            imgNum = img['imgNum']
+            imgID = self.generateID(str(index) + imgName)
+            imagePath = ImgPath(imgPathID=imgID, path=imgName, foreignID=foreignID,
                                 tag=tag, imgNum=imgNum)
             db.session.add(imagePath)
             index = index + 1

@@ -21,7 +21,7 @@ from models.Tender import Tender
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
-from sqlalchemy import desc, and_
+from sqlalchemy import desc, and_, func
 from user.AdminManager import AdminManager
 
 class TenderManager(Util):
@@ -204,13 +204,21 @@ class TenderManager(Util):
         #获取tenderID列表
         query = db.session.query(Tender)
         info['query'] = query
-        query = self.__getQueryResult(info)
+        query = self.__getQueryResult(info=info)
         tenderList = query.offset(startIndex).limit(pageCount).all()
         tenderIDList = [t.tenderID for t in tenderList]
         tenderIDTuple = tuple(tenderIDList)
         info['tenderIDTuple'] = tenderIDTuple
-        resultList = self.__doGetTenderList(info)
-        return (True, resultList)
+        tenderList = self.__doGetTenderList(info)
+
+        queryCount = db.session.query(func.count(Tender.tenderID))
+        info['query'] = queryCount
+        queryCount = self.__getQueryResult(info=info)
+        count = queryCount.first()
+        result = {}
+        result['tenderList'] = tenderList
+        result['count'] = count
+        return (True, result)
 
     # 对公告进行城市,时间筛选
     def __getQueryResult(self, info):
