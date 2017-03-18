@@ -14,13 +14,15 @@ class ImgPath(db.Model):
     path = db.Column(db.Text)
     foreignID = db.Column(db.String(100))
     tag = db.Column(db.Integer)
+    imgNum = db.Column(db.String(100))
 
     def __init__(self, imgPathID=None, path=None, foreignID=None,
-                 tag=0):
+                 tag=0, imgNum=None):
         self.imgPathID = imgPathID
         self.path = path
         self.foreignID = foreignID
         self.tag = tag
+        self.imgNum = imgNum
 
     @staticmethod
     def generate(img, ossInfo, directory):

@@ -59,7 +59,8 @@ create table imgPath
     imgPathID nvarchar(100) primary key comment '图片主键',
     path text comment '照片的路径',
     foreignID nvarchar(100) comment '照片对应的商品',
-    tag int comment '区别同一张表中不同的图片，比如公司表中，证书图片N张，信用手册图片N张等等'
+    tag int comment '区别同一张表中不同的图片，比如公司表中，证书图片N张，信用手册图片N张等等',
+    imgNum nvarchar(100) comment '图片在原网站的编号'
 );
 
 -- 项目经理表
@@ -159,9 +160,10 @@ create table certificationGrade4(
 create table winBiddingPub(
 	biddingID nvarchar(100) primary key comment '中标公示ID',
 	title nvarchar(100) comment '标题',
-	publicDate date comment '发布时间',
+	publishDate date comment '发布时间',
 	biddingNum nvarchar(100) comment '标段编号',
-	detail mediumtext comment '详情'
+	detail mediumtext comment '详情',
+	cityID nvarchar(100) comment '城市'
 );
 
 -- 候选人表
@@ -205,3 +207,4 @@ alter table projectManager add constraint manager_FK_company foreign key(company
 alter table companyAchievement add constraint company_a_FK_company foreign key(companyID) references company(companyID);
 alter table delinquenentConduct add constraint delinquenent_FK_company foreign key(companyID) references company(companyID);
 alter table candidate add constraint candidate_FK_win foreign key(biddingID) references winBiddingPub(biddingID);
+alter table winBiddingPub add constraint bidding_FK_city foreign key(cityID) references city(cityID);

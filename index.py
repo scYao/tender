@@ -28,6 +28,7 @@ from certificationGrade.CertificationGrade4Manager import CertificationGrade4Man
 from winBidding.WinBiddingManager import WinBiddingManager
 from winBidding.CandidateManager import CandidateManager
 from search.SearchManager import SearchManager
+from image.ImageManager import ImageManager
 
 
 def allowed_file(filename):
@@ -970,6 +971,22 @@ def delete_bidding_background():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = winBiddingManager.deleteBiddingBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+
+# 删除中标信息，后台
+@app.route('/does_image_exists/', methods=['POST', 'GET'])
+def does_image_exists():
+    imageManager = ImageManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = imageManager.doesImageExists(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist

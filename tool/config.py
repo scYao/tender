@@ -104,6 +104,12 @@ ErrorInfo['TENDER_17'] = {
     'zhInfo' : '该中标已存在!'
 }
 
+ErrorInfo['TENDER_18'] = {
+    'code' : 'TENDER_18',
+    'info' : 'company already exists!',
+    'zhInfo' : '该公司已存在!'
+}
+
 
 
 #支付宝公钥

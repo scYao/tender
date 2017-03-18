@@ -30,6 +30,25 @@ class CompanyManager(Util):
     def __init__(self):
         pass
 
+    # 通过title判断改标段是否存在, 存在为True
+    def doesCompanyExists(self, info):
+        companyName = info['companyName']
+        try:
+            result = db.session.query(Company).filter(
+                Company.companyName == companyName
+            ).first()
+            if result is not None:
+                return (True, result.tenderID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
     # 创建公司
     def createCompany(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -69,6 +88,9 @@ class CompanyManager(Util):
         companyBrief = info['companyBrief'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         companyID = self.generateID(companyName)
+        (status, reason) = self.doesCompanyExists(info=info)
+        if status is True:
+            return (False, ErrorInfo['TENDER_18'])
 
         company = Company(companyID=companyID, companyName=companyName, newArchiveID=newArchiveID,
                           registerArea=registerArea, companyAreaType=companyAreaType,
