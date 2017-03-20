@@ -468,6 +468,21 @@ def get_manager_achievement_list_background():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 获取招标数据库列表，后台
+def get_company_assistant_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_company_assistant_list_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
 
 
 
@@ -510,8 +525,9 @@ def pythonic():
 
 
 if __name__ == '__main__':
+    get_company_assistant_list_background()
     # get_company_achievement_list_background()
-    get_manager_achievement_list_background()
+    # get_manager_achievement_list_background()
     # get_project_manager_info_background()
     # create_tender()
     # get_company_img_background()
