@@ -90,10 +90,10 @@ class WinBiddingManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
-    def __generateBrief(self, w):
+    def __generateBrief(self, o):
         res = {}
-        res.update(WinBiddingPub.generateBrief(result=w.WinBiddingPub))
-        res.update(City.generate(city=w.City))
+        res.update(WinBiddingPub.generateBrief(result=o.WinBiddingPub))
+        res.update(City.generate(city=o.City))
         return res
 
     def getBiddingList(self, jsonInfo):
@@ -107,7 +107,7 @@ class WinBiddingManager(Util):
         info['query'] = query
         query = self.__getQueryResult(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
-        biddingList = [self.__generateBrief(w=result) for result in allResult]
+        biddingList = [self.__generateBrief(o=result) for result in allResult]
 
         # count
         countQuery = db.session.query(func.count(WinBiddingPub.biddingID)).outerjoin(
@@ -293,3 +293,47 @@ class WinBiddingManager(Util):
                 errorInfo['detail'] = str(e)
                 return (False, errorInfo)
         return (True, None)
+
+
+    def getBiddingListByCompanyIDBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        companyID = info['companyID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+
+        try:
+            biddingIDResult = db.session.query(Candidate).filter(
+                Candidate.companyID == companyID
+            ).group_by(WinBiddingPub.biddingID).all()
+            biddingIDTuple = (b.biddingID for b in biddingIDResult)
+            query = db.session.query(WinBiddingPub, City).outerjoin(
+                City, WinBiddingPub.cityID == City.cityID
+            )
+            info['query'] = query
+            query = self.__getQueryResult(info=info)
+            allBiddingResult = query.filter(
+                WinBiddingPub.biddingID.in_(biddingIDTuple)
+            ).order_by(
+                desc(WinBiddingPub.publishDate)
+            ).offset(startIndex).limit(pageCount).all()
+            biddingResult = {}
+            biddingList = [self.__generateBrief(o=o) for o in allBiddingResult]
+
+            countQuery = db.session.query(func.count(
+                WinBiddingPub.biddingID
+            ))
+            info['query'] = countQuery
+            countQuery = self.__getQueryResult(info=info)
+            count = countQuery.first()
+            count = count[0]
+            biddingResult['biddingList'] = biddingList
+            biddingResult['count'] = count
+            return (True, biddingResult)
+
+        except Exception as e:
+                # traceback.print_stack()
+                db.session.rollback()
+                print e
+                errorInfo = ErrorInfo['TENDER_02']
+                errorInfo['detail'] = str(e)
+                return (False, errorInfo)

@@ -189,6 +189,21 @@ def get_bidding_list():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 获取中标信息列表
+@app.route('/get_bidding_list_by_company_id_background/', methods=['POST', 'GET'])
+def get_bidding_list_by_company_id_background():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBiddingListByCompanyIDBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 # 获取公司列表,后台使用
 @app.route('/get_company_list_background/', methods=['POST', 'GET'])
 def get_company_list_background():
