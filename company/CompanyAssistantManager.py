@@ -100,3 +100,20 @@ class CompanyAssistantManager(Util):
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
+
+    def getCompanyAssistantIDByName(self, info):
+        companyName = info['companyName']
+
+        try:
+            result = db.session.query(CompanyAssistant).filter(
+                CompanyAssistant.companyName == companyName
+            ).first()
+            if result is None:
+                return (False, None)
+            return (True, result.companyID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

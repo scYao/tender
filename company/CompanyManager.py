@@ -13,10 +13,10 @@ sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
 from sqlalchemy import desc, and_
-from models.flask_app import db, cache
-from models.DelinquenentConduct import DelinquenentConduct
+from models.flask_app import db
 from models.Company import Company
 from models.ImgPath import ImgPath
+from models.CompanyAssistant import CompanyAssistant
 
 from tool.Util import Util
 from tool.config import ErrorInfo
@@ -108,8 +108,10 @@ class CompanyManager(Util):
                           creditAuthority=creditAuthority, creditAddress=creditAddress, creditWebSet=creditWebSet,
                           creditContact=creditContact, creditNjAddress=creditNjAddress, creditNjPrincipal=creditNjPrincipal,
                           creditNjTech=creditNjTech, creditFinancialStaff=creditFinancialStaff, companyBrief=companyBrief)
+        companyAssistant = CompanyAssistant(companyID=companyID, companyName=companyName, foreignCompanyID=companyID)
         try:
             db.session.add(company)
+            db.session.add(companyAssistant)
             db.session.commit()
         except Exception as e:
             # traceback.print_stack()
@@ -244,3 +246,20 @@ class CompanyManager(Util):
         imgResult['imgList'] = imgList
         imgResult['count'] = count[0]
         return (True, imgResult)
+
+    def getCompanyIDByName(self, info):
+        companyName = info['companyName']
+
+        try:
+            result = db.session.query(Company).filter(
+                Company.companyName == companyName
+            ).first()
+            if result is None:
+                return (False, None)
+            return (True, result.companyID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

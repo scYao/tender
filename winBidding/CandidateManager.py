@@ -14,11 +14,13 @@ from datetime import datetime
 from sqlalchemy import desc, and_
 from models.flask_app import db
 from models.Candidate import Candidate
+from models.CompanyAssistant import CompanyAssistant
 
 from tool.Util import Util
 from tool.config import ErrorInfo
 from sqlalchemy import func
-
+from company.CompanyManager import CompanyManager
+from company.CompanyAssistantManager import CompanyAssistantManager
 
 class CandidateManager(Util):
 
@@ -38,15 +40,26 @@ class CandidateManager(Util):
         biddingID = info['biddingID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         candidateID = self.generateID(candidateName)
+        _companyID = '-1'
+
+        companyAssistantManager = CompanyAssistantManager()
+        info['companyName'] = candidateName.strip()
+        (status, companyID) = companyAssistantManager.getCompanyAssistantIDByName(info=info)
+        if status is True:
+            _companyID = companyID
+
         (status, reason) = self.doesCandidateExists(info=info)
         if status is True:
             return (False, ErrorInfo['TENDER_16'])
-        candidate = Candidate(candidateID=candidateID,
-                              candidateName=candidateName,
-                              price=price, ranking=ranking,
-                              managerName=managerName,
-                              biddingID=biddingID)
         try:
+            info['companyName'] = candidateName.strip()
+            if _companyID == '-1':
+                (status, _companyID) = self.createCompanyAssistant(info=info)
+            candidate = Candidate(candidateID=candidateID,
+                                  candidateName=candidateName,
+                                  price=price, ranking=ranking,
+                                  managerName=managerName,
+                                  biddingID=biddingID, companyID=_companyID)
             db.session.add(candidate)
             db.session.commit()
         except Exception as e:
@@ -57,6 +70,19 @@ class CandidateManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, biddingID)
+
+    def createCompanyAssistant(self, info):
+        companyName = info['companyName']
+        companyManager = CompanyManager()
+        (status, _companyID) = companyManager.getCompanyIDByName(info=info)
+        if status is False:
+            _companyID = '-1'
+            companyID = self.generateID(companyName)
+        else:
+            companyID = _companyID
+        companyAssistant = CompanyAssistant(companyID=companyID, companyName=companyName, foreignCompanyID=_companyID)
+        db.session.add(companyAssistant)
+        return (True, None)
 
     # 通过title判断改标段是否存在, 存在为True
     def doesCandidateExists(self, info):

@@ -109,7 +109,7 @@ class CompanyAchievementManager(Util):
 
             achievementResult = {}
             achievementResult['achievementList'] = achievementList
-            achievementResult['count'] = count
+            achievementResult['count'] = count[0]
             return (True, achievementResult)
         except Exception as e:
             db.session.rollback()
