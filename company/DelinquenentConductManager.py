@@ -10,7 +10,7 @@ import os
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, and_
 from datetime import datetime
 from models.flask_app import db
 from models.DelinquenentConduct import DelinquenentConduct
@@ -35,6 +35,9 @@ class DelinquenentConductManager(Util):
         publicDateEnd = info['publicDateEnd'].replace('\'', '\\\'').replace('\"', '\\\"')
         companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
+        (status, reason) = self.doesDelinquenentConductExists(info=info)
+        if status is True:
+            return (False, ErrorInfo['TENDER_22'])
         conductID = self.generateID(conductName)
 
         delinquenentConduct = DelinquenentConduct(
@@ -52,6 +55,29 @@ class DelinquenentConductManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, conductID)
+
+    # 通过conductName， companyID判断公司不良记录是否存在, 存在为True
+    def doesDelinquenentConductExists(self, info):
+        conductName = info['conductName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        try:
+            result = db.session.query(DelinquenentConduct).filter(
+                and_(
+                    DelinquenentConduct.conductName == conductName,
+                    DelinquenentConduct.companyID == companyID
+                )
+            ).first()
+            if result is not None:
+                return (True, result.conductID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
 
 
     def getDelinquenentConductListBackground(self, jsonInfo):

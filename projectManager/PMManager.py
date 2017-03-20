@@ -30,7 +30,7 @@ class PMManager(Util):
     def __init__(self):
         pass
 
-    # 创建公司
+    # 创建项目经理
     def createProjectManager(self, jsonInfo):
         info = json.loads(jsonInfo)
         managerName = info['managerName'].replace('\'', '\\\'').replace('\"', '\\\"')
@@ -43,6 +43,9 @@ class PMManager(Util):
         safeFromDate = info['safeFromDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
+        (status, reason) = self.doesProjectManagerExists(info=info)
+        if status is True:
+            return (False, ErrorInfo['TENDER_19'])
         managerID = self.generateID(managerName)
 
         projectManager = ProjectManager(
@@ -61,6 +64,30 @@ class PMManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, managerID)
+
+
+    # 通过managerName， companyID判断项目经理是否存在, 存在为True
+    def doesProjectManagerExists(self, info):
+        managerName = info['managerName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        try:
+            result = db.session.query(ProjectManager).filter(
+                and_(
+                    ProjectManager.managerName == managerName,
+                    ProjectManager.companyID == companyID
+                )
+            ).first()
+            if result is not None:
+                return (True, result.managerID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
 
     def getProjectManagerListBackground(self, jsonInfo):
         info = json.loads(jsonInfo)

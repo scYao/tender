@@ -36,7 +36,9 @@ class CompanyAchievementManager(Util):
         companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
         tag = info['tag']
 
-
+        (status, reason) = self.doesCompanyAchievementExists(info=info)
+        if status is True:
+            return (False, ErrorInfo['TENDER_21'])
 
         achievementID = self.generateID(projectName)
 
@@ -55,6 +57,30 @@ class CompanyAchievementManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, achievementID)
+
+
+    # 通过projectName， companyID判断公司业绩是否存在, 存在为True
+    def doesCompanyAchievementExists(self, info):
+        projectName = info['projectName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        try:
+            result = db.session.query(CompanyAchievement).filter(
+                and_(
+                    CompanyAchievement.projectName == projectName,
+                    CompanyAchievement.companyID == companyID
+                )
+            ).first()
+            if result is not None:
+                return (True, result.achievementID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
 
     # 获取企业业绩列表，后台
     def getCompanyAchievementListBackground(self, jsonInfo):
