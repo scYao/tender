@@ -101,26 +101,25 @@ class WinBiddingManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         # 获取tenderID列表
-        query = db.session.query(WinBiddingPub, City).outerjoin(
-            City, WinBiddingPub.cityID == City.cityID
-        )
-        info['query'] = query
-        query = self.__getQueryResult(info)
-        allResult = query.offset(startIndex).limit(pageCount).all()
-        biddingList = [self.__generateBrief(w=result) for result in allResult]
-
-        # count
-        countQuery = db.session.query(func.count(WinBiddingPub.biddingID)).outerjoin(
-            City, WinBiddingPub.cityID == City.cityID
-        )
-        info['query'] = countQuery
-        countQuery = self.__getQueryResult(info=info)
-        count = countQuery.first()
-        count = count[0]
-        biddingResult = {}
-        biddingResult['biddingList'] = biddingList
-        biddingResult['count'] = count
-        return (True, biddingResult)
+        try:
+            query = db.session.query(WinBiddingPub, City).outerjoin(
+                City, WinBiddingPub.cityID == City.cityID
+            )
+            info['query'] = query
+            query = self.__getQueryResult(info)
+            count = len(query.all())
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            biddingList = [self.__generateBrief(w=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = biddingList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
     # 获取中标信息列表,后台管理
     # @cache.memoize(timeout=60 * 2)

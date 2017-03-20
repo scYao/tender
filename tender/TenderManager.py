@@ -180,15 +180,26 @@ class TenderManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         #获取tenderID列表
-        query = db.session.query(Tender)
-        info['query'] = query
-        query = self.getQueryResult(info)
-        tenderList = query.offset(startIndex).limit(pageCount).all()
-        tenderIDList = [t.tenderID for t in tenderList]
-        tenderIDTuple = tuple(tenderIDList)
-        info['tenderIDTuple'] = tenderIDTuple
-        resultList = self.__doGetTenderList(info)
-        return (True, resultList)
+        try:
+            query = db.session.query(Tender)
+            info['query'] = query
+            query = self.getQueryResult(info)
+            count = len(query.all())
+            tenderList = query.offset(startIndex).limit(pageCount).all()
+            tenderIDList = [t.tenderID for t in tenderList]
+            tenderIDTuple = tuple(tenderIDList)
+            info['tenderIDTuple'] = tenderIDTuple
+            resultList = self.__doGetTenderList(info)
+            callBackInfo = {}
+            callBackInfo['dataList'] = resultList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
     # 获取投标信息列表,后台管理
     # @cache.memoize(timeout=60 * 2)
@@ -201,24 +212,7 @@ class TenderManager(Util):
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
-        #获取tenderID列表
-        query = db.session.query(Tender)
-        info['query'] = query
-        query = self.__getQueryResult(info=info)
-        tenderList = query.offset(startIndex).limit(pageCount).all()
-        tenderIDList = [t.tenderID for t in tenderList]
-        tenderIDTuple = tuple(tenderIDList)
-        info['tenderIDTuple'] = tenderIDTuple
-        tenderList = self.__doGetTenderList(info)
-
-        queryCount = db.session.query(func.count(Tender.tenderID))
-        info['query'] = queryCount
-        queryCount = self.__getQueryResult(info=info)
-        count = queryCount.first()
-        result = {}
-        result['tenderList'] = tenderList
-        result['count'] = count
-        return (True, result)
+        return self.getTenderList(jsonInfo=jsonInfo)
 
     # 对公告进行城市,时间筛选
     def __getQueryResult(self, info):

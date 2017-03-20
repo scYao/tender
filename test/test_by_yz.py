@@ -76,10 +76,10 @@ def getTenderList():
     info = {}
     info['startIndex'] = 0
     info['pageCount'] = 10
-    info['cityID'] = '0'
-    info['searchKey'] = '化学工业园'
-    info['startDate'] = '2016-07-24 00:00:00'
-    info['endDate'] = '2016-08-18 00:00:00'
+    info['cityID'] = '-1'
+    info['searchKey'] = '-1'
+    info['startDate'] = '-1'
+    info['endDate'] = '-1'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -102,15 +102,31 @@ def get_tender_list_background():
     print result
 
 #获取招标公告列表，后台管理
-def get_bid_list_background():
+def get_bidding_list_background():
     opener = poster.streaminghttp.register_openers()
-    upload_url = 'http://%s:5007/get_bid_list_background/' % LOCALHOST
+    upload_url = 'http://%s:5007/get_bidding_list_background/' % LOCALHOST
     info = {}
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['tokenID'] = YZTOKENID
     info['startDate'] = '-1'
     info['endDate'] = '-1'
+    info['cityID'] = '-1'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+#获取招标公告列表
+def get_bidding_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_bidding_list/' % LOCALHOST
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['startDate'] = '-1'
+    info['endDate'] = '-1'
+    info['cityID'] = '-1'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -124,6 +140,18 @@ def get_company_list_background():
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['tokenID'] = YZTOKENID
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+#获取公司列表
+def get_company_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_company_list/' % LOCALHOST
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -435,6 +463,7 @@ def get_company_achievement_list_background():
     info['companyID'] = '2017-03-1817570920a745ba3dc69398c16b14fd72b09826'
     info['startIndex'] = 0
     info['pageCount'] = 10
+    info['tag'] = 0
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -480,12 +509,6 @@ def get_company_assistant_list_background():
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
     print result
-
-
-
-
-
-
 
 def formatDic(info):
     for (key, value) in info.items():
@@ -537,6 +560,7 @@ if __name__ == '__main__':
 
     # get_company_detail_background()
     # get_company_list_background()
+    # get_company_list()
 
 
 
@@ -550,8 +574,8 @@ if __name__ == '__main__':
     # update_tender_background()
     # re_generate_bid_search_index()
     # search_background()
-
-    # get_bid_list_background()
+    # get_bidding_list()
+    # get_bidding_list_background()
 
     # print datetime.date.today()
 

@@ -92,7 +92,7 @@ class DelinquenentConductManager(Util):
                 DelinquenentConduct.companyID == companyID
             ).offset(startIndex).limit(pageCount).all()
             conductList = [DelinquenentConduct.generate(o=d) for d in allResult]
-            conductListResult['conductListList'] = conductList
+            conductListResult['dataList'] = conductList
             count = db.session.query(func.count(DelinquenentConduct.conductID)).filter(
                 DelinquenentConduct.companyID == companyID
             ).first()

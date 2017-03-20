@@ -99,18 +99,13 @@ class CompanyAchievementManager(Util):
                 and_(CompanyAchievement.companyID == companyID,
                      CompanyAchievement.tag == tag)
             )
+            count = len(query.all())
             allResult = query.offset(startIndex).limit(pageCount).all()
             achievementList = [CompanyAchievement.generate(result) for result in allResult]
-
-            count = db.session.query(func.count(CompanyAchievement.companyID)).filter(
-                and_(CompanyAchievement.companyID == companyID,
-                     CompanyAchievement.tag == tag)
-            ).first()
-
-            achievementResult = {}
-            achievementResult['achievementList'] = achievementList
-            achievementResult['count'] = count[0]
-            return (True, achievementResult)
+            callBackInfo = {}
+            callBackInfo['dataList'] = achievementList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
         except Exception as e:
             db.session.rollback()
             print e

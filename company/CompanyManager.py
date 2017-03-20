@@ -151,16 +151,23 @@ class CompanyManager(Util):
         info = json.loads(jsonInfo)
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        # (status, userID) = self.isTokenValid(tokenID)
-        # if not status:
-        #     errorInfo = ErrorInfo['TENDER_01']
-        #     return (False, errorInfo)
         # 获取company列表
-        query = self.__getQueryResult(info)
-        allResult = query.offset(startIndex).limit(pageCount).all()
-        companyList = [Company.generateBrief(result) for result in allResult]
-        return (True, companyList)
+        try:
+            query = self.__getQueryResult(info)
+            count = len(query.all())
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            companyList = [Company.generateBrief(result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = companyList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
 
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
     def __getQueryResult(self, info):
         query = db.session.query(Company)

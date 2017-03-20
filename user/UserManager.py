@@ -60,7 +60,13 @@ class UserManager(Util):
         info['query'] = query
         allResult = query.offset(startIndex).limit(pageCount).all()
         userInfoList = [UserInfo.generate(result) for result in allResult]
-        return (True, userInfoList)
+        countQuery = db.session.query(func.count(UserInfo.userID))
+        count = countQuery.first()
+        count = count[0]
+        biddingResult = {}
+        biddingResult['dataList'] = userInfoList
+        biddingResult['count'] = count
+        return (True, biddingResult)
 
 
 

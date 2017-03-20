@@ -101,7 +101,7 @@ class PMManager(Util):
                 ProjectManager.companyID == companyID
             ).offset(startIndex).limit(pageCount).all()
             managerList = [ProjectManager.generate(c=p) for p in allResult]
-            managerResult['managerList'] = managerList
+            managerResult['dataList'] = managerList
             count = db.session.query(func.count(ProjectManager.managerID)).filter(
                 ProjectManager.companyID == companyID
             ).first()
@@ -143,13 +143,24 @@ class PMManager(Util):
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
-        query = db.session.query(ManagerAchievement).filter(
-            and_(
-                ManagerAchievement.managerID == managerID,
-                ManagerAchievement.tag == tag
+        try:
+            query = db.session.query(ManagerAchievement).filter(
+                and_(
+                    ManagerAchievement.managerID == managerID,
+                    ManagerAchievement.tag == tag
+                )
             )
+            count = len(query.all())
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            achievementResult = [ManagerAchievement.generate(result) for result in allResult]
+            biddingResult = {}
+            biddingResult['dataList'] = achievementResult
+            biddingResult['count'] = count
+            return (True, biddingResult)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
-        )
-        allResult = query.offset(startIndex).limit(pageCount).all()
-        achievementResult = [ManagerAchievement.generate(result) for result in allResult]
-        return (True, achievementResult)

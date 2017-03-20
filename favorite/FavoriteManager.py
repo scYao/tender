@@ -109,23 +109,22 @@ class FavoriteManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        # if tag == FAVORITE_TAG_TENDER:
         try:
             query = db.session.query(Tender, Favorite).outerjoin(
                 Favorite, Tender.tenderID == Favorite.tenderID
             ).filter(
                 and_(Favorite.userID == userID,
                      Favorite.tag == FAVORITE_TAG_TENDER)
-            ).offset(startIndex).limit(pageCount)
-            allResult = query.all()
+            )
+            count = len(query.all())
+            allResult = query.offset(startIndex).limit(pageCount).all()
             tenderList = [self.__generateTender(t=t) for t in allResult]
-            count = db.session.query(func.count(Favorite.favoriteID)).filter(
-                and_(Favorite.userID == userID,
-                     Favorite.tag == FAVORITE_TAG_TENDER)
-            ).first()
+            callBackInfo = {}
+            callBackInfo['dataList'] = tenderList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
         except Exception as e:
             print e
             errorInfo = ErrorInfo['TENDER_02']
@@ -133,13 +132,6 @@ class FavoriteManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-        if count is None:
-            count = 0
-
-        result = {}
-        result['tenderList'] = tenderList
-        result['count'] = count
-        return (True, result)
 
     def getFavoriteWinBiddingList(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -148,23 +140,22 @@ class FavoriteManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        # if tag == FAVORITE_TAG_TENDER:
         try:
             query = db.session.query(WinBiddingPub, Favorite).outerjoin(
                 Favorite, WinBiddingPub.biddingID == Favorite.tenderID
             ).filter(
                 and_(Favorite.userID == userID,
                      Favorite.tag == FAVORITE_TAG_WIN_BIDDING)
-            ).offset(startIndex).limit(pageCount)
-            allResult = query.all()
+            )
+            count = len(query.all())
+            allResult = query.offset(startIndex).limit(pageCount).all()
             biddingList = [self.__generateBidding(b=b) for b in allResult]
-            count = db.session.query(func.count(Favorite.favoriteID)).filter(
-                and_(Favorite.userID == userID,
-                     Favorite.tag == FAVORITE_TAG_WIN_BIDDING)
-            ).first()
+            callBackInfo = {}
+            callBackInfo['dataList'] = biddingList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
         except Exception as e:
             print e
             errorInfo = ErrorInfo['TENDER_02']
@@ -172,20 +163,11 @@ class FavoriteManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-        if count is None:
-            count = 0
-
-        result = {}
-        result['biddingList'] = biddingList
-        result['count'] = count
-        return (True, result)
-
     # 判断招标或中标是否被收藏
     @staticmethod
     def doesItemFavorite(info):
         itemID = info['item']
         userID = info['userID']
-
         try:
             result = db.session.query(Favorite).filter(
                 and_(

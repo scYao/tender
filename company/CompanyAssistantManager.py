@@ -85,12 +85,12 @@ class CompanyAssistantManager(Util):
             return (False, reason)
 
         try:
-            query = db.session.query(CompanyAssistant).offset(startIndex).limit(pageCount)
-            allResult = query.all()
+            query = db.session.query(CompanyAssistant)
+            count = len(query.all())
+            allResult = query.offset(startIndex).limit(pageCount).all()
             companyList = [CompanyAssistant.generate(o=c) for c in allResult]
-            count = db.session.query(func.count(CompanyAssistant.companyID)).first()
             companyResult = {}
-            companyResult['companyList'] = companyList
+            companyResult['dataList'] = companyList
             companyResult['count'] = count
             return (True, companyResult)
         except Exception as e:
