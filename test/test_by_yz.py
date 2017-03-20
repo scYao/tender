@@ -426,6 +426,50 @@ def get_company_img_background():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 获取企业业绩列表，后台
+def get_company_achievement_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_company_achievement_list_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['companyID'] = '2017-03-1817570920a745ba3dc69398c16b14fd72b09826'
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+# 获取项目经理详情，后台
+def get_project_manager_info_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_project_manager_info_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['managerID'] = '2017-03-1818024883175b2ad7e73eb42e980b699e64802a'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 获取项目经理业绩列表，后台
+def get_manager_achievement_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_manager_achievement_list_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['managerID'] = '2017-03-18180248a90ec6f40486c03d4adbfc3f53086f66'
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tag'] = 0
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
 
 
 def formatDic(info):
@@ -466,6 +510,9 @@ def pythonic():
 
 
 if __name__ == '__main__':
+    # get_company_achievement_list_background()
+    get_manager_achievement_list_background()
+    # get_project_manager_info_background()
     # create_tender()
     # get_company_img_background()
     # common()
@@ -517,6 +564,7 @@ if __name__ == '__main__':
     # getUserInfoDetail()
     info = {}
     info['tokenID'] = YZTOKENID
-    info['companyID'] = '2017-03-10162147bbd4e62a521b35e887a75b310b6c87b8'
-    info['tag'] = 4
+    info['companyID'] = '2017-03-1817570920a745ba3dc69398c16b14fd72b09826'
+    info['startIndex'] = 0
+    info['pageCount'] = 10
     formatDic(info)

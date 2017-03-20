@@ -1037,10 +1037,6 @@ def get_company_img_background():
         data['data'] = jsonlist
         return json.dumps(data)
 
-
-
-
-
 # 删除中标信息，后台
 @app.route('/does_image_exists/', methods=['POST', 'GET'])
 def does_image_exists():
@@ -1054,6 +1050,54 @@ def does_image_exists():
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
+        return json.dumps(data)
+
+
+# 获取企业业绩列表，后台
+@app.route('/get_company_achievement_list_background/', methods=['POST', 'GET'])
+def get_company_achievement_list_background():
+    companyAchievementManager = CompanyAchievementManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = companyAchievementManager.getCompanyAchievementListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+
+# 获取项目经理详情，后台
+@app.route('/get_project_manager_info_background/', methods=['POST', 'GET'])
+def get_project_manager_info_background():
+    pMManager = PMManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = pMManager.getProjectManagerInfoBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 获取项目经理业绩列表，后台
+@app.route('/get_manager_achievement_list_background/', methods=['POST', 'GET'])
+def get_manager_achievement_list_background():
+    pMManager = PMManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = pMManager.getManagerAchievementListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
         return json.dumps(data)
 
 
