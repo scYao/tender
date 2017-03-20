@@ -108,7 +108,19 @@ class WinBiddingManager(Util):
         query = self.__getQueryResult(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
         biddingList = [self.__generateBrief(w=result) for result in allResult]
-        return (True, biddingList)
+
+        # count
+        countQuery = db.session.query(func.count(WinBiddingPub.biddingID)).outerjoin(
+            City, WinBiddingPub.cityID == City.cityID
+        )
+        info['query'] = countQuery
+        countQuery = self.__getQueryResult(info=info)
+        count = countQuery.first()
+        count = count[0]
+        biddingResult = {}
+        biddingResult['biddingList'] = biddingList
+        biddingResult['count'] = count
+        return (True, biddingResult)
 
     # 获取中标信息列表,后台管理
     # @cache.memoize(timeout=60 * 2)
