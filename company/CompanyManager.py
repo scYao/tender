@@ -31,6 +31,25 @@ class CompanyManager(Util):
     def __init__(self):
         pass
 
+    # 通过title判断改标段是否存在, 存在为True
+    def doesCompanyExists(self, info):
+        companyName = info['companyName']
+        try:
+            result = db.session.query(Company).filter(
+                Company.companyName == companyName
+            ).first()
+            if result is not None:
+                return (True, result.companyID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
     # 创建公司
     def createCompany(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -70,6 +89,11 @@ class CompanyManager(Util):
         companyBrief = info['companyBrief'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         companyID = self.generateID(companyName)
+        (status, reason) = self.doesCompanyExists(info=info)
+        if status is True:
+            errorInfo = ErrorInfo['TENDER_18']
+            errorInfo['detail'] = reason
+            return (False, errorInfo)
 
         company = Company(companyID=companyID, companyName=companyName, newArchiveID=newArchiveID,
                           registerArea=registerArea, companyAreaType=companyAreaType,
@@ -129,7 +153,7 @@ class CompanyManager(Util):
         # if not status:
         #     errorInfo = ErrorInfo['TENDER_01']
         #     return (False, errorInfo)
-        # 获取tenderID列表
+        # 获取company列表
         query = self.__getQueryResult(info)
         allResult = query.offset(startIndex).limit(pageCount).all()
         companyList = [Company.generateBrief(result) for result in allResult]
@@ -183,21 +207,40 @@ class CompanyManager(Util):
     #获取企业图片，根据不同的tag
     def getCompanyImgBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if not status:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
         companyID = info['companyID']
-        tag = info['tag']
-        query = db.session.query(ImgPath).filter(
-            and_(
-                ImgPath.foreignID == companyID,
-                ImgPath.tag == tag
-            )
-        )
-        allResult = query.all()
+        tag = int(info['tag'])
+
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        try:
+            query = db.session.query(ImgPath).filter(
+                and_(
+                    ImgPath.foreignID == companyID,
+                    ImgPath.tag == tag
+                )
+            ).offset(startIndex).limit(pageCount)
+            allResult = query.all()
+            count = db.session.query(func.count(ImgPath.imgPathID)).filter(
+                and_(
+                    ImgPath.foreignID == companyID,
+                    ImgPath.tag == tag
+                )
+            ).first()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
         ossInfo = {}
         ossInfo['bucket'] = 'sjtender'
-        imgList = [ImgPath.generate(result, ossInfo, 'company') for result in allResult]
-        return (True, imgList)
+        imgList = [ImgPath.generate(result, ossInfo, 'company', True) for result in allResult]
+        imgResult = {}
+        imgResult['imgList'] = imgList
+        imgResult['count'] = count[0]
+        return (True, imgResult)

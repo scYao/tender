@@ -14,19 +14,24 @@ class ImgPath(db.Model):
     path = db.Column(db.Text)
     foreignID = db.Column(db.String(100))
     tag = db.Column(db.Integer)
+    imgNum = db.Column(db.String(100))
 
     def __init__(self, imgPathID=None, path=None, foreignID=None,
-                 tag=0):
+                 tag=0, imgNum=None):
         self.imgPathID = imgPathID
         self.path = path
         self.foreignID = foreignID
         self.tag = tag
+        self.imgNum = imgNum
 
     @staticmethod
-    def generate(img, ossInfo, directory):
+    def generate(img, ossInfo, directory, hd=None):
         res = {}
         res['imgPathID'] = img.imgPathID
-        ossInfo['objectKey'] = '%s/%s@!constrain-300h' % (directory, img.path)
+        if hd is not None:
+            ossInfo['objectKey'] = '%s/%s' % (directory, img.path)
+        else:
+            ossInfo['objectKey'] = '%s/%s@!constrain-300h' % (directory, img.path)
         util = Util()
         res['imgPath'] = util.getSecurityUrl(ossInfo)
         res['tag'] = img.tag

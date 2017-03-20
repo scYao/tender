@@ -12,6 +12,7 @@ import jieba
 from models.ImgPath import ImgPath
 from tool.config import ErrorInfo
 from tool.Util import Util
+from sqlalchemy import and_
 from datetime import datetime
 from pypinyin import lazy_pinyin
 
@@ -28,14 +29,40 @@ class ImageManager(Util):
             tag = info['tag']
         else:
             tag = 0
+
         index = 0
         for img in imgList:
-            imgID = self.generateID(str(index) + img)
-            imagePath = ImgPath(imgPathID=imgID, path=img, foreignID=foreignID, tag=tag)
+            imgName = img['imgName']
+            imgNum = img['imgNum']
+            imgID = self.generateID(str(index) + imgName)
+            imagePath = ImgPath(imgPathID=imgID, path=imgName, foreignID=foreignID,
+                                tag=tag, imgNum=imgNum)
             db.session.add(imagePath)
             index = index + 1
 
         return (True, None)
+
+    def doesImageExists(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        foreignID = info['foreignID']
+        imgNum = info['imgNum']
+
+        try:
+            result = db.session.query(ImgPath).filter(
+                and_(ImgPath.foreignID == foreignID,
+                     ImgPath.imgNum == imgNum)
+            ).first()
+            if result is not None:
+                return (True, result.imgPathID)
+            else:
+                return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
 
 
     def addImagesWithOSS(self, info):
