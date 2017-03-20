@@ -29,11 +29,14 @@ class CompanyAssistantManager(Util):
     def __init__(self):
         pass
 
-
     def create(self, jsonInfo):
         info = json.loads(jsonInfo)
         companyName = info['companyName'].replace('\'', '\\\'').replace('\"', '\\\"')
         foreignCompanyID = info['foreignCompanyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+
+        (status, reason) = self.doesCompanyExists(info=info)
+        if status is True:
+            return (False, reason)
 
         companyID = self.generateID(companyName)
         companyAssistant = CompanyAssistant(companyID=companyID, companyName=companyName,
@@ -70,3 +73,30 @@ class CompanyAssistantManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
+
+    def getCompanyAssistantListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+
+        try:
+            query = db.session.query(CompanyAssistant).offset(startIndex).limit(pageCount)
+            allResult = query.all()
+            companyList = [CompanyAssistant.generate(o=c) for c in allResult]
+            count = db.session.query(func.count(CompanyAssistant.companyID)).first()
+            companyResult = {}
+            companyResult['companyList'] = companyList
+            companyResult['count'] = count
+            return (True, companyResult)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)

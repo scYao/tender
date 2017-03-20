@@ -29,6 +29,7 @@ from winBidding.WinBiddingManager import WinBiddingManager
 from winBidding.CandidateManager import CandidateManager
 from search.SearchManager import SearchManager
 from image.ImageManager import ImageManager
+from company.CompanyAssistantManager import CompanyAssistantManager
 
 
 def allowed_file(filename):
@@ -1100,6 +1101,20 @@ def get_manager_achievement_list_background():
         data['data'] = result
         return json.dumps(data)
 
+# 创建CompanyAssistant
+@app.route('/get_company_assistant_list_background/', methods=['POST', 'GET'])
+def get_company_assistant_list_background():
+    companyAssistatntManager = CompanyAssistantManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = companyAssistatntManager.getCompanyAssistantListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
 
 
 
