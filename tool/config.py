@@ -110,6 +110,30 @@ ErrorInfo['TENDER_18'] = {
     'zhInfo' : '该公司已存在!'
 }
 
+ErrorInfo['TENDER_19'] = {
+    'code' : 'TENDER_19',
+    'info' : 'project manager already exists!',
+    'zhInfo' : '该项目经理已存在!'
+}
+
+ErrorInfo['TENDER_20'] = {
+    'code' : 'TENDER_20',
+    'info' : 'project manager achievement already exists!',
+    'zhInfo' : '该项目经理业绩已存在!'
+}
+
+ErrorInfo['TENDER_21'] = {
+    'code' : 'TENDER_21',
+    'info' : 'company achievement already exists!',
+    'zhInfo' : '该公司业绩已存在!'
+}
+
+ErrorInfo['TENDER_22'] = {
+    'code' : 'TENDER_22',
+    'info' : 'company delinquenent conduct already exists!',
+    'zhInfo' : '该不良行为已存在!'
+}
+
 
 
 #支付宝公钥
