@@ -5,6 +5,7 @@ import urllib2
 import poster
 import requests
 
+
 sys.path.append("..")
 import os
 reload(sys)
@@ -12,9 +13,11 @@ sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
 from pypinyin import lazy_pinyin
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, and_
 from models.flask_app import db
 from models.ProjectManager import ProjectManager
+from models.ManagerAchievement import ManagerAchievement
+from user.AdminManager import AdminManager
 from models.SearchKey import SearchKey
 
 from tool.Util import Util
@@ -84,3 +87,42 @@ class PMManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, managerResult)
+
+    # 获取项目经理详情，后台
+    def getProjectManagerInfoBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        managerID = info['managerID']
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        query = db.session.query(ProjectManager).filter(
+            ProjectManager.managerID == managerID
+        )
+        result = query.first()
+        projectManagerInfo = ProjectManager.generate(result)
+        return (True, projectManagerInfo)
+
+    # 获取项目经理业绩列表，后台
+    def getManagerAchievementListBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        managerID = info['managerID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tag = info['tag']
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        query = db.session.query(ManagerAchievement).filter(
+            and_(
+                ManagerAchievement.managerID == managerID,
+                ManagerAchievement.tag == tag
+            )
+
+        )
+        allResult = query.offset(startIndex).limit(pageCount).all()
+        achievementResult = [ManagerAchievement.generate(result) for result in allResult]
+        return (True, achievementResult)

@@ -5,7 +5,6 @@ import urllib2
 import poster
 import requests
 from sqlalchemy import desc
-
 sys.path.append("..")
 import os
 reload(sys)
@@ -14,6 +13,8 @@ import json
 from datetime import datetime
 from models.flask_app import db
 from models.CompanyAchievement import CompanyAchievement
+from user.AdminManager import AdminManager
+
 
 from tool.Util import Util
 from tool.config import ErrorInfo
@@ -55,18 +56,20 @@ class CompanyAchievementManager(Util):
             return (False, errorInfo)
         return (True, achievementID)
 
+ #获取企业业绩列表，后台
     def getCompanyAchievementListBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         companyID = info['companyID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        try:
-            achievementResult = {}
-
-        except Exception as e:
-            db.session.rollback()
-            print e
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            return (False, errorInfo)
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        query = db.session.query(CompanyAchievement).filter(
+            CompanyAchievement.companyID == companyID
+        )
+        allResult = query.offset(startIndex).limit(pageCount).all()
+        achievementResult = [CompanyAchievement.generate(result) for result in allResult]
         return (True, achievementResult)

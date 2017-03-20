@@ -39,7 +39,7 @@ class CompanyAchievement(db.Model):
         res['achievementID'] = o.achievementID
         res['projectName'] = o.projectName
         res['companyName'] = o.companyName
-        res['winBiddingDate'] = o.winBiddingDate
+        res['winBiddingDate'] = str(o.winBiddingDate)
         res['price'] = o.price
         res['projectManagerName'] = o.projectManagerName
         res['managerID'] = o.managerID
