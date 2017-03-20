@@ -61,8 +61,8 @@ class CompanyAchievementManager(Util):
 
     # 通过projectName， companyID判断公司业绩是否存在, 存在为True
     def doesCompanyAchievementExists(self, info):
-        projectName = info['projectName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        projectName = info['projectName']
+        companyID = info['companyID']
         try:
             result = db.session.query(CompanyAchievement).filter(
                 and_(

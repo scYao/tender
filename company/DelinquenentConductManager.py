@@ -58,8 +58,8 @@ class DelinquenentConductManager(Util):
 
     # 通过conductName， companyID判断公司不良记录是否存在, 存在为True
     def doesDelinquenentConductExists(self, info):
-        conductName = info['conductName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        conductName = info['conductName']
+        companyID = info['companyID']
         try:
             result = db.session.query(DelinquenentConduct).filter(
                 and_(

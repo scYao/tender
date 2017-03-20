@@ -56,8 +56,8 @@ class AchievementManager(Util):
 
     # 通过projectName， projectManagerName判断项目经理业绩是否存在, 存在为True
     def doesManagerAchievementExists(self, info):
-        projectName = info['projectName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        projectManagerName = info['projectManagerName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        projectName = info['projectName']
+        projectManagerName = info['projectManagerName']
         try:
             result = db.session.query(ManagerAchievement).filter(
                 and_(

@@ -68,8 +68,8 @@ class PMManager(Util):
 
     # 通过managerName， companyID判断项目经理是否存在, 存在为True
     def doesProjectManagerExists(self, info):
-        managerName = info['managerName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+        managerName = info['managerName']
+        companyID = info['companyID']
         try:
             result = db.session.query(ProjectManager).filter(
                 and_(
