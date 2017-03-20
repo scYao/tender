@@ -105,7 +105,7 @@ class PMManager(Util):
             count = db.session.query(func.count(ProjectManager.managerID)).filter(
                 ProjectManager.companyID == companyID
             ).first()
-            managerResult['count'] = count
+            managerResult['count'] = count[0]
 
         except Exception as e:
             db.session.rollback()
