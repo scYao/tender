@@ -6,6 +6,8 @@ import poster
 import requests
 from sqlalchemy import desc
 
+from user.AdminManager import AdminManager
+
 sys.path.append("..")
 import os
 reload(sys)
@@ -48,3 +50,29 @@ class CertificationGrade3Manager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, gradeID)
+
+    def getGrade3ListBackground(self, jsonInfo):
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        return self.getGrade3List(jsonInfo=jsonInfo)
+
+    def getGrade3List(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        gradeID = info['gradeID']
+        # 获取tenderID列表
+        try:
+            query = db.session.query(CertificationGrade3).filter(
+                CertificationGrade3.superiorID == gradeID
+            )
+            allResult = query.all()
+            callBackInfo = [CertificationGrade3.generate(result) for result in allResult]
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

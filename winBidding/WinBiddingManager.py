@@ -310,24 +310,18 @@ class WinBiddingManager(Util):
             )
             info['query'] = query
             query = self.__getQueryResult(info=info)
-            allBiddingResult = query.filter(
+            query = query.filter(
                 WinBiddingPub.biddingID.in_(biddingIDTuple)
-            ).order_by(
+            )
+            count = len(query.all())
+            allBiddingResult = query.order_by(
                 desc(WinBiddingPub.publishDate)
             ).offset(startIndex).limit(pageCount).all()
-            biddingResult = {}
             biddingList = [self.__generateBrief(o=o) for o in allBiddingResult]
-
-            countQuery = db.session.query(func.count(
-                WinBiddingPub.biddingID
-            ))
-            info['query'] = countQuery
-            countQuery = self.__getQueryResult(info=info)
-            count = countQuery.first()
-            count = count[0]
-            biddingResult['biddingList'] = biddingList
-            biddingResult['count'] = count
-            return (True, biddingResult)
+            callBackInfo = {}
+            callBackInfo['dataList'] = biddingList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
 
         except Exception as e:
                 # traceback.print_stack()

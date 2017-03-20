@@ -510,6 +510,55 @@ def get_company_assistant_list_background():
     result = resultManager.getResult(params, upload_url)
     print result
 
+
+
+# 获取招标数据库列表，后台
+def get_grade_1_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_grade_1_list_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 获取招标数据库列表，后台
+def get_grade_2_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_grade_2_list_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['gradeID'] = '2017-03-101500404bad30da3e3ad7663281341fdd5ad0ea'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 获取招标数据库列表，后台
+def get_grade_3_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_grade_3_list_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['gradeID'] = '2017-03-10150041cee6bd9455c5220fe4522990fb794012'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 获取招标数据库列表，后台
+def get_grade_4_list_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_grade_4_list_background/' % LOCALHOST
+    info = {}
+    info['tokenID'] = YZTOKENID
+    info['gradeID'] = '2017-03-10150041ce0944d08ddafa5faa221df5428104eb'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
 def formatDic(info):
     for (key, value) in info.items():
         print '{:<20}'.format(key), '{:^20}'.format('string'), '{:<20}'.format(value)
@@ -548,7 +597,11 @@ def pythonic():
 
 
 if __name__ == '__main__':
-    get_company_assistant_list_background()
+    # get_grade_1_list_background()
+    # get_grade_2_list_background()
+    # get_grade_3_list_background()
+    get_grade_4_list_background()
+    # get_company_assistant_list_background()
     # get_company_achievement_list_background()
     # get_manager_achievement_list_background()
     # get_project_manager_info_background()

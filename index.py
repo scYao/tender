@@ -826,6 +826,8 @@ def create_certification_grade1():
         data['data'] = result
         return json.dumps(data)
 
+
+
 # 创建二级资质等级
 @app.route('/create_certification_grade2/', methods=['POST', 'GET'])
 def create_certification_grade2():
@@ -1111,6 +1113,66 @@ def get_company_assistant_list_background():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = companyAssistatntManager.getCompanyAssistantListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取一级资质等级列表
+@app.route('/get_grade_1_list_background/', methods=['POST', 'GET'])
+def get_grade_1_list_background():
+    certificationGrade1Manager = CertificationGrade1Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade1Manager.getGrade1ListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取2级资质等级列表
+@app.route('/get_grade_2_list_background/', methods=['POST', 'GET'])
+def get_grade_2_list_background():
+    certificationGrade2Manager = CertificationGrade2Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade2Manager.getGrade2ListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取3级资质等级列表
+@app.route('/get_grade_3_list_background/', methods=['POST', 'GET'])
+def get_grade_3_list_background():
+    certificationGrade3Manager = CertificationGrade3Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade3Manager.getGrade3ListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取4级资质等级列表
+@app.route('/get_grade_4_list_background/', methods=['POST', 'GET'])
+def get_grade_4_list_background():
+    certificationGrade4Manager = CertificationGrade4Manager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = certificationGrade4Manager.getGrade4ListBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
