@@ -180,6 +180,12 @@ create table candidate(
 	biddingID nvarchar(100) comment '中部公示ID'
 );
 
+-- 从中标公示中，爬取的公司
+create table companyAssistant(
+	companyID nvarchar(100) primary key comment '公司ID',
+	companyName nvarchar(100) comment '公司名称',
+	foreignCompanyID nvarchar(100) default '-1' comment 'company 表的ID, 不设外键'
+);
 
 ALTER TABLE company CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE qualificationGrade CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -195,6 +201,7 @@ ALTER TABLE certificationGrade3 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4
 ALTER TABLE certificationGrade4 CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE winBiddingPub CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE candidate CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE companyAssistant CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table companyQualification add constraint company_q_FK_company foreign key(companyID) references company(companyID);
 alter table companyQualification add constraint company_q_FK_qualification foreign key(qualificationID) references qualificationGrade(qualificationID);
