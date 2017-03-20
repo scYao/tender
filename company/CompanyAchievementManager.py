@@ -4,12 +4,12 @@ import traceback
 import urllib2
 import poster
 import requests
-from sqlalchemy import desc
 sys.path.append("..")
 import os
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
+from sqlalchemy import desc, and_, func
 from datetime import datetime
 from models.flask_app import db
 from models.CompanyAchievement import CompanyAchievement
@@ -56,20 +56,38 @@ class CompanyAchievementManager(Util):
             return (False, errorInfo)
         return (True, achievementID)
 
- #获取企业业绩列表，后台
+    # 获取企业业绩列表，后台
     def getCompanyAchievementListBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         companyID = info['companyID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
+        tag = info['tag']
         # 管理员身份校验, 里面已经校验过token合法性
         adminManager = AdminManager()
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
-        query = db.session.query(CompanyAchievement).filter(
-            CompanyAchievement.companyID == companyID
-        )
-        allResult = query.offset(startIndex).limit(pageCount).all()
-        achievementResult = [CompanyAchievement.generate(result) for result in allResult]
-        return (True, achievementResult)
+        try:
+            query = db.session.query(CompanyAchievement).filter(
+                and_(CompanyAchievement.companyID == companyID,
+                     CompanyAchievement.tag == tag)
+            )
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            achievementList = [CompanyAchievement.generate(result) for result in allResult]
+
+            count = db.session.query(func.count(CompanyAchievement.companyID)).filter(
+                and_(CompanyAchievement.companyID == companyID,
+                     CompanyAchievement.tag == tag)
+            ).first()
+
+            achievementResult = {}
+            achievementResult['achievementList'] = achievementList
+            achievementResult['count'] = count
+            return (True, achievementResult)
+        except Exception as e:
+            db.session.rollback()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
