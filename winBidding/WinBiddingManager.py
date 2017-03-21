@@ -90,10 +90,10 @@ class WinBiddingManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
-    def __generateBrief(self, w):
+    def __generateBrief(self, o):
         res = {}
-        res.update(WinBiddingPub.generateBrief(result=w.WinBiddingPub))
-        res.update(City.generate(city=w.City))
+        res.update(WinBiddingPub.generateBrief(result=o.WinBiddingPub))
+        res.update(City.generate(city=o.City))
         return res
 
     def getBiddingList(self, jsonInfo):
@@ -107,9 +107,14 @@ class WinBiddingManager(Util):
             )
             info['query'] = query
             query = self.__getQueryResult(info)
-            count = len(query.all())
+            # count
+            countQuery = db.session.query(func.count(WinBiddingPub.biddingID))
+            info['query'] = countQuery
+            countQuery = self.__getQueryResult(info=info)
+            count = countQuery.first()
+            count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            biddingList = [self.__generateBrief(w=result) for result in allResult]
+            biddingList = [self.__generateBrief(o=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = biddingList
             callBackInfo['count'] = count
@@ -313,7 +318,15 @@ class WinBiddingManager(Util):
             query = query.filter(
                 WinBiddingPub.biddingID.in_(biddingIDTuple)
             )
-            count = len(query.all())
+            # count
+            biddingIDTuple = (b.biddingID for b in biddingIDResult)
+            countQuery = db.session.query(func.count(WinBiddingPub.biddingID)).filter(
+                WinBiddingPub.biddingID.in_(biddingIDTuple)
+            )
+            info['query'] = countQuery
+            countQuery = self.__getQueryResult(info=info)
+            count = countQuery.first()
+            count = count[0]
             allBiddingResult = query.order_by(
                 desc(WinBiddingPub.publishDate)
             ).offset(startIndex).limit(pageCount).all()

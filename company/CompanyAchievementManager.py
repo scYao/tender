@@ -99,7 +99,13 @@ class CompanyAchievementManager(Util):
                 and_(CompanyAchievement.companyID == companyID,
                      CompanyAchievement.tag == tag)
             )
-            count = len(query.all())
+            # count
+            countQuery = db.session.query(func.count(CompanyAchievement.achievementID)).filter(
+                and_(CompanyAchievement.companyID == companyID,
+                     CompanyAchievement.tag == tag)
+            )
+            count = countQuery.first()
+            count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
             achievementList = [CompanyAchievement.generate(result) for result in allResult]
             callBackInfo = {}

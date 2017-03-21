@@ -181,17 +181,27 @@ class TenderManager(Util):
         pageCount = info['pageCount']
         #获取tenderID列表
         try:
-            query = db.session.query(Tender)
+            query = db.session.query(Tender, City).outerjoin(
+                City, Tender.cityID == City.cityID
+            )
             info['query'] = query
-            query = self.getQueryResult(info)
-            count = len(query.all())
-            tenderList = query.offset(startIndex).limit(pageCount).all()
-            tenderIDList = [t.tenderID for t in tenderList]
-            tenderIDTuple = tuple(tenderIDList)
-            info['tenderIDTuple'] = tenderIDTuple
-            resultList = self.__doGetTenderList(info)
+            query = self.__getQueryResult(info)
+            # count
+            countQuery = db.session.query(func.count(Tender.tenderID))
+            info['query'] = countQuery
+            countQuery = self.__getQueryResult(info=info)
+            count = countQuery.first()
+            count = count[0]
+            resultResult = query.order_by(
+                desc(Tender.publishDate)
+            ).offset(startIndex).limit(pageCount).all()
+            # tenderIDList = [t.tenderID for t in tenderList]
+            # tenderIDTuple = tuple(tenderIDList)
+            # info['tenderIDTuple'] = tenderIDTuple
+            # resultList = self.__doGetTenderList(info)
+            dataList = [self.__generateBrief(o=o) for o in resultResult]
             callBackInfo = {}
-            callBackInfo['dataList'] = resultList
+            callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
             return (True, callBackInfo)
         except Exception as e:
@@ -285,7 +295,7 @@ class TenderManager(Util):
         #     res['cityID'] = city.cityID
         #     res['cityName'] = city.cityName
         #     return res
-        tenderList = [self.__generateBrief(t=result) for result in allResult]
+        tenderList = [self.__generateBrief(o=result) for result in allResult]
         return filter(None, tenderList)
 
     def getTenderListByIDTuple(self, info):
@@ -311,7 +321,7 @@ class TenderManager(Util):
         #     res['cityID'] = city.cityID
         #     res['cityName'] = city.cityName
         #     return res
-        tenderList = [self.__generateBrief(t=result) for result in allResult]
+        tenderList = [self.__generateBrief(o=result) for result in allResult]
         return filter(None, tenderList)
 
     def getTenderDetail(self, jsonInfo):
@@ -411,10 +421,10 @@ class TenderManager(Util):
         db.session.commit()
         return (True, '111')
 
-    def __generateBrief(self, t):
+    def __generateBrief(self, o):
         res = {}
-        tender = t.Tender
-        city = t.City
+        tender = o.Tender
+        city = o.City
         res.update(Tender.generateBrief(tender=tender))
         res.update(City.generate(city=city))
         return res
