@@ -364,9 +364,9 @@ class UserManager(Util):
         tel = info['tel']
         password = info['password']
         password = self.getMD5String(password)
-        # (status, reason) = self.checkSmsCode(info)
-        # if status is not True:
-        #     return (False, reason)
+        (status, reason) = self.checkSmsCode(info)
+        if status is not True:
+            return (False, reason)
         (status, reason) = self.__resetPassWord(tel=tel, pwd=password)
         print status, reason
         if status is not True:

@@ -34,7 +34,7 @@ class PMManager(Util):
     def createProjectManager(self, jsonInfo):
         info = json.loads(jsonInfo)
         managerName = info['managerName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        gender = info['gender'].replace('\'', '\\\'').replace('\"', '\\\"')
+        gender = info['gender']
         positionalTitles = info['positionalTitles'].replace('\'', '\\\'').replace('\"', '\\\"')
         post = info['post'].replace('\'', '\\\'').replace('\"', '\\\"')
         safetyAssessment = info['safetyAssessment'].replace('\'', '\\\'').replace('\"', '\\\"')
@@ -45,7 +45,9 @@ class PMManager(Util):
 
         (status, reason) = self.doesProjectManagerExists(info=info)
         if status is True:
-            return (False, ErrorInfo['TENDER_19'])
+            errorInfo = ErrorInfo['TENDER_19']
+            errorInfo['detail'] = reason
+            return (False, errorInfo)
         managerID = self.generateID(managerName)
 
         projectManager = ProjectManager(

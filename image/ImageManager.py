@@ -49,8 +49,9 @@ class ImageManager(Util):
 
         try:
             result = db.session.query(ImgPath).filter(
-                and_(ImgPath.foreignID == foreignID,
-                     ImgPath.imgNum == imgNum)
+                # and_(ImgPath.foreignID == foreignID,
+                #      ImgPath.imgNum == imgNum)
+                ImgPath.imgNum == imgNum
             ).first()
             if result is not None:
                 return (True, result.imgPathID)
