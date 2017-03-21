@@ -153,10 +153,15 @@ class CompanyManager(Util):
         pageCount = info['pageCount']
         # 获取company列表
         try:
-            query = self.__getQueryResult(info)
-            count = len(query.all())
+            query = db.session.query(Company)
             allResult = query.offset(startIndex).limit(pageCount).all()
             companyList = [Company.generateBrief(result) for result in allResult]
+            # count
+            countQuery = db.session.query(func.count(Company.companyID))
+            info['query'] = countQuery
+            countQuery = self.__getQueryResult(info=info)
+            count = countQuery.first()
+            count = count[0]
             callBackInfo = {}
             callBackInfo['dataList'] = companyList
             callBackInfo['count'] = count

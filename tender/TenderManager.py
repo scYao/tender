@@ -186,7 +186,12 @@ class TenderManager(Util):
             )
             info['query'] = query
             query = self.__getQueryResult(info)
-            count = len(query.all())
+            # count
+            countQuery = db.session.query(func.count(Tender.tenderID))
+            info['query'] = countQuery
+            countQuery = self.__getQueryResult(info=info)
+            count = countQuery.first()
+            count = count[0]
             resultResult = query.order_by(
                 desc(Tender.publishDate)
             ).offset(startIndex).limit(pageCount).all()

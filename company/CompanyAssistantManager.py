@@ -86,7 +86,10 @@ class CompanyAssistantManager(Util):
 
         try:
             query = db.session.query(CompanyAssistant)
-            count = len(query.all())
+            # count
+            countQuery = db.session.query(func.count(CompanyAssistant.companyID))
+            count = countQuery.first()
+            count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
             companyList = [CompanyAssistant.generate(o=c) for c in allResult]
             companyResult = {}

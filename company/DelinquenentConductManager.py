@@ -96,7 +96,7 @@ class DelinquenentConductManager(Util):
             count = db.session.query(func.count(DelinquenentConduct.conductID)).filter(
                 DelinquenentConduct.companyID == companyID
             ).first()
-            conductListResult['count'] = count
+            conductListResult['count'] = count[0]
 
         except Exception as e:
             db.session.rollback()

@@ -150,9 +150,17 @@ class PMManager(Util):
                     ManagerAchievement.tag == tag
                 )
             )
-            count = len(query.all())
             allResult = query.offset(startIndex).limit(pageCount).all()
             achievementResult = [ManagerAchievement.generate(result) for result in allResult]
+            # count
+            countQuery = db.session.query(func.count(ManagerAchievement.achievementID)).filter(
+                and_(
+                    ManagerAchievement.managerID == managerID,
+                    ManagerAchievement.tag == tag
+                )
+            )
+            count = countQuery.first()
+            count = count[0]
             biddingResult = {}
             biddingResult['dataList'] = achievementResult
             biddingResult['count'] = count
