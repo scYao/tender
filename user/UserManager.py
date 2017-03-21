@@ -253,20 +253,18 @@ class UserManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-
         userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"')
-        email = info['email'].replace('\'', '\\\'').replace('\"', '\\\"')
-        gender = info['gender'].replace('\'', '\\\'').replace('\"', '\\\"')
-        description = info['info'].replace('\'', '\\\'').replace('\"', '\\\"')
-
+        companyName = info['companyName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        jobPosition = info['jobPosition'].replace('\'', '\\\'').replace('\"', '\\\"')
+        tel = info['tel'].replace('\'', '\\\'').replace('\"', '\\\"')
         try:
             db.session.query(UserInfo).filter(
                 UserInfo.userID == userID
             ).update({
                 UserInfo.userName : userName,
-                UserInfo.email : email,
-                UserInfo.gender : gender,
-                UserInfo.info : description
+                UserInfo.tel : tel,
+                UserInfo.companyName : companyName,
+                UserInfo.jobPosition : jobPosition
             },
                 synchronize_session=False)
             db.session.commit()
