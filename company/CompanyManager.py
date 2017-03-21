@@ -158,8 +158,6 @@ class CompanyManager(Util):
             companyList = [Company.generateBrief(result) for result in allResult]
             # count
             countQuery = db.session.query(func.count(Company.companyID))
-            info['query'] = countQuery
-            countQuery = self.__getQueryResult(info=info)
             count = countQuery.first()
             count = count[0]
             callBackInfo = {}
@@ -173,10 +171,6 @@ class CompanyManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
-
-    def __getQueryResult(self, info):
-        query = db.session.query(Company)
-        return query
 
     def __generateCompanyDetail(self, result):
         # ossInfo = {}
