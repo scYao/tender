@@ -159,7 +159,7 @@ def get_company_list():
 
 
 #找回密码
-def findPassword():
+def find_password():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/find_password/' % LOCALHOST
     info = {}
@@ -597,10 +597,11 @@ def pythonic():
 
 
 if __name__ == '__main__':
+    find_password()
     # get_grade_1_list_background()
     # get_grade_2_list_background()
     # get_grade_3_list_background()
-    get_grade_4_list_background()
+    # get_grade_4_list_background()
     # get_company_assistant_list_background()
     # get_company_achievement_list_background()
     # get_manager_achievement_list_background()
