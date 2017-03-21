@@ -16,6 +16,7 @@ from models.flask_app import db
 from models.Favorite import Favorite
 from models.Tender import Tender
 from models.WinBiddingPub import WinBiddingPub
+from models.City import City
 from datetime import datetime
 
 from tool.Util import Util
@@ -93,13 +94,13 @@ class FavoriteManager(Util):
     def __generateTender(self, t):
         res = {}
         res.update(Tender.generateBrief(tender=t.Tender))
-        res.update(Favorite.generate(f=t.Favorite))
+        res.update(City.generate(city=t.City))
         return res
 
     def __generateBidding(self, b):
         res = {}
         res.update(WinBiddingPub.generateBrief(result=b.WinBiddingPub))
-        res.update(Favorite.generate(f=b.Favorite))
+        res.update(City.generate(city=b.City))
         return res
 
     def getFavoriteTenderList(self, jsonInfo):
@@ -112,18 +113,24 @@ class FavoriteManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         try:
-            query = db.session.query(Tender, Favorite).outerjoin(
-                Favorite, Tender.tenderID == Favorite.tenderID
+            info['userID'] = userID
+            info['tag'] = FAVORITE_TAG_TENDER
+            (status, tenderIDTuple) = self.getFavoriteItemID(info=info)
+            query = db.session.query(Tender, City).outerjoin(
+                City, Tender.cityID == City.cityID
             ).filter(
-                and_(Favorite.userID == userID,
-                     Favorite.tag == FAVORITE_TAG_TENDER)
+                Tender.tenderID.in_(tenderIDTuple)
             )
-            count = len(query.all())
             allResult = query.offset(startIndex).limit(pageCount).all()
             tenderList = [self.__generateTender(t=t) for t in allResult]
+            # count
+            countQuery = db.session.query(func.count(Tender.tenderID)).filter(
+                Tender.tenderID.in_(tenderIDTuple)
+            )
+            count = countQuery.first()
             callBackInfo = {}
             callBackInfo['dataList'] = tenderList
-            callBackInfo['count'] = count
+            callBackInfo['count'] = count[0]
             return (True, callBackInfo)
         except Exception as e:
             print e
@@ -143,18 +150,24 @@ class FavoriteManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         try:
-            query = db.session.query(WinBiddingPub, Favorite).outerjoin(
-                Favorite, WinBiddingPub.biddingID == Favorite.tenderID
+            info['userID'] = userID
+            info['tag'] = FAVORITE_TAG_WIN_BIDDING
+            (status, biddingIDTuple) = self.getFavoriteItemID(info=info)
+            query = db.session.query(WinBiddingPub, City).outerjoin(
+                City, WinBiddingPub.cityID == City.cityID
             ).filter(
-                and_(Favorite.userID == userID,
-                     Favorite.tag == FAVORITE_TAG_WIN_BIDDING)
+                WinBiddingPub.biddingID.in_(biddingIDTuple)
             )
-            count = len(query.all())
             allResult = query.offset(startIndex).limit(pageCount).all()
             biddingList = [self.__generateBidding(b=b) for b in allResult]
+            # count
+            countQuery = db.session.query(func.count(WinBiddingPub.biddingID)).filter(
+                WinBiddingPub.biddingID.in_(biddingIDTuple)
+            )
+            count = countQuery.first()
             callBackInfo = {}
             callBackInfo['dataList'] = biddingList
-            callBackInfo['count'] = count
+            callBackInfo['count'] = count[0]
             return (True, callBackInfo)
         except Exception as e:
             print e
@@ -162,6 +175,18 @@ class FavoriteManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+    def getFavoriteItemID(self, info):
+        userID = info['userID']
+        tag = info['tag']
+
+        allResult = db.session.query(Favorite).filter(
+            and_(Favorite.userID == userID,
+                 Favorite.tag == tag)
+        ).all()
+
+        dataList = (o.tenderID for o in allResult)
+        return (True, dataList)
 
     # 判断招标或中标是否被收藏
     @staticmethod
