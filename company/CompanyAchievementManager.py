@@ -84,16 +84,20 @@ class CompanyAchievementManager(Util):
 
     # 获取企业业绩列表，后台
     def getCompanyAchievementListBackground(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        companyID = info['companyID']
-        startIndex = info['startIndex']
-        pageCount = info['pageCount']
-        tag = info['tag']
         # 管理员身份校验, 里面已经校验过token合法性
         adminManager = AdminManager()
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
+        return self.getCompanyAchievementList(jsonInfo=jsonInfo)
+
+    # 获取企业业绩列表
+    def getCompanyAchievementList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        companyID = info['companyID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tag = info['tag']
         try:
             query = db.session.query(CompanyAchievement).filter(
                 and_(CompanyAchievement.companyID == companyID,

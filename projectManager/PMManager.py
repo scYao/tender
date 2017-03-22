@@ -119,13 +119,17 @@ class PMManager(Util):
 
     # 获取项目经理详情，后台
     def getProjectManagerInfoBackground(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        managerID = info['managerID']
         # 管理员身份校验, 里面已经校验过token合法性
         adminManager = AdminManager()
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
+        return self.getProjectManagerInfo(jsonInfo=jsonInfo)
+
+    # 获取项目经理详情
+    def getProjectManagerInfo(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        managerID = info['managerID']
         query = db.session.query(ProjectManager).filter(
             ProjectManager.managerID == managerID
         )
@@ -145,6 +149,16 @@ class PMManager(Util):
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
+        return self.getManagerAchievementList(jsonInfo=jsonInfo)
+
+
+    # 获取项目经理业绩列表
+    def getManagerAchievementList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        managerID = info['managerID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tag = info['tag']
         try:
             query = db.session.query(ManagerAchievement).filter(
                 and_(

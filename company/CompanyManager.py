@@ -202,29 +202,38 @@ class CompanyManager(Util):
     def getCompanyDetailBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if not status:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
-        query = self.__getDetailQueryResult(info)
-        result = query.first()
-        companyDetail = self.__generateCompanyDetail(result=result)
-        return (True, companyDetail)
-
-
-    #获取企业图片，根据不同的tag
-    def getCompanyImgBackground(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        startIndex = info['startIndex']
-        pageCount = info['pageCount']
-        companyID = info['companyID']
-        tag = int(info['tag'])
-
         # 管理员身份校验, 里面已经校验过token合法性
         adminManager = AdminManager()
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
+        return self.getCompanyDetail(jsonInfo=jsonInfo)
+
+
+    #获取企业信息详情
+    def getCompanyDetail(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        query = self.__getDetailQueryResult(info)
+        result = query.first()
+        companyDetail = self.__generateCompanyDetail(result=result)
+        return (True, companyDetail)
+
+    # 获取企业图片，根据不同的tag
+    def getCompanyImgBackground(self, jsonInfo):
+        # 管理员身份校验, 里面已经校验过token合法性
+        adminManager = AdminManager()
+        (status, reason) = adminManager.adminAuth(jsonInfo)
+        if status is not True:
+            return (False, reason)
+        self.getCompanyImg(jsonInfo=jsonInfo)
+
+    #获取企业图片，根据不同的tag
+    def getCompanyImg(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        companyID = info['companyID']
+        tag = int(info['tag'])
         try:
             query = db.session.query(ImgPath).filter(
                 and_(
