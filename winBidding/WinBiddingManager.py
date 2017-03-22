@@ -308,13 +308,13 @@ class WinBiddingManager(Util):
         try:
             biddingIDResult = db.session.query(Candidate).filter(
                 Candidate.companyID == companyID
-            ).group_by(WinBiddingPub.biddingID).all()
+            ).group_by(Candidate.biddingID).all()
             biddingIDTuple = (b.biddingID for b in biddingIDResult)
             query = db.session.query(WinBiddingPub, City).outerjoin(
                 City, WinBiddingPub.cityID == City.cityID
             )
-            info['query'] = query
-            query = self.__getQueryResult(info=info)
+            # info['query'] = query
+            # query = self.__getQueryResult(info=info)
             query = query.filter(
                 WinBiddingPub.biddingID.in_(biddingIDTuple)
             )
@@ -323,8 +323,8 @@ class WinBiddingManager(Util):
             countQuery = db.session.query(func.count(WinBiddingPub.biddingID)).filter(
                 WinBiddingPub.biddingID.in_(biddingIDTuple)
             )
-            info['query'] = countQuery
-            countQuery = self.__getQueryResult(info=info)
+            # info['query'] = countQuery
+            # countQuery = self.__getQueryResult(info=info)
             count = countQuery.first()
             count = count[0]
             allBiddingResult = query.order_by(

@@ -67,4 +67,5 @@ class UserInfo(db.Model):
         res['info'] = userInfo.info
         res['companyName'] = userInfo.companyName
         res['jobPosition'] = userInfo.jobPosition
+        res['tel'] = userInfo.tel
         return res
