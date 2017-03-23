@@ -26,3 +26,21 @@ class OperatorManager(Util):
 
     def createOperation(self, jsonInfo):
         pass
+
+    def getOperatorPushList(self, jsonInfo):
+        pass
+
+    # 经办人特殊, 获取自己参与的, 正在进行中的列表
+    # 考虑策略模式
+    def getTenderDoingListByOperator(self, jsonInfo):
+        pass
+
+    def getTenderDoingDetail(self, jsonInfo):
+        pass
+
+    # 经办人特殊, 获取自己参与的, 已完成的列表
+    def getTenderDoneListByOperator(self, jsonInfo):
+        pass
+
+    def getTenderDoneDetail(self, jsonInfo):
+        pass

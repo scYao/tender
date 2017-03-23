@@ -23,3 +23,4 @@ class OperationManager(Util):
     # 根据tenderid 获取 操作列表, 是否已报名等
     def getOperationList(self, jsonInfo):
         pass
+
