@@ -30,6 +30,7 @@ from winBidding.CandidateManager import CandidateManager
 from search.SearchManager import SearchManager
 from image.ImageManager import ImageManager
 from company.CompanyAssistantManager import CompanyAssistantManager
+from message.MessageManager import MessageManager
 
 
 def allowed_file(filename):
@@ -1248,6 +1249,36 @@ def get_grade_4_list_background():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = certificationGrade4Manager.getGrade4ListBackground(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取未读消息列表
+@app.route('/get_message_list/', methods=['POST', 'GET'])
+def get_message_list():
+    messageManager = MessageManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = messageManager.getMessageList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 删除未读消息
+@app.route('/delete_messages/', methods=['POST', 'GET'])
+def delete_messages():
+    messageManager = MessageManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = messageManager.deleteMessages(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
