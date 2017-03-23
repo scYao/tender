@@ -157,10 +157,10 @@ if __name__ == '__main__':
 	userID nvarchar(100) comment '用户',
 	tenderID nvarchar(100) comment '经办的项目, 不设外键',
 	tag int comment '负责人分配好经办人, 老板是否同意 0 未操作, 1 同意, 2 驳回' '''
-    sql_to_model_members(sql)
-    sql_to_model_init(sql)
-    sql_to_model_generate(sql, 'c')
-    create_tender(sql)
-    # sql_to_model_init_model_param(sql)
+    # sql_to_model_members(sql)
+    # sql_to_model_init(sql)
+    # sql_to_model_generate(sql, 'c')
+    # create_tender(sql)
+    sql_to_model_init_model_param(sql)
     # sql_to_generate_info(sql)
     # sql_to_create_info(sql)
