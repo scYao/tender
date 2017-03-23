@@ -14,6 +14,7 @@ create table pushedTenderInfo(
 	tenderID nvarchar(100) comment '哪一个标, 不设外键'
 );
 
+-- 经办人表
 create table operator(
 	operatorID nvarchar(100) primary key comment '经办人ID, 每个项目一个经办人, 一个用户可以充当多个经办人',
 	userID nvarchar(100) comment '用户', 
@@ -29,7 +30,7 @@ create table operation(
 	operationID nvarchar(100) primary key comment '业务ID',
 	tag int comment '业务类型',
 	operatorID nvarchar(100) comment '经办人ID, 不是用户ID, 需要通过经办人ID知道哪个项目',
-	state int comment '0 未做, 1 成功, 2 失败',
+	state int comment '1 成功, 2 失败',
 	description text comment '备注',
 	createTime datetime comment '创建时间'
 );
@@ -55,12 +56,26 @@ create table customizedTender(
 	url text comment '链接'
 );
 
+-- 未读消息
+create table message(
+    messageID nvarchar(100) primary key comment '消息ID',
+    foreignID nvarchar(100) comment '外键ID',
+    fromUserID nvarchar(100) comment '主动回复人ID',
+    toUserID nvarchar(100) comment '被动回复人ID',
+    description text comment '回复的文本内容',
+    createTime datetime comment '回复时间',
+    tag int comment '消息类型, 1 推送消息'
+);
+
 ALTER TABLE pushedTenderInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operator CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE biddingDocPushInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE customizedTender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE message CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);
 alter table customizedTender add constraint customized_T_FK_operator foreign key(userID) references UserInfo(userID);
+alter table message add constraint message_FK_T_user foreign key(toUserID) references userInfo(userID);
+alter table message add constraint message_FK_F_user foreign key(fromUserID) references userInfo(userID);
