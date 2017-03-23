@@ -141,13 +141,26 @@ def sql_to_generate_info(str):
 
         print template
 
+def create_tender(str):
+    lines = str.split('\n')
+    for l in lines:
+        str = l.strip()
+        words = str.split(' ')
+        name = words[0]
+
+        template = '%s = info[\'%s\'], ' % (name, name)
+
+        print template
+
 if __name__ == '__main__':
-    sql = '''companyID nvarchar(100) primary key comment '公司ID',
-	companyName nvarchar(100) comment '公司名称',
-	foreignCompanyID nvarchar(100) default '-1' comment 'company 表的ID, 不设外键' '''
-    # sql_to_create_info(sql)
-    sql_to_model_init_model_param(sql)
-    # sql_to_model_members(sql)
-    # sql_to_model_init(sql)
-    # sql_to_model_generate(sql, 'o')
+    sql = '''				operatorID nvarchar(100) primary key comment '经办人ID, 每个项目一个经办人, 一个用户可以充当多个经办人',
+	userID nvarchar(100) comment '用户',
+	tenderID nvarchar(100) comment '经办的项目, 不设外键',
+	tag int comment '负责人分配好经办人, 老板是否同意 0 未操作, 1 同意, 2 驳回' '''
+    sql_to_model_members(sql)
+    sql_to_model_init(sql)
+    sql_to_model_generate(sql, 'c')
+    create_tender(sql)
+    # sql_to_model_init_model_param(sql)
     # sql_to_generate_info(sql)
+    # sql_to_create_info(sql)

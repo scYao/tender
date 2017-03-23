@@ -108,7 +108,9 @@ def get_tender_id_list():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:%s/get_tender_id_list/' % (LOCALHOST, PORT)
     print upload_url
-    info = {}
+    info = {
+
+    }
 
     params = {'data': json.dumps(info)}
     datagen, headers = poster.encode.multipart_encode(params)
