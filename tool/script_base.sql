@@ -89,6 +89,8 @@ create table userInfo
     cityID nvarchar(100) default '-1' comment '城市ID',
     companyName nvarchar(100) comment '公司名称',
     jobPosition nvarchar(100) comment '职位',
+    customizedCompanyID nvarchar(100) comment '客户公司ID',
+    tag int comment '身份, 1 审定人, 2 审核人, 3 负责人, 4 经办人'
 );
 
 -- 管理员信息
