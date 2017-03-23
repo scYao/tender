@@ -5,7 +5,7 @@ import urllib2
 import poster
 import requests
 from sqlalchemy import desc
-
+from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -18,6 +18,8 @@ from datetime import datetime
 from sqlalchemy import func, desc, and_
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
+from models.UserInfo import UserInfo
+from message.MessageManager import MessageManager
 
 class PushedTenderManager(Util):
 
@@ -40,6 +42,23 @@ class PushedTenderManager(Util):
         info['state'] = None
         (status, result) = PushedTenderInfo.create(info)
         try:
+            companyID = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first().customizedCompanyID
+            query = db.session.query(UserInfo).filter(
+                and_(UserInfo.customizedCompanyID == companyID,
+                     UserInfo.tag == USER_TAG_RESPONSIBLEPERSON)
+            ).first()
+            toUserID = query.userID
+            #发送消息给负责人
+            messageInfo = {}
+            messageInfo['fromUserID'] = userID
+            messageInfo['pushedID'] = pushedID
+            messageInfo['toUserID'] = toUserID
+            messageInfo['tag'] = 1
+            messageInfo['description'] = ''
+            messageManager = MessageManager()
+            messageManager.createMessage(messageInfo)
             db.session.commit()
             return (True, pushedID)
         except Exception as e:
