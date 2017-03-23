@@ -12,13 +12,13 @@ class Operator(db.Model):
     operatorID = db.Column(db.String(100), primary_key=True)
     userID = db.Column(db.String(100))
     tenderID = db.Column(db.String(100))
-    tag = db.Column(db.Integer)
+    state = db.Column(db.Integer)
 
-    def __init__(self, operatorID=None, userID=None, tenderID=None, tag=0):
+    def __init__(self, operatorID=None, userID=None, tenderID=None, state=0):
         self.operatorID = operatorID
         self.userID = userID
         self.tenderID = tenderID
-        self.tag = tag
+        self.state = state
 
     @staticmethod
     def create(info):
@@ -26,7 +26,7 @@ class Operator(db.Model):
             operatorID=info['operatorID'],
             userID=info['userID'],
             tenderID=info['tenderID'],
-            tag=info['tag'],
+            state=info['state'],
         )
         db.session.add(operator)
         return (True, info['operatorID'])
@@ -37,7 +37,7 @@ class Operator(db.Model):
         res['operatorID'] = c.operatorID
         res['userID'] = c.userID
         res['tenderID'] = c.tenderID
-        res['tag'] = c.tag
+        res['state'] = c.state
         return res
 
     def __repr__(self):

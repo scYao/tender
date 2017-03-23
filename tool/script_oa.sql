@@ -19,7 +19,7 @@ create table operator(
 	operatorID nvarchar(100) primary key comment '经办人ID, 每个项目一个经办人, 一个用户可以充当多个经办人',
 	userID nvarchar(100) comment '用户', 
 	tenderID nvarchar(100) comment '经办的项目, 不设外键',
-	tag int comment '负责人分配好经办人, 老板是否同意 0 未操作, 1 同意, 2 驳回'
+	state int comment '负责人分配好经办人, 老板是否同意 0 未操作, 1 同意, 2 驳回'
 );
 
 -- 报名  1

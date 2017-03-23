@@ -134,6 +134,18 @@ ErrorInfo['TENDER_22'] = {
     'zhInfo' : '该不良行为已存在!'
 }
 
+ErrorInfo['TENDER_23'] = {
+    'code' : 'TENDER_23',
+    'info' : 'user does not exists!',
+    'zhInfo' : '该用户不存在!'
+}
+
+ErrorInfo['TENDER_24'] = {
+    'code' : 'TENDER_24',
+    'info' : 'can not create operator!',
+    'zhInfo' : '只有负责人才能创建经办人!'
+}
+
 
 
 #支付宝公钥

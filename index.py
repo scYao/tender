@@ -31,7 +31,8 @@ from search.SearchManager import SearchManager
 from image.ImageManager import ImageManager
 from company.CompanyAssistantManager import CompanyAssistantManager
 from message.MessageManager import MessageManager
-
+from user.OperatorManager import OperatorManager
+from user.ResponsiblePersonManager import ResponsiblePersonManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -1279,6 +1280,22 @@ def delete_messages():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = messageManager.deleteMessages(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 创建经办人, 分配工作给经办人
+@app.route('/create_operator/', methods=['POST', 'GET'])
+def create_operator():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.createOperator(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

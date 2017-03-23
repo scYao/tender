@@ -19,10 +19,15 @@ from tool.tagconfig import OPERATOR_TAG_CREATED
 from ResponsiblePersonManager import ResponsiblePersonManager
 
 
-class OperatorManager(Util):
+class BossManager(Util):
+
     def __init__(self):
         pass
 
+    # 决定是否投标
+    def operatePushedTenderInfo(self, jsonInfo):
+        pass
 
-    def createOperation(self, jsonInfo):
+    # 决定是否采用该经办人
+    def operateCreatedOperator(self, jsonInfo):
         pass
