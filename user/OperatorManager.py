@@ -26,7 +26,8 @@ class OperatorManager(Util):
 
     # 经办人推送
     def createPushedTenderByOperator(self, jsonInfo):
-        pass
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.createPushedTender(jsonInfo)
 
     # 记录动作, 打保证金等
     def createOperation(self, jsonInfo):
