@@ -20,6 +20,7 @@ from models.City import City
 from models.Tender import Tender
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
+from models.PushedTenderInfo import PushedTenderInfo
 from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
 from sqlalchemy import desc, and_, func
 from user.AdminManager import AdminManager
@@ -428,3 +429,25 @@ class TenderManager(Util):
         res.update(Tender.generateBrief(tender=tender))
         res.update(City.generate(city=city))
         return res
+
+    # 获取招标列表, 标志是否被push
+    def getTenderListWithPushedTag(self, jsonInfo):
+        (status, result) = self.getTenderList(jsonInfo=jsonInfo)
+        if status is True:
+            dataList = result['dataList']
+            tenderIDTuple = (o['tenderID'] for o in dataList)
+            allResult = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID.in_(tenderIDTuple)
+            ).all()
+
+            pushedTenderList = []
+            for o in allResult:
+                pushedTenderList.append(o.tenderID)
+
+            for o in result['dataList']:
+                if o['tenderID'] in pushedTenderList:
+                    o['pushed'] = True
+                else:
+                    o['pushed'] = False
+            return (True, result)
+        return (False, result)
