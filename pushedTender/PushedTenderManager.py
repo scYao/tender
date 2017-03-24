@@ -16,10 +16,13 @@ sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
 from sqlalchemy import func, desc, and_
+from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
+
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
 from models.UserInfo import UserInfo
 from models.Tender import Tender
+
 from message.MessageManager import MessageManager
 
 class PushedTenderManager(Util):
@@ -27,8 +30,35 @@ class PushedTenderManager(Util):
     def __init__(self):
         pass
 
-    def createPushedTender(self, jsonInfo):
-        info = json.loads(jsonInfo)
+    def createMessage(self, info):
+        userID = info['userID']
+        pushedID = info['pushedID']
+        tag = info['tag']
+        userResult = db.session.query(UserInfo).filter(
+            UserInfo.userID == userID
+        ).first()
+        if userResult is None:
+            return (False, ErrorInfo['TENDER_23'])
+        companyID = userResult.customizedCompanyID
+        query = db.session.query(UserInfo).filter(
+            and_(UserInfo.customizedCompanyID == companyID,
+                 UserInfo.userType == tag)
+        )
+        responResult = query.first()
+        if responResult:
+            toUserID = responResult.userID
+            # 发送消息给负责人
+            messageInfo = {}
+            messageInfo['fromUserID'] = userID
+            messageInfo['pushedID'] = pushedID
+            messageInfo['toUserID'] = toUserID
+            messageInfo['tag'] = 1
+            messageInfo['description'] = ''
+            messageManager = MessageManager()
+            messageManager.createMessage(messageInfo)
+
+
+    def createPushedTender(self, info):
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
         if status is not True:
@@ -38,10 +68,9 @@ class PushedTenderManager(Util):
         info['pushedID'] = pushedID
         info['userID'] = userID
         info['createTime'] = datetime.now()
-        info['responsiblePersonPushedTime'] = None
-        info['auditorPushedTime'] = None
-        info['state'] = 0
-        info['step'] = 0
+        tag = info['tag']
+        if tag == USER_TAG_AUDITOR:
+            info['responsiblePersonPushedTime'] = datetime.now()
         try:
             #判断是否已经创建过推送消息
             result = db.session.query(PushedTenderInfo).filter(
@@ -50,27 +79,8 @@ class PushedTenderManager(Util):
             if result:
                 return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
-            userResult = db.session.query(UserInfo).filter(
-                UserInfo.userID == userID
-            ).first()
-            if userResult is None:
-                return (False, ErrorInfo['TENDER_23'])
-            companyID = userResult.customizedCompanyID
-            query = db.session.query(UserInfo).filter(
-                and_(UserInfo.customizedCompanyID == companyID,
-                     UserInfo.userType == USER_TAG_RESPONSIBLEPERSON)
-            ).first()
-            if query:
-                toUserID = query.userID
-                #发送消息给负责人
-                messageInfo = {}
-                messageInfo['fromUserID'] = userID
-                messageInfo['pushedID'] = pushedID
-                messageInfo['toUserID'] = toUserID
-                messageInfo['tag'] = 1
-                messageInfo['description'] = ''
-                messageManager = MessageManager()
-                messageManager.createMessage(messageInfo)
+            #推送消息
+            (status, result) = self.createMessage(info=info)
             db.session.commit()
             return (True, pushedID)
         except Exception as e:
@@ -127,11 +137,11 @@ class PushedTenderManager(Util):
             return (False, errorInfo)
 
     #获取正在进行中的列表
-    def getTenderDoingList(self, jsonInfo, step):
-        info = json.loads(jsonInfo)
+    def getTenderDoingList(self, info):
         tokenID = info['tokenID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
+        step = info['step']
         (status, logInUserID) = self.isTokenValid(tokenID)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']

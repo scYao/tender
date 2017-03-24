@@ -15,6 +15,7 @@ from models.Operator import Operator
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON
+from tool.tagconfig import OPERATOR_TAG_CREATED
 from pushedTender.PushedTenderManager import PushedTenderManager
 
 
@@ -25,7 +26,7 @@ class ResponsiblePersonManager(Util):
     # 经办人推送
     def createPushedTenderByResp(self, jsonInfo):
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.createPushedTender(jsonInfo)
+        return pushedTenderManager.createPushedTender(jsonInfo, tag=1)
 
     @staticmethod
     def isResponsiblePerson(info):

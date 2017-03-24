@@ -31,3 +31,9 @@ MESSAGE_TAG_OPERATOR = 2 # 成功分配经办人
 OPERATOR_TAG_CREATED = 0
 OPERATOR_TAG_YES = 1
 OPERATOR_TAG_NO = 2
+
+
+#'0表示未开始，１表示正在进行中，２表示已经完成，３表示历史记录',
+DOING_STEP = 1
+DONE_STEP = 2
+HISTORY_STEP = 3
