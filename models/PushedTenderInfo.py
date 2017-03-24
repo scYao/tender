@@ -45,15 +45,22 @@ class PushedTenderInfo(db.Model):
         db.session.add(pushedTenderInfo)
         return (True, info['pushedID'])
 
+    @staticmethod
+    def generateBrief(c):
+        res = {}
+        res['pushedID'] = c.pushedID
+        res['createTime'] = str(c.createTime)
+        res['tenderID'] = c.tenderID
+        return res
 
     @staticmethod
     def generate(c):
         res = {}
         res['pushedID'] = c.pushedID
         res['userID'] = c.userID
-        res['createTime'] = c.createTime
-        res['responsiblePersonPushedTime'] = c.responsiblePersonPushedTime
-        res['auditorPushedTime'] = c.auditorPushedTime
+        res['createTime'] = str(c.createTime)
+        res['responsiblePersonPushedTime'] = str(c.responsiblePersonPushedTime)
+        res['auditorPushedTime'] = str(c.auditorPushedTime)
         res['state'] = c.state
         res['step'] = c.step
         res['tenderID'] = c.tenderID
