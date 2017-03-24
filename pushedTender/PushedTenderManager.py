@@ -19,6 +19,7 @@ from sqlalchemy import func, desc, and_
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
 from models.UserInfo import UserInfo
+from models.Tender import Tender
 from message.MessageManager import MessageManager
 
 class PushedTenderManager(Util):
@@ -79,6 +80,13 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    def __generateBrief(self, result):
+        res = {}
+        res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
+        res.update(Tender.generateBrief(tender=result.Tender))
+        return res
+
+
     def getPushedTenderListByUserID(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
@@ -93,7 +101,11 @@ class PushedTenderManager(Util):
         else:
             userID = loginUserID
         try:
-            query = db.session.query(PushedTenderInfo).filter(
+            query = db.session.query(
+                PushedTenderInfo, Tender
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).filter(
                 PushedTenderInfo.userID == userID
             )
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
@@ -102,7 +114,7 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [ PushedTenderInfo.generateBrief(result) for result in allResult ]
+            dataList = [ self.__generateBrief(result=result) for result in allResult ]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
@@ -129,7 +141,11 @@ class PushedTenderManager(Util):
         else:
             userID = logInUserID
         try:
-            query = db.session.query(PushedTenderInfo).filter(
+            query = db.session.query(
+                PushedTenderInfo, Tender
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).filter(
                 and_(PushedTenderInfo.userID == userID,
                      PushedTenderInfo.step == step)
             )
@@ -140,7 +156,7 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [PushedTenderInfo.generate(result) for result in allResult]
+            dataList = [self.__generateBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
