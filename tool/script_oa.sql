@@ -11,6 +11,7 @@ create table pushedTenderInfo(
 	responsiblePersonPushedTime datetime comment '负责人推送时间',
 	auditorPushedTime datetime comment '审核人',
 	state int comment 'boss决定是否投标, 0 未确定, 1 投, 2 放弃',
+	step int comment '0表示未开始，１表示正在进行中，２表示已经完成，３表示历史记录',
 	tenderID nvarchar(100) comment '哪一个标, 不设外键'
 );
 
