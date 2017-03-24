@@ -109,31 +109,34 @@ class PushedTenderManager(Util):
     # 负责人或审核人推送, 从上一级或上两级中继续推送
     def updatePushedTenderInfo(self, info):
         pushedID = info['pushID']
-        tag = info['tag']
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
+        userType = info['userType']
+        try:
+            query = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.pushedID == pushedID
+            )
+            result = query.first()
+            if not result:
+                return (False, ErrorInfo['TENDER_25'])
+            updateInfo = {}
+            if userType == USER_TAG_AUDITOR:
+                updateInfo = {
+                    PushedTenderInfo.auditorPushedTime : datetime.now()
+                }
+            elif userType == USER_TAG_RESPONSIBLEPERSON:
+                updateInfo = {
+                    PushedTenderInfo.responsiblePersonPushedTime : datetime.now()
+                }
+            query.update(
+                updateInfo, synchronize_session=False
+            )
+            db.session.commit()
+            return (True, None)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
             return (False, errorInfo)
-        query = db.session.query(PushedTenderInfo).filter(
-            PushedTenderInfo.pushedID == pushedID
-        )
-        result = query.first()
-        if not result:
-            return (False, ErrorInfo['TENDER_25'])
-        updateInfo = {}
-        if tag == USER_TAG_AUDITOR:
-            updateInfo = {
-                PushedTenderInfo.auditorPushedTime : datetime.now()
-            }
-        elif tag == USER_TAG_RESPONSIBLEPERSON:
-            updateInfo = {
-                PushedTenderInfo.responsiblePersonPushedTime : datetime.now()
-            }
-        query.update(
-            updateInfo, synchronize_session=False
-        )
-        return (True, None)
 
 
     # 经办人 获取我的推送列表, 获取经办人推送列表

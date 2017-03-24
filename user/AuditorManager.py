@@ -81,4 +81,4 @@ class AuditorManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         info['userType'] = USER_TAG_AUDITOR
-        return pushedTenderManager.getPushedTenderListByUserType(info=info)
+        return pushedTenderManager.updatePushedTenderInfo(info=info)
