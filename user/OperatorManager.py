@@ -17,7 +17,7 @@ from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED
 
 from ResponsiblePersonManager import ResponsiblePersonManager
-from pushedTender import PushedTenderManager
+from pushedTender.PushedTenderManager import PushedTenderManager
 
 
 class OperatorManager(Util):
