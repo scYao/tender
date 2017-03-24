@@ -1317,6 +1317,21 @@ def create_operator():
         return json.dumps(data)
 
 # 获取经办人推送消息列表
+@app.route('/create_pushed_tender_operator/', methods=['POST', 'GET'])
+def create_pushed_tender_operator():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.createPushedTenderByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取经办人推送消息列表
 @app.route('/get_operator_pushed_list/', methods=['POST', 'GET'])
 def get_operator_pushed_list():
     operatorManager = OperatorManager()
