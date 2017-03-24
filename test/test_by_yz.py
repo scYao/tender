@@ -559,45 +559,38 @@ def get_grade_4_list_background():
     result = resultManager.getResult(params, upload_url)
     print result
 
-def formatDic(info):
-    for (key, value) in info.items():
-        print '{:<20}'.format(key), '{:^20}'.format('string'), '{:<20}'.format(value)
 
+# 获取招标数据库列表，后台
+def create_pushed_tender_by_operator():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/create_pushed_tender_by_operator/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2016-12-171435141c5f22cb8420c728648529041d6b7427'
+    info['tenderID'] = '2017-03-231554222453565aec199fdfe7e80c10d51f37f2'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
 
+# 获取经办人推送消息列表
+def get_pushed_list_by_operator():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_pushed_list_by_operator/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2016-12-171435141c5f22cb8420c728648529041d6b7427'
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
 
-
-
-def common():
-    data = [
-        {'bar', 10}, {'foo', 20}, {'foo', 30}
-    ]
-    groups = {}
-    for (key, value) in data:
-        if key in groups:
-            groups[key].append(value)
-        else:
-            groups[key] = [value]
-    print groups
-
-from collections import defaultdict
-def pythonic():
-    data = [
-        {'bar', 10}, {'foo', 20}, {'foo', 30}
-    ]
-    #第一种方法
-    groups = {}
-    for (key, value) in data:
-        groups.setdefault(key, []).append(value)
-    print groups
-    #第二种方法
-    groups = defaultdict(list)
-    for (key, value) in data:
-        groups[key].append(value)
-    print groups
 
 
 if __name__ == '__main__':
-    find_password()
+    get_pushed_list_by_operator()
+    # create_pushed_tender_by_operator()
+    # find_password()
     # get_grade_1_list_background()
     # get_grade_2_list_background()
     # get_grade_3_list_background()
@@ -655,10 +648,10 @@ if __name__ == '__main__':
     # createFavorite()
     # deleteFavorite()
     # getFavoriteList()
-    # getUserInfoDetail()
-    info = {}
-    info['tokenID'] = YZTOKENID
-    info['companyID'] = '2017-03-1817570920a745ba3dc69398c16b14fd72b09826'
-    info['startIndex'] = 0
-    info['pageCount'] = 10
-    formatDic(info)
+    # # getUserInfoDetail()
+    # info = {}
+    # info['tokenID'] = YZTOKENID
+    # info['companyID'] = '2017-03-1817570920a745ba3dc69398c16b14fd72b09826'
+    # info['startIndex'] = 0
+    # info['pageCount'] = 10
+    # formatDic(info)

@@ -37,10 +37,17 @@ class PushedTenderManager(Util):
         info['pushedID'] = pushedID
         info['userID'] = userID
         info['createTime'] = datetime.now()
-        info['responsiblePersonPushedTime'] = None
-        info['auditorPushedTime'] = None
-        info['state'] = None
+        info['responsiblePersonPushedTime'] = ''
+        info['auditorPushedTime'] = ''
+        info['state'] = 0
+        info['step'] = 0
         try:
+            #判断是否已经创建过推送消息
+            result = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == info['tenderID']
+            ).first()
+            if result:
+                return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
             companyID = db.session.query(UserInfo).filter(
                 UserInfo.userID == userID
@@ -49,16 +56,17 @@ class PushedTenderManager(Util):
                 and_(UserInfo.customizedCompanyID == companyID,
                      UserInfo.userType == USER_TAG_RESPONSIBLEPERSON)
             ).first()
-            toUserID = query.userID
-            #发送消息给负责人
-            messageInfo = {}
-            messageInfo['fromUserID'] = userID
-            messageInfo['pushedID'] = pushedID
-            messageInfo['toUserID'] = toUserID
-            messageInfo['tag'] = 1
-            messageInfo['description'] = ''
-            messageManager = MessageManager()
-            messageManager.createMessage(messageInfo)
+            if query:
+                toUserID = query.userID
+                #发送消息给负责人
+                messageInfo = {}
+                messageInfo['fromUserID'] = userID
+                messageInfo['pushedID'] = pushedID
+                messageInfo['toUserID'] = toUserID
+                messageInfo['tag'] = 1
+                messageInfo['description'] = ''
+                messageManager = MessageManager()
+                messageManager.createMessage(messageInfo)
             db.session.commit()
             return (True, pushedID)
         except Exception as e:
@@ -91,7 +99,45 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [ PushedTenderInfo.generate(result) for result in allResult ]
+            dataList = [ PushedTenderInfo.generateBrief(result) for result in allResult ]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    #获取正在进行中的列表
+    def getTenderDoingList(self, jsonInfo, step):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        (status, logInUserID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        if info.has_key('userID'):
+            userID = info['userID']
+        else:
+            userID = logInUserID
+        try:
+            query = db.session.query(PushedTenderInfo).filter(
+                and_(PushedTenderInfo.userID == userID,
+                     PushedTenderInfo.step == step)
+            )
+            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
+                and_(PushedTenderInfo.userID == userID,
+                     PushedTenderInfo.step == step)
+            )
+            count = countQuery.first()
+            count = count[0]
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            dataList = [PushedTenderInfo.generate(result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count

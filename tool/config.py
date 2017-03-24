@@ -146,6 +146,12 @@ ErrorInfo['TENDER_24'] = {
     'zhInfo' : '只有负责人才能创建经办人!'
 }
 
+ErrorInfo['TENDER_25'] = {
+    'code' : 'TENDER_25',
+    'info' : 'the pushed tender info already exist!',
+    'zhInfo' : '招标公告已经推送'
+}
+
 
 
 #支付宝公钥
