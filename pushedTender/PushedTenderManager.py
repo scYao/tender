@@ -241,6 +241,7 @@ class PushedTenderManager(Util):
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count[0]
+            return (True, callBackInfo)
         except Exception as e:
 
             print e

@@ -50,3 +50,16 @@ class AuditorManager(Util):
         info['userType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
+
+    # 负责人 获取某个经办人的推送列表
+    def getOperatorPushedListByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        operatorUserID = info['userID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = operatorUserID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getPushedTenderListByUserID(info=info)
