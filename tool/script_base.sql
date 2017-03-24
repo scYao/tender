@@ -90,7 +90,7 @@ create table userInfo
     companyName nvarchar(100) comment '公司名称',
     jobPosition nvarchar(100) comment '职位',
     customizedCompanyID nvarchar(100) comment '客户公司ID',
-    tag int comment '身份, 1 审定人, 2 审核人, 3 负责人, 4 经办人'
+    userType int comment '身份, 1 审定人, 2 审核人, 3 负责人, 4 经办人'
 );
 
 -- 管理员信息

@@ -44,7 +44,7 @@ class ResponsiblePersonManager(Util):
         if result is None:
             return (False, ErrorInfo['TENDER_23'])
 
-        tag = UserInfo.tag
+        tag = UserInfo.userType
         if tag == USER_TAG_RESPONSIBLEPERSON:
             return (True, None)
         return (False, None)

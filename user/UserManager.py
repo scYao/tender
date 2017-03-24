@@ -383,3 +383,26 @@ class UserManager(Util):
         allResult = query.all()
         userInfoList = [UserInfo.generate(result) for result in allResult]
         return filter(None, userInfoList)
+
+    # OA系统登录界面
+    def oaLogin(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tel = info['tel']
+        password = info['password']
+        # 验证用户真实存在
+        query = db.session.query(UserInfo).filter(
+            UserInfo.tel == tel
+        )
+        result = query.first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_10']
+            return (False, errorInfo)
+        # 验证登录密码正确
+        password = self.getMD5String(password)
+        passwordResult = query.filter(
+            and_(UserInfo.tel == tel,
+                 UserInfo.password == password)
+        ).first()
+        if passwordResult is None:
+            errorInfo = ErrorInfo['TENDER_05']
+            return (False, errorInfo)

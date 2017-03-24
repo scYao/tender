@@ -40,14 +40,14 @@ class PushedTenderManager(Util):
         info['responsiblePersonPushedTime'] = None
         info['auditorPushedTime'] = None
         info['state'] = None
-        (status, result) = PushedTenderInfo.create(info)
         try:
+            (status, result) = PushedTenderInfo.create(info)
             companyID = db.session.query(UserInfo).filter(
                 UserInfo.userID == userID
             ).first().customizedCompanyID
             query = db.session.query(UserInfo).filter(
                 and_(UserInfo.customizedCompanyID == companyID,
-                     UserInfo.tag == USER_TAG_RESPONSIBLEPERSON)
+                     UserInfo.userType == USER_TAG_RESPONSIBLEPERSON)
             ).first()
             toUserID = query.userID
             #发送消息给负责人

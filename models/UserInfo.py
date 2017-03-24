@@ -26,7 +26,7 @@ class UserInfo(db.Model):
     cityID = db.Column(db.String(100), db.ForeignKey('City.cityID'))
     provinceID = db.Column(db.String(100), db.ForeignKey('Province.provinceID'))
     customizedCompanyID = db.Column(db.String(100))
-    tag = db.Column(db.Integer)
+    userType = db.Column(db.Integer)
 
     userIp = db.relationship('UserIP', backref='UserInfo', lazy='dynamic')
 
@@ -35,7 +35,7 @@ class UserInfo(db.Model):
                  tel=None, email=None, gender=0,
                  createTime=None, deviceID=None, code=None,
                  cityID=63, provinceID=10, companyName=None, jobPosition=None,
-                 customizedCompanyID=None, tag=0):
+                 customizedCompanyID=None, userType=0):
         self.userID = userID
         self.userName = userName
         self.password = password
@@ -53,7 +53,7 @@ class UserInfo(db.Model):
         self.companyName = companyName
         self.jobPosition = jobPosition
         self.customizedCompanyID = customizedCompanyID
-        self.tag = tag
+        self.userType = userType
 
     def __repr__(self):
         return self.userID
@@ -73,5 +73,5 @@ class UserInfo(db.Model):
         res['jobPosition'] = userInfo.jobPosition
         res['tel'] = userInfo.tel
         res['customizedCompanyID'] = userInfo.customizedCompanyID
-        res['tag'] = userInfo.tag
+        res['userType'] = userInfo.userType
         return res

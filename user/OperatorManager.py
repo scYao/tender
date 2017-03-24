@@ -23,10 +23,15 @@ class OperatorManager(Util):
     def __init__(self):
         pass
 
+    # 经办人推送
+    def createPushedTenderByOperator(self, jsonInfo):
+        pass
 
+    # 记录动作, 打保证金等
     def createOperation(self, jsonInfo):
         pass
 
+    # 获取经办人推送列表
     def getOperatorPushList(self, jsonInfo):
         pass
 
