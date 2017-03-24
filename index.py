@@ -129,6 +129,21 @@ def get_tender_list():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 获取招标列表, 标志是否被push
+@app.route('/get_tender_list_with_pushed_tag/', methods=['POST', 'GET'])
+def get_tender_list_with_pushed_tag():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.getTenderListWithPushedTag(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 
 # 获取投标信息列表,后台使用
 @app.route('/get_tender_list_background/', methods=['POST', 'GET'])
@@ -1316,7 +1331,7 @@ def create_operator():
         data['data'] = result
         return json.dumps(data)
 
-# 获取经办人推送消息列表
+# 创建推送
 @app.route('/create_pushed_tender_by_operator/', methods=['POST', 'GET'])
 def create_pushed_tender_by_operator():
     operatorManager = OperatorManager()
@@ -1342,6 +1357,21 @@ def get_tender_doing_list_by_operator():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = operatorManager.getTenderDoingListByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取经办人的推送
+@app.route('/get_pushed_list_by_operator/', methods=['POST', 'GET'])
+def get_pushed_list_by_operator():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.getPushedListByOperator(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
