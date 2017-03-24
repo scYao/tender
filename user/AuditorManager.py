@@ -37,7 +37,13 @@ class AuditorManager(Util):
 
     # 推送经办人来的推送
     def pushedTenderByAuditor(self, jsonInfo):
-        pass
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
 
     # 审核人获取我的推送列表
     def getPushedListByAuditor(self, jsonInfo):

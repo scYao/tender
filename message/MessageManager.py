@@ -143,7 +143,7 @@ class MessageManager(Util):
         message = Message(messageID=messageID, foreignID=foreignID,
                           fromUserID=fromUserID, toUserID=toUserID,
                           description=description, tag=tag)
-        # db.session.add(message)
+        db.session.add(message)
         return (True, messageID)
 
     #  删除未读消息

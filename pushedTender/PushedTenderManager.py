@@ -54,10 +54,12 @@ class PushedTenderManager(Util):
             messageInfo['toUserID'] = toUserID
             messageInfo['tag'] = 1
             messageInfo['description'] = ''
+            messageInfo['foreignID'] = info['tenderID']
             messageManager = MessageManager()
-            messageManager.createMessage(messageInfo)
+            return messageManager.createMessage(messageInfo)
+        return (False, None)
 
-
+    # 经办人 负责人 审核人 创建推送
     def createPushedTender(self, info):
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
@@ -67,9 +69,17 @@ class PushedTenderManager(Util):
         pushedID = self.generateID(userID + info['tenderID'])
         info['pushedID'] = pushedID
         info['userID'] = userID
-        info['createTime'] = datetime.now()
+        info['createTime'] = None
+        info['responsiblePersonPushedTime'] = None
+        info['auditorPushedTime'] = None
+        info['state'] = 0
+        info['step'] = 0
         tag = info['tag']
+        if tag == USER_TAG_OPERATOR:
+            info['createTime'] = datetime.now()
         if tag == USER_TAG_AUDITOR:
+            info['auditorPushedTime'] = datetime.now()
+        if tag == USER_TAG_RESPONSIBLEPERSON:
             info['responsiblePersonPushedTime'] = datetime.now()
         try:
             #判断是否已经创建过推送消息
