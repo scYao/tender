@@ -106,7 +106,7 @@ class PushedTenderManager(Util):
         res.update(Tender.generateBrief(tender=result.Tender))
         return res
 
-    # 负责人或审核人推送
+    # 负责人或审核人推送, 从上一级或上两级中继续推送
     def updatePushedTenderInfo(self, info):
         pushedID = info['pushID']
         tag = info['tag']
@@ -124,11 +124,11 @@ class PushedTenderManager(Util):
         updateInfo = {}
         if tag == USER_TAG_AUDITOR:
             updateInfo = {
-                PushedTenderInfo.responsiblePersonPushedTime: datetime.now()
+                PushedTenderInfo.auditorPushedTime : datetime.now()
             }
-        elif tag == USER_TAG_BOSS:
+        elif tag == USER_TAG_RESPONSIBLEPERSON:
             updateInfo = {
-                PushedTenderInfo.auditorPushedTime: datetime.now()
+                PushedTenderInfo.responsiblePersonPushedTime : datetime.now()
             }
         query.update(
             updateInfo, synchronize_session=False

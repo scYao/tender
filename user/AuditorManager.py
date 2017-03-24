@@ -69,3 +69,16 @@ class AuditorManager(Util):
         info['userID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
+
+    # 审核人人从经办人推送列表, 或负责人推送列表推送
+    def updatePushedTenderByAuditor(self, jsonInfo):
+        # 负责人从经办人列表推送
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        info['userType'] = USER_TAG_AUDITOR
+        return pushedTenderManager.getPushedTenderListByUserType(info=info)
