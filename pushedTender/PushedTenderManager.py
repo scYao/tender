@@ -96,7 +96,7 @@ class PushedTenderManager(Util):
         res.update(Tender.generateBrief(tender=result.Tender))
         return res
 
-
+    # 负责人或审核人推送
     def updatePushedTenderInfo(self, info):
         pushedID = info['pushID']
         tag = info['tag']
@@ -126,20 +126,12 @@ class PushedTenderManager(Util):
         return (True, None)
 
 
-
-    def getPushedTenderListByUserID(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
+    # 经办人 获取我的推送列表, 获取经办人推送列表
+    def getPushedTenderListByUserID(self, info):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        (status, loginUserID) = self.isTokenValid(tokenID)
-        if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
-        if info.has_key('userID'):
-            userID = info['userID']
-        else:
-            userID = loginUserID
+        userID = info['userID']
+
         try:
             query = db.session.query(
                 PushedTenderInfo, Tender
@@ -154,7 +146,7 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [ self.__generateBrief(result=result) for result in allResult ]
+            dataList = [self.__generateBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
@@ -166,7 +158,7 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-    #获取正在进行中的列表
+    # 获取正在进行中的列表
     def getTenderDoingList(self, info):
         tokenID = info['tokenID']
         startIndex = info['startIndex']
@@ -208,4 +200,51 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    # 审核人 负责人 获取我的推送
+    def getPushedTenderListByUserType(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        userType = info['userType']
 
+        try:
+            query = db.session.query(
+                PushedTenderInfo, Tender
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            )
+            countQuery = db.session.query(
+                func.count(PushedTenderInfo.pushedID)
+            )
+            # 负责人查询
+            if userType == USER_TAG_RESPONSIBLEPERSON:
+                query = query.filter(
+                    PushedTenderInfo.responsiblePersonPushedTime != None
+                ).order_by(desc(
+                    PushedTenderInfo.responsiblePersonPushedTime
+                ))
+                countQuery = countQuery.filter(
+                    PushedTenderInfo.responsiblePersonPushedTime != None
+                )
+            #     审核人查询
+            elif userType == USER_TAG_AUDITOR:
+                query = query.filter(
+                    PushedTenderInfo.auditorPushedTime != None
+                ).order_by(desc(
+                    PushedTenderInfo.auditorPushedTime
+                ))
+                countQuery = countQuery.filter(
+                    PushedTenderInfo.auditorPushedTime != None
+                )
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            count = countQuery.first()
+            dataList = [self.__generateBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count[0]
+        except Exception as e:
+
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

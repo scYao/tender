@@ -16,6 +16,7 @@ from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_T
 from models.flask_app import db
 from models.Operator import Operator
 from models.Message import Message
+from models.UserInfo import UserInfo
 
 from ResponsiblePersonManager import ResponsiblePersonManager
 from pushedTender.PushedTenderManager import PushedTenderManager
@@ -36,10 +37,17 @@ class OperatorManager(Util):
     def createOperation(self, jsonInfo):
         pass
 
-    # 获取经办人推送列表
+    # 经办人获取我的推送列表
     def getPushedListByOperator(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getPushedTenderListByUserID(jsonInfo)
+        return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
     # 经办人特殊, 获取自己参与的, 正在进行中的列表
     # 考虑策略模式
@@ -71,3 +79,49 @@ class OperatorManager(Util):
 
     def getTenderHistoryDetail(self, jsonInfo):
         pass
+
+
+    def __generateUserInfo(self, o):
+        res = {}
+        res['userID'] = o.userID
+        res['userName'] = o.userName
+        return res
+
+    # 获取员工列表
+    def getUserList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        try:
+            result = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+            companyID = result.customizedCompanyID
+            allResult = db.session.query(UserInfo).filter(
+                UserInfo.customizedCompanyID == companyID
+            ).all()
+            dataList = [self.__generateUserInfo(o=o) for o in allResult]
+            count = db.session.query(func.count(UserInfo.userID)).filter(
+                UserInfo.customizedCompanyID == companyID
+            ).first()
+
+            if count is None:
+                count = 0
+            else:
+                count = count[0]
+
+            userResult = {}
+            userResult['dataList'] = dataList
+            userResult['count'] = count
+            return (True, userResult)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+

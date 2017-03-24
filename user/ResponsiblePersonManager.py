@@ -54,7 +54,7 @@ class ResponsiblePersonManager(Util):
             return (True, None)
         return (False, None)
 
-    # 创建经办人
+    # 创建经办人, 分配工作
     def createOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
@@ -92,3 +92,29 @@ class ResponsiblePersonManager(Util):
     # 经办人被否定, 重新分配经办人
     def updateOperator(self, jsonInfo):
         pass
+
+
+    # 负责人 获取某个经办人的推送列表
+    def getOperatorPushedListByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        operatorUserID = info['userID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = operatorUserID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getPushedTenderListByUserID(info=info)
+
+    # 负责人获取我的推送列表
+    def getPushedListByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getPushedTenderListByUserType(info=info)

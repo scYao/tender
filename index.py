@@ -33,6 +33,7 @@ from company.CompanyAssistantManager import CompanyAssistantManager
 from message.MessageManager import MessageManager
 from user.OperatorManager import OperatorManager
 from user.ResponsiblePersonManager import ResponsiblePersonManager
+from user.AuditorManager import AuditorManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -1331,6 +1332,21 @@ def create_operator():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人获取我的推送列表
+@app.route('/get_pushed_list_by_resp/', methods=['POST', 'GET'])
+def get_pushed_list_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getPushedListByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 创建推送
 @app.route('/create_pushed_tender_by_operator/', methods=['POST', 'GET'])
 def create_pushed_tender_by_operator():
@@ -1357,6 +1373,22 @@ def get_tender_doing_list_by_operator():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = operatorManager.getTenderDoingListByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 获取经办人列表
+@app.route('/get_operator_list/', methods=['POST', 'GET'])
+def get_operator_list():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.getUserList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1404,6 +1436,21 @@ def get_tender_history_list_by_operator():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = operatorManager.getTenderHistoryListByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审核人获取我的推送列表
+@app.route('/get_pushed_list_by_auditor/', methods=['POST', 'GET'])
+def get_pushed_list_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getPushedListByAuditor(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
