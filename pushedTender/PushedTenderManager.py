@@ -37,8 +37,8 @@ class PushedTenderManager(Util):
         info['pushedID'] = pushedID
         info['userID'] = userID
         info['createTime'] = datetime.now()
-        info['responsiblePersonPushedTime'] = ''
-        info['auditorPushedTime'] = ''
+        info['responsiblePersonPushedTime'] = None
+        info['auditorPushedTime'] = None
         info['state'] = 0
         info['step'] = 0
         try:
@@ -49,9 +49,12 @@ class PushedTenderManager(Util):
             if result:
                 return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
-            companyID = db.session.query(UserInfo).filter(
+            userResult = db.session.query(UserInfo).filter(
                 UserInfo.userID == userID
-            ).first().customizedCompanyID
+            ).first()
+            if userResult is None:
+                return (False, ErrorInfo['TENDER_23'])
+            companyID = userResult.customizedCompanyID
             query = db.session.query(UserInfo).filter(
                 and_(UserInfo.customizedCompanyID == companyID,
                      UserInfo.userType == USER_TAG_RESPONSIBLEPERSON)
