@@ -406,3 +406,29 @@ class UserManager(Util):
         if passwordResult is None:
             errorInfo = ErrorInfo['TENDER_05']
             return (False, errorInfo)
+        userType = result.userType
+
+        # 生成新的Token记录
+        userID = result.userID
+        createTime = datetime.now()
+        tokenID = self.generateID(userID)
+        try:
+            db.session.query(Token).filter(
+                Token.userID == userID
+            ).delete(synchronize_session=False)
+            token = Token(
+                tokenID=tokenID, userID=userID,
+                createTime=createTime, validity='7'
+            )
+            db.session.add(token)
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+        resultDic = {}
+        resultDic['tokenID'] = tokenID
+        resultDic['userType'] = userType
+        return (True, resultDic)

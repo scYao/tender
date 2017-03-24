@@ -530,6 +530,21 @@ def login():
         data['data'] = result
         return json.dumps(data)
 
+# oa系统登录函数
+@app.route('/oa_login/', methods=['POST', 'GET'])
+def oa_login():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = userManager.oaLogin(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 获取用户详情
 @app.route('/get_user_info_detail/', methods=['POST', 'GET'])
 def get_user_info_detail():
