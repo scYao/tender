@@ -33,7 +33,7 @@ class OperatorManager(Util):
         pass
 
     # 获取经办人推送列表
-    def getOperatorPushList(self, jsonInfo):
+    def getOperatorPushedList(self, jsonInfo):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserID(jsonInfo)
 
