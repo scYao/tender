@@ -15,17 +15,19 @@ class PushedTenderInfo(db.Model):
     responsiblePersonPushedTime = db.Column(db.DateTime)
     auditorPushedTime = db.Column(db.DateTime)
     state = db.Column(db.Integer)
+    step = db.Column(db.Integer)
     tenderID = db.Column(db.String(100))
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
-                 tenderID=None):
+                 tenderID=None, step=0):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
         self.responsiblePersonPushedTime = responsiblePersonPushedTime
         self.auditorPushedTime = auditorPushedTime
         self.state = state
+        self.step = step
         self.tenderID = tenderID
 
     @staticmethod
@@ -37,6 +39,7 @@ class PushedTenderInfo(db.Model):
             responsiblePersonPushedTime=info['responsiblePersonPushedTime'],
             auditorPushedTime=info['auditorPushedTime'],
             state=info['state'],
+            step=info['step'],
             tenderID=info['tenderID'],
         )
         db.session.add(pushedTenderInfo)
@@ -52,6 +55,7 @@ class PushedTenderInfo(db.Model):
         res['responsiblePersonPushedTime'] = c.responsiblePersonPushedTime
         res['auditorPushedTime'] = c.auditorPushedTime
         res['state'] = c.state
+        res['step'] = c.step
         res['tenderID'] = c.tenderID
         return res
 

@@ -17,6 +17,7 @@ from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED
 
 from ResponsiblePersonManager import ResponsiblePersonManager
+from pushedTender import PushedTenderManager
 
 
 class OperatorManager(Util):
@@ -33,7 +34,8 @@ class OperatorManager(Util):
 
     # 获取经办人推送列表
     def getOperatorPushList(self, jsonInfo):
-        pass
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getPushedTenderListByUserID(jsonInfo)
 
     # 经办人特殊, 获取自己参与的, 正在进行中的列表
     # 考虑策略模式
