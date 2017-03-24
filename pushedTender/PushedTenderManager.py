@@ -73,14 +73,14 @@ class PushedTenderManager(Util):
         tokenID = info['tokenID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        (status, logInUserID) = self.isTokenValid(tokenID)
+        (status, loginUserID) = self.isTokenValid(tokenID)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         if info.has_key('userID'):
             userID = info['userID']
         else:
-            userID = logInUserID
+            userID = loginUserID
         try:
             query = db.session.query(PushedTenderInfo).filter(
                 PushedTenderInfo.userID == userID
