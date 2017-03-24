@@ -97,6 +97,36 @@ class PushedTenderManager(Util):
         return res
 
 
+    def updatePushedTenderInfo(self, info):
+        pushedID = info['pushID']
+        tag = info['tag']
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        query = db.session.query(PushedTenderInfo).filter(
+            PushedTenderInfo.pushedID == pushedID
+        )
+        result = query.first()
+        if not result:
+            return (False, ErrorInfo['TENDER_25'])
+        updateInfo = {}
+        if tag == USER_TAG_AUDITOR:
+            updateInfo = {
+                PushedTenderInfo.responsiblePersonPushedTime: datetime.now()
+            }
+        elif tag == USER_TAG_BOSS:
+            updateInfo = {
+                PushedTenderInfo.auditorPushedTime: datetime.now()
+            }
+        query.update(
+            updateInfo, synchronize_session=False
+        )
+        return (True, None)
+
+
+
     def getPushedTenderListByUserID(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
