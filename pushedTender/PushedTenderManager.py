@@ -139,7 +139,7 @@ class PushedTenderManager(Util):
             return (False, errorInfo)
 
 
-    # 经办人 获取我的推送列表, 获取经办人推送列表
+    # 经办人 获取我的推送列表, 其他人获取经办人推送列表
     def getPushedTenderListByUserID(self, info):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
