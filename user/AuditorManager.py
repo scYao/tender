@@ -25,7 +25,10 @@ class AuditorManager(Util):
         pass
 
 
-    # 负责人推送
+    # 负责人推送, 创建推送
     def createPushedTenderByAuditor(self, jsonInfo):
         pass
 
+    # 推送经办人来的推送
+    def pushedTenderByAuditor(self, jsonInfo):
+        pass
