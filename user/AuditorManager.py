@@ -82,3 +82,7 @@ class AuditorManager(Util):
         pushedTenderManager = PushedTenderManager()
         info['userType'] = USER_TAG_AUDITOR
         return pushedTenderManager.updatePushedTenderInfo(info=info)
+
+    # 审核人获取所有的招标信息列表
+    def getTenderListWithPushedTagByAuditor(self, jsonInfo):
+        pass

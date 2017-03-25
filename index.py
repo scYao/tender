@@ -1347,6 +1347,21 @@ def get_pushed_list_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人获取我的推送列表
+@app.route('/update_pushed_tender_by_resp/', methods=['POST', 'GET'])
+def update_pushed_tender_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.updatePushedTenderByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 负责人 获取某个经办人的推送列表
 @app.route('/get_operator_pushed_list_by_resp/', methods=['POST', 'GET'])
 def get_operator_pushed_list_by_resp():

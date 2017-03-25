@@ -35,3 +35,7 @@ class BossManager(Util):
     # 老板确定推送消息后,  获取推送消息列表
     def getCertainPushedList(self, jsonInfo):
         pass
+
+    # 审定人获取所有的招标信息列表
+    def getTenderListWithPushedTagByBoss(self, jsonInfo):
+        pass
