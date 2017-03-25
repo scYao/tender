@@ -420,6 +420,9 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    def getDistributedTenderList(self, info):
+        pass
+
     # 经办人特殊, 获取自己参与的, 正在进行中的列表
     # 考虑策略模式
 

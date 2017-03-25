@@ -201,4 +201,4 @@ class ResponsiblePersonManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getUndistributedTenderList(info=info)
+        return pushedTenderManager.getDistributedTenderList(info=info)
