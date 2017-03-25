@@ -104,6 +104,37 @@ class ResponsiblePersonManager(Util):
     def updateOperator(self, jsonInfo):
         pass
 
+    #获取经办人列表
+    def getOperatorList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        # 验证登录信息
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            return (False, userID)
+        try:
+            query = db.session.query(UserInfo).filter(
+                UserInfo, UserInfo.userType == USER_TAG_OPERATOR
+            )
+            allResult = query.all()
+            countQuery = db.session.query(func.count(UserInfo.userID)).filter(
+                UserInfo.userType == USER_TAG_OPERATOR
+            )
+            count = countQuery.first()[0]
+            dataList = [UserInfo.generate(result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
+
 
     # 负责人 获取某个经办人的推送列表
     def getOperatorPushedListByResp(self, jsonInfo):
