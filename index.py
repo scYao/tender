@@ -1578,4 +1578,19 @@ def update_pushed_tender_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+#审定人决定是否投标
+@app.route('/operate_pushed_tender_info/', methods=['POST', 'GET'])
+def operate_pushed_tender_info():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.operatePushedTenderInfo(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
