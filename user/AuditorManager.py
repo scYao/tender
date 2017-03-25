@@ -57,8 +57,8 @@ class AuditorManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
 
-    # 负责人 获取某个经办人的推送列表
-    def getOperatorPushedListByResp(self, jsonInfo):
+    # 审核人 获取某个经办人的推送列表
+    def getOperatorPushedListByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         operatorUserID = info['userID']
@@ -82,3 +82,7 @@ class AuditorManager(Util):
         pushedTenderManager = PushedTenderManager()
         info['userType'] = USER_TAG_AUDITOR
         return pushedTenderManager.updatePushedTenderInfo(info=info)
+
+    # 审核人获取所有的招标信息列表
+    def getTenderListWithPushedTagByAuditor(self, jsonInfo):
+        pass

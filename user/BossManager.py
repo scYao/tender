@@ -1,8 +1,6 @@
 # coding=utf8
 import sys
 import json
-
-
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -14,7 +12,6 @@ from sqlalchemy import and_, text, func, desc
 from models.flask_app import db
 from models.Operator import Operator
 from models.Message import Message
-
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
@@ -54,4 +51,8 @@ class BossManager(Util):
 
     # 老板确定推送消息后,  获取推送消息列表
     def getCertainPushedList(self, jsonInfo):
+        pass
+
+    # 审定人获取所有的招标信息列表
+    def getTenderListWithPushedTagByBoss(self, jsonInfo):
         pass

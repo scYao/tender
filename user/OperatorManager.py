@@ -102,7 +102,8 @@ class OperatorManager(Util):
             ).first()
             companyID = result.customizedCompanyID
             allResult = db.session.query(UserInfo).filter(
-                UserInfo.customizedCompanyID == companyID
+                and_(UserInfo.customizedCompanyID == companyID,
+                     UserInfo.userType == USER_TAG_OPERATOR)
             ).all()
             dataList = [self.__generateUserInfo(o=o) for o in allResult]
             count = db.session.query(func.count(UserInfo.userID)).filter(
@@ -125,3 +126,7 @@ class OperatorManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+
+    # 经办人获取所有的招标信息列表
+    def getTenderListWithPushedTagByOperator(self, jsonInfo):
+        pass

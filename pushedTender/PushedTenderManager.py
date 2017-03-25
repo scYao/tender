@@ -109,7 +109,7 @@ class PushedTenderManager(Util):
 
     # 负责人或审核人推送, 从上一级或上两级中继续推送
     def updatePushedTenderInfo(self, info):
-        pushedID = info['pushID']
+        pushedID = info['pushedID']
         userType = info['userType']
         try:
             query = db.session.query(PushedTenderInfo).filter(
