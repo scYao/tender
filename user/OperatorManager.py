@@ -51,31 +51,43 @@ class OperatorManager(Util):
 
     # 经办人特殊, 获取自己参与的, 正在进行中的列表
     # 考虑策略模式
-    def getTenderDoingListByOperator(self, jsonInfo):
+    def getTenderDoingList(self, jsonInfo):
         info = json.loads(jsonInfo)
+        userType = info['userType']
         info['step'] = DOING_STEP
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getTenderDoingList(info=info)
+        if userType == USER_TAG_OPERATOR:
+            return pushedTenderManager.getTenderDoingList(info=info)
+        else:
+            return pushedTenderManager.getAllTenderDoingList(info=info)
 
     def getTenderDoingDetail(self, jsonInfo):
         pass
 
     # 经办人特殊, 获取自己参与的, 已完成的列表
-    def getTenderDoneListByOperator(self, jsonInfo):
+    def getTenderDoneList(self, jsonInfo):
         info = json.loads(jsonInfo)
+        userType = info['userType']
         info['step'] = DONE_STEP
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getTenderDoingList(info=info)
+        if userType == USER_TAG_OPERATOR:
+            return pushedTenderManager.getTenderDoingList(info=info)
+        else:
+            return pushedTenderManager.getAllTenderDoingList(info=info)
 
     def getTenderDoneDetail(self, jsonInfo):
         pass
 
     # 经办人特殊, 获取自己参与的, 历史记录
-    def getTenderHistoryListByOperator(self, jsonInfo):
+    def getTenderHistoryList(self, jsonInfo):
         info = json.loads(jsonInfo)
+        userType = info['userType']
         info['step'] = HISTORY_STEP
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getTenderDoingList(info=info)
+        if userType == USER_TAG_OPERATOR:
+            return pushedTenderManager.getTenderDoingList(info=info)
+        else:
+            return pushedTenderManager.getAllTenderDoingList(info=info)
 
     def getTenderHistoryDetail(self, jsonInfo):
         pass
@@ -109,12 +121,7 @@ class OperatorManager(Util):
             count = db.session.query(func.count(UserInfo.userID)).filter(
                 UserInfo.customizedCompanyID == companyID
             ).first()
-
-            if count is None:
-                count = 0
-            else:
-                count = count[0]
-
+            count = count[0]
             userResult = {}
             userResult['dataList'] = dataList
             userResult['count'] = count
