@@ -108,6 +108,17 @@ class PushedTenderManager(Util):
         res.update(Tender.generateBrief(tender=result.Tender))
         return res
 
+    def __generateUndistributedBrief(self, result):
+        res = {}
+        res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
+        res.update(Tender.generateBrief(tender=result.Tender))
+        res.update(UserInfo.generateBrief(userInfo=result.UserInfo))
+        if result.Operator:
+            res.update(Operator.generate(c=result.Operator))
+        else:
+            res.update({'state': -1})
+        return res
+
     # 负责人或审核人推送, 从上一级或上两级中继续推送
     def updatePushedTenderInfo(self, info):
         pushedID = info['pushedID']
@@ -332,13 +343,17 @@ class PushedTenderManager(Util):
         pageCount = info['pageCount']
         try:
             query = db.session.query(
-                PushedTenderInfo, Tender
+                PushedTenderInfo, Tender, UserInfo, Operator
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).outerjoin(
+                UserInfo, PushedTenderInfo.userID == UserInfo.userID
+            ).outerjoin(
+                Operator, PushedTenderInfo.tenderID == Operator.tenderID
             ).filter(and_(
                 PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
                 PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
-            )).offset(startIndex).limit(pageCount).all()
+            ))
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
                 PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
                 PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
@@ -346,7 +361,7 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [self.__generateBrief(result=result) for result in allResult]
+            dataList = [self.__generateUndistributedBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count

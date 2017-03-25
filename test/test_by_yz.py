@@ -612,9 +612,54 @@ def get_tender_doing_list():
     print result
 
 
+def get_undistributed_tender_list_by_resp():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_undistributed_tender_list_by_resp/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2017-03-251443070e1839557d4b287869e57ead5e92edd9'
+    info['userType'] = 2
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+def get_resp_pushed_list_by_boss():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_resp_pushed_list_by_boss/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2017-03-251443070e1839557d4b287869e57ead5e92edd9'
+    info['userType'] = 2
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+def operate_pushed_tender_info():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/operate_pushed_tender_info/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2017-03-251443070e1839557d4b287869e57ead5e92edd9'
+    info['state'] = 1
+    info['pushedID'] = '2017-03-251319040d9e70af98fff8d9159c49d7c0dbe01d'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
+
 
 if __name__ == '__main__':
-    get_tender_doing_list()
+    # operate_pushed_tender_info()
+    # get_resp_pushed_list_by_boss()
+    get_undistributed_tender_list_by_resp()
+    # get_tender_doing_list()
     # get_operator_list()
     # get_pushed_list_by_operator()
     # create_pushed_tender_by_operator()
