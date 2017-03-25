@@ -12,6 +12,7 @@ from sqlalchemy import and_, text, func, desc
 from models.flask_app import db
 from models.Operator import Operator
 from models.Message import Message
+from models.PushedTenderInfo import PushedTenderInfo
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
@@ -83,3 +84,42 @@ class BossManager(Util):
         info['userType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
+
+    # 判断是否已经投过该标
+    def getApprovedState(self, info):
+        dataList = info['dataList']
+        try:
+            tenderIDTuple = (o['tenderID'] for o in dataList)
+
+            pushedResult = db.session.query(PushedTenderInfo).filter(and_(
+                PushedTenderInfo.responsiblePersonPushedTime != None,
+                PushedTenderInfo.tenderID.in_(tenderIDTuple)
+            )).all()
+            pushedTenderIDList = [o.tenderID for o in pushedResult]
+            for o in dataList:
+                if o['tenderID'] not in pushedTenderIDList:
+                    o['state'] = -1
+            return (True, info)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
+    # 审定人 获取某个经办人的推送列表
+    def getOperatorPushedListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        operatorUserID = info['userID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = operatorUserID
+        pushedTenderManager = PushedTenderManager()
+        (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
+        if status is True:
+            return self.getApprovedState(info=tenderResult)
+        return (False, tenderResult)

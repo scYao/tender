@@ -25,7 +25,7 @@ class ResponsiblePersonManager(Util):
     def __init__(self):
         pass
 
-    # 经办人推送
+    # 负责人人推送
     def createPushedTenderByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['tag'] = USER_TAG_AUDITOR
