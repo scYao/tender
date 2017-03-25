@@ -1670,3 +1670,18 @@ def operate_pushed_tender_info():
         return json.dumps(data)
 
 
+# 决定是否采用该经办人
+@app.route('/validate_operator/', methods=['POST', 'GET'])
+def validate_operator():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.validateOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
