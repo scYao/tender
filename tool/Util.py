@@ -15,7 +15,9 @@ import json
 import oss2
 import datetime
 from models.flask_app import db
+from sqlalchemy import and_
 from models.Token import Token
+from models.UserInfo import UserInfo
 
 class Util:
     def __init__(self):
@@ -119,6 +121,45 @@ class Util:
             return (False, errorInfo)
 
         return (True, result.userID)
+
+    def isTokenValidByUserType(self, info):
+        tokenID = info['tokenID']
+        userType = info['userType']
+        query = db.session.query(
+            Token, UserInfo
+        ).outerjoin(
+            UserInfo, Token.userID == UserInfo.userID
+        ).filter(and_(
+            UserInfo.userType == userType,
+            Token.tokenID == tokenID
+        ))
+        result = query.first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_01']
+            errorInfo['detail'] = result
+            return (False, errorInfo)
+        token = result.Token
+        now = datetime.datetime.now()
+        # 将token登录时间更新为最近的一次操作时间
+        db.session.query(Token).filter(
+            Token.tokenID == tokenID
+        ).update(
+            {Token.createTime: now},
+            synchronize_session=False)
+        try:
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['SPORTS_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+        days = (now - token.createTime).days
+        if days > token.validity:
+            errorInfo = ErrorInfo['SPORTS_01']
+            errorInfo['detail'] = result
+            return (False, errorInfo)
+        return (True, result.Token.userID)
 
     def generateID(self, value):
         # currentTime = datetime.datetime.now()
