@@ -35,6 +35,7 @@ from user.OperatorManager import OperatorManager
 from user.ResponsiblePersonManager import ResponsiblePersonManager
 from user.AuditorManager import AuditorManager
 from user.BossManager import BossManager
+from pushedTender.PushedTenderManager import PushedTenderManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -1427,13 +1428,13 @@ def create_pushed_tender_by_operator():
 # 正在进行中的列表
 @app.route('/get_tender_doing_list/', methods=['POST', 'GET'])
 def get_tender_doing_list():
-    operatorManager = OperatorManager()
+    pushedTenderManager = PushedTenderManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = operatorManager.getTenderDoingList(paramsJson)
+        (status, result) = pushedTenderManager.getTenderDoingList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1474,13 +1475,13 @@ def get_pushed_list_by_operator():
 # 已完成的列表
 @app.route('/get_tender_done_list/', methods=['POST', 'GET'])
 def get_tender_done_list():
-    operatorManager = OperatorManager()
+    pushedTenderManager = PushedTenderManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = operatorManager.getTenderDoneList(paramsJson)
+        (status, result) = pushedTenderManager.getTenderDoneList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1490,13 +1491,13 @@ def get_tender_done_list():
 # 历史记录列表
 @app.route('/get_tender_history_list/', methods=['POST', 'GET'])
 def get_tender_history_list():
-    operatorManager = OperatorManager()
+    pushedTenderManager = PushedTenderManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = operatorManager.getTenderHistoryList(paramsJson)
+        (status, result) = pushedTenderManager.getTenderHistoryList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

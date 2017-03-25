@@ -10,13 +10,13 @@ from datetime import datetime
 from sqlalchemy import and_, text, func, desc
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 
 from models.flask_app import db
 from models.Operator import Operator
 from models.Message import Message
 from models.UserInfo import UserInfo
+from models.Token import Token
 
 from ResponsiblePersonManager import ResponsiblePersonManager
 from pushedTender.PushedTenderManager import PushedTenderManager
@@ -29,7 +29,11 @@ class OperatorManager(Util):
     # 经办人推送
     def createPushedTenderByOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
-        info['tag'] = USER_TAG_RESPONSIBLEPERSON
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info)
 
@@ -40,58 +44,14 @@ class OperatorManager(Util):
     # 经办人获取我的推送列表
     def getPushedListByOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
-
-    # 经办人特殊, 获取自己参与的, 正在进行中的列表
-    # 考虑策略模式
-    def getTenderDoingList(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        userType = info['userType']
-        info['step'] = DOING_STEP
-        pushedTenderManager = PushedTenderManager()
-        if userType == USER_TAG_OPERATOR:
-            return pushedTenderManager.getTenderDoingList(info=info)
-        else:
-            return pushedTenderManager.getAllTenderDoingList(info=info)
-
-    def getTenderDoingDetail(self, jsonInfo):
-        pass
-
-    # 经办人特殊, 获取自己参与的, 已完成的列表
-    def getTenderDoneList(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        userType = info['userType']
-        info['step'] = DONE_STEP
-        pushedTenderManager = PushedTenderManager()
-        if userType == USER_TAG_OPERATOR:
-            return pushedTenderManager.getTenderDoingList(info=info)
-        else:
-            return pushedTenderManager.getAllTenderDoingList(info=info)
-
-    def getTenderDoneDetail(self, jsonInfo):
-        pass
-
-    # 经办人特殊, 获取自己参与的, 历史记录
-    def getTenderHistoryList(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        userType = info['userType']
-        info['step'] = HISTORY_STEP
-        pushedTenderManager = PushedTenderManager()
-        if userType == USER_TAG_OPERATOR:
-            return pushedTenderManager.getTenderDoingList(info=info)
-        else:
-            return pushedTenderManager.getAllTenderDoingList(info=info)
-
-    def getTenderHistoryDetail(self, jsonInfo):
-        pass
-
 
     def __generateUserInfo(self, o):
         res = {}
@@ -102,12 +62,11 @@ class OperatorManager(Util):
     # 获取员工列表
     def getUserList(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-
         try:
             result = db.session.query(UserInfo).filter(
                 UserInfo.userID == userID

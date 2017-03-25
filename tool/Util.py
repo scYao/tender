@@ -15,6 +15,7 @@ import json
 import oss2
 import datetime
 from models.flask_app import db
+from sqlalchemy import and_
 from models.Token import Token
 
 class Util:
