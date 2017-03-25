@@ -17,7 +17,6 @@ import datetime
 from models.flask_app import db
 from sqlalchemy import and_
 from models.Token import Token
-from models.UserInfo import UserInfo
 
 class Util:
     def __init__(self):

@@ -52,7 +52,7 @@ class PushedTenderManager(Util):
             errorInfo['detail'] = result
             return (False, errorInfo)
         token = result.Token
-        now = datetime.datetime.now()
+        now = datetime.now()
         # 将token登录时间更新为最近的一次操作时间
         db.session.query(Token).filter(
             Token.tokenID == tokenID
