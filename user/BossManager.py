@@ -60,6 +60,26 @@ class BossManager(Util):
     def getCertainPushedList(self, jsonInfo):
         pass
 
-    # 审定人获取所有的招标信息列表
-    def getTenderListWithPushedTagByBoss(self, jsonInfo):
-        pass
+    # 审定人 获取负责人推送列表
+    def getRespPushedListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getPushedTenderListByUserType(info=info)
+
+    # 审定人获取 审核人的推送列表
+    def getAuditorPushedListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getPushedTenderListByUserType(info=info)

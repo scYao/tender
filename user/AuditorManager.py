@@ -86,3 +86,15 @@ class AuditorManager(Util):
     # 审核人获取所有的招标信息列表
     def getTenderListWithPushedTagByAuditor(self, jsonInfo):
         pass
+
+    # 审核人 获取负责人推送列表
+    def getRespPushedListByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getPushedTenderListByUserType(info=info)

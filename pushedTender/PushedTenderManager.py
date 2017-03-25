@@ -5,7 +5,8 @@ import urllib2
 import poster
 import requests
 from sqlalchemy import desc
-from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON
+from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
+    PUSH_TENDER_INFO_TAG_STEP_WAIT
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -297,7 +298,7 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-    #ｂｏｓｓ是否指定该经办人
+    # boss是否指定该经办人
     def validateOperator(self, info):
         tenderID = info['tenderID']
         state = info['state']
@@ -325,3 +326,34 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+
+    def getUndistributedTenderList(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            query = db.session.query(
+                PushedTenderInfo, Tender
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).filter(and_(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
+            )).offset(startIndex).limit(pageCount).all()
+            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
+            ))
+            count = countQuery.first()
+            count = count[0]
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            dataList = [self.__generateBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
