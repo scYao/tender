@@ -1486,4 +1486,19 @@ def get_pushed_list_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+# 审核人 获取某个经办人的推送列表
+@app.route('/get_operator_pushed_list_by_auditor/', methods=['POST', 'GET'])
+def get_operator_pushed_list_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getOperatorPushedListByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 

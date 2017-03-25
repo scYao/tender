@@ -129,7 +129,7 @@ class ResponsiblePersonManager(Util):
                     PushedTenderInfo.responsiblePersonPushedTime != None,
                     PushedTenderInfo.tenderID.in_(tenderIDTuple)
                 )).all()
-                pushedTenderIDList = [o['tenderID'] for o in pushedResult]
+                pushedTenderIDList = [o.tenderID for o in pushedResult]
                 for o in dataList:
                     if o['tenderID'] in pushedTenderIDList:
                         o['pushed'] = True

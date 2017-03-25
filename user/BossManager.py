@@ -26,7 +26,7 @@ class BossManager(Util):
 
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):
-        pass
+        info = json.loads(jsonInfo)
 
     # 决定是否采用该经办人
     def operateCreatedOperator(self, jsonInfo):
