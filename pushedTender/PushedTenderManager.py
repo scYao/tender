@@ -338,7 +338,7 @@ class PushedTenderManager(Util):
             ).filter(and_(
                 PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
                 PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
-            )).offset(startIndex).limit(pageCount).all()
+            ))
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
                 PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
                 PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT

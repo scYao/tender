@@ -19,6 +19,7 @@ from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_T
 from models.flask_app import db
 from models.Operator import Operator
 from models.Message import Message
+from models.PushedTenderInfo import PushedTenderInfo
 
 from pushedTender.PushedTenderManager import PushedTenderManager
 
@@ -68,7 +69,30 @@ class AuditorManager(Util):
             return (False, errorInfo)
         info['userID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getPushedTenderListByUserID(info=info)
+        (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
+        if status is True:
+            try:
+                dataList = tenderResult['dataList']
+                tenderIDTuple = (o['tenderID'] for o in dataList)
+
+                pushedResult = db.session.query(PushedTenderInfo).filter(and_(
+                    PushedTenderInfo.auditorPushedTime != None,
+                    PushedTenderInfo.tenderID.in_(tenderIDTuple)
+                )).all()
+                pushedTenderIDList = [o.tenderID for o in pushedResult]
+                for o in dataList:
+                    if o['tenderID'] in pushedTenderIDList:
+                        o['pushed'] = True
+                    else:
+                        o['pushed'] = False
+                return (True, tenderResult)
+            except Exception as e:
+                print str(e)
+                # traceback.print_stack()
+                db.session.rollback()
+                errorInfo = ErrorInfo['TENDER_02']
+                errorInfo['detail'] = str(e)
+                return (False, errorInfo)
 
     # 审核人人从经办人推送列表, 或负责人推送列表推送
     def updatePushedTenderByAuditor(self, jsonInfo):
@@ -97,4 +121,27 @@ class AuditorManager(Util):
             return (False, errorInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getPushedTenderListByUserType(info=info)
+        (status, tenderResult) =  pushedTenderManager.getPushedTenderListByUserType(info=info)
+        if status is True:
+            try:
+                dataList = tenderResult['dataList']
+                tenderIDTuple = (o['tenderID'] for o in dataList)
+
+                pushedResult = db.session.query(PushedTenderInfo).filter(and_(
+                    PushedTenderInfo.auditorPushedTime != None,
+                    PushedTenderInfo.tenderID.in_(tenderIDTuple)
+                )).all()
+                pushedTenderIDList = [o.tenderID for o in pushedResult]
+                for o in dataList:
+                    if o['tenderID'] in pushedTenderIDList:
+                        o['pushed'] = True
+                    else:
+                        o['pushed'] = False
+                return (True, tenderResult)
+            except Exception as e:
+                print str(e)
+                # traceback.print_stack()
+                db.session.rollback()
+                errorInfo = ErrorInfo['TENDER_02']
+                errorInfo['detail'] = str(e)
+                return (False, errorInfo)
