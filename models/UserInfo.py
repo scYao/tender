@@ -75,3 +75,10 @@ class UserInfo(db.Model):
         res['customizedCompanyID'] = userInfo.customizedCompanyID
         res['userType'] = userInfo.userType
         return res
+
+    @staticmethod
+    def generateBrief(userInfo):
+        res = {}
+        res['userID'] = userInfo.userID
+        res['userName'] = userInfo.userName
+        return res
