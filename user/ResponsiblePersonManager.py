@@ -184,3 +184,8 @@ class ResponsiblePersonManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
 
+    # 负责人获取待分配列表
+    def getUndistributedTenderListByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getUndistributedTenderList(info=info)
