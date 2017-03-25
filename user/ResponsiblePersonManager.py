@@ -30,7 +30,7 @@ class ResponsiblePersonManager(Util):
     def createPushedTenderByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -42,7 +42,7 @@ class ResponsiblePersonManager(Util):
     def updatePushedTenderByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -77,7 +77,7 @@ class ResponsiblePersonManager(Util):
     def createOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -105,7 +105,7 @@ class ResponsiblePersonManager(Util):
     def updateOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -136,7 +136,7 @@ class ResponsiblePersonManager(Util):
     def getOperatorPushedListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -172,7 +172,7 @@ class ResponsiblePersonManager(Util):
     def getPushedListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -185,7 +185,7 @@ class ResponsiblePersonManager(Util):
     def getUndistributedTenderListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)

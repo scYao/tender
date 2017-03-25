@@ -30,7 +30,7 @@ class OperatorManager(Util):
     def createPushedTenderByOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_OPERATOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -45,7 +45,7 @@ class OperatorManager(Util):
     def getPushedListByOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_OPERATOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -63,7 +63,7 @@ class OperatorManager(Util):
     def getUserList(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_OPERATOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)

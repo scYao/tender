@@ -29,7 +29,7 @@ class BossManager(Util):
     def createPushedTenderByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_BOSS
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -41,7 +41,7 @@ class BossManager(Util):
     def operatePushedTenderInfo(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_BOSS
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -53,7 +53,7 @@ class BossManager(Util):
     def validateOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_BOSS
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -69,7 +69,7 @@ class BossManager(Util):
     def getRespPushedListByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_BOSS
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -81,7 +81,7 @@ class BossManager(Util):
     def getAuditorPushedListByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_BOSS
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)

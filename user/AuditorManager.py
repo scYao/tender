@@ -34,7 +34,7 @@ class AuditorManager(Util):
     def createPushedTenderByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_AUDITOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -46,7 +46,7 @@ class AuditorManager(Util):
     def pushedTenderByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_AUDITOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -56,7 +56,7 @@ class AuditorManager(Util):
     def getPushedListByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_AUDITOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -69,7 +69,7 @@ class AuditorManager(Util):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_AUDITOR
         operatorUserID = info['userID']
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -104,7 +104,7 @@ class AuditorManager(Util):
     def updatePushedTenderByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_AUDITOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -120,7 +120,7 @@ class AuditorManager(Util):
     def getRespPushedListByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_AUDITOR
-        (status, userID) = self.isTokenValidByUserType(info=info)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
