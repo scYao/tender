@@ -658,10 +658,10 @@ def operate_pushed_tender_info():
 if __name__ == '__main__':
     # operate_pushed_tender_info()
     # get_resp_pushed_list_by_boss()
-    get_undistributed_tender_list_by_resp()
+    # get_undistributed_tender_list_by_resp()
     # get_tender_doing_list()
     # get_operator_list()
-    # get_pushed_list_by_operator()
+    get_pushed_list_by_operator()
     # create_pushed_tender_by_operator()
     # create_pushed_tender_by_operator()
     # find_password()
