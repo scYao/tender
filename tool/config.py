@@ -152,6 +152,11 @@ ErrorInfo['TENDER_25'] = {
     'zhInfo' : '招标公告已经推送'
 }
 
+ErrorInfo['TENDER_26'] = {
+    'code' : 'TENDER_26',
+    'info' : 'the operator is not exist!',
+    'zhInfo' : '不存在经办人'
+}
 
 
 #支付宝公钥

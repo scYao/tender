@@ -22,6 +22,7 @@ from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
 from models.UserInfo import UserInfo
 from models.Tender import Tender
+from models.Operator import Operator
 
 from message.MessageManager import MessageManager
 
@@ -125,6 +126,10 @@ class PushedTenderManager(Util):
             elif userType == USER_TAG_RESPONSIBLEPERSON:
                 updateInfo = {
                     PushedTenderInfo.responsiblePersonPushedTime : datetime.now()
+                }
+            elif userType == USER_TAG_BOSS:
+                updateInfo = {
+                    PushedTenderInfo.state : int(info['state'])
                 }
             query.update(
                 updateInfo, synchronize_session=False
@@ -262,3 +267,32 @@ class PushedTenderManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+    #ｂｏｓｓ是否指定该经办人
+    def validateOperator(self, info):
+        tenderID = info['tenderID']
+        state = info['state']
+        try:
+            query = db.session.query(Operator).filter(
+                and_(Operator.tenderID == tenderID,
+                     Operator.state == 0)
+            )
+            result = query.first()
+            if result:
+                updateInfo = {
+                    Operator.state: int(state)
+                }
+                query.update(
+                    updateInfo, synchronize_session=False
+                )
+                db.session.commit()
+                return (True, None)
+            else:
+                return (False, ErrorInfo['TENDER_26'])
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+

@@ -75,21 +75,18 @@ class ResponsiblePersonManager(Util):
         (status, userID) = self.isTokenValid(tokenID)
         if status is not True:
             return (False, userID)
-
         # 检查是否是负责人
         info['userID'] = userID
         (status, reason) = ResponsiblePersonManager.isResponsiblePerson(info=info)
         if status is not True:
             return (False, ErrorInfo['TENDER_24'])
-
         toUserID = info['userID'].replace('\'', '\\\'').replace('\"', '\\\"')
         tenderID = info['tenderID'].replace('\'', '\\\'').replace('\"', '\\\"')
-
-
         operatorID = self.generateID(tenderID)
-
-        operator = Operator(operatorID=operatorID, userID=toUserID, tenderID=tenderID, state=OPERATOR_TAG_CREATED)
-
+        operator = Operator(
+            operatorID=operatorID, userID=toUserID, 
+            tenderID=tenderID, state=OPERATOR_TAG_CREATED
+        )
         try:
             db.session.add(operator)
             db.session.commit()
@@ -130,16 +127,4 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getPushedTenderListByUserType(info=info)
-
-    # 负责人从经办人列表推送
-    def updatePushedTenderByResp(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
-        pushedTenderManager = PushedTenderManager()
-        info['userType'] = USER_TAG_RESPONSIBLEPERSON
         return pushedTenderManager.getPushedTenderListByUserType(info=info)

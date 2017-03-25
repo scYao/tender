@@ -1,6 +1,8 @@
 # coding=utf8
 import sys
 import json
+
+
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -12,11 +14,13 @@ from sqlalchemy import and_, text, func, desc
 from models.flask_app import db
 from models.Operator import Operator
 from models.Message import Message
+
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED
+from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
+from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 
-from ResponsiblePersonManager import ResponsiblePersonManager
+from pushedTender.PushedTenderManager import PushedTenderManager
 
 
 class BossManager(Util):
@@ -26,11 +30,27 @@ class BossManager(Util):
 
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):
-        pass
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        info['userType'] = USER_TAG_BOSS
+        return pushedTenderManager.updatePushedTenderInfo(info=info)
 
     # 决定是否采用该经办人
-    def operateCreatedOperator(self, jsonInfo):
-        pass
+    def validateOperator(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        info['userType'] = USER_TAG_BOSS
+        return pushedTenderManager.validateOperator(info=info)
 
     # 老板确定推送消息后,  获取推送消息列表
     def getCertainPushedList(self, jsonInfo):
