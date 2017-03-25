@@ -26,48 +26,11 @@ class ResponsiblePersonManager(Util):
     def __init__(self):
         pass
 
-    def __isTokenValid(self, info):
-        tokenID = info['tokenID']
-        query = db.session.query(
-            Token, UserInfo
-        ).outerjoin(
-            UserInfo, Token.userID == UserInfo.userID
-        ).filter(and_(
-                UserInfo.userType == USER_TAG_RESPONSIBLEPERSON,
-                Token.tokenID == tokenID
-            ))
-        result = query.first()
-        if result is None:
-            errorInfo = ErrorInfo['TENDER_01']
-            errorInfo['detail'] = result
-            return (False, errorInfo)
-        token = result.Token
-        now = datetime.now()
-        # 将token登录时间更新为最近的一次操作时间
-        db.session.query(Token).filter(
-            Token.tokenID == tokenID
-        ).update(
-            {Token.createTime: now},
-            synchronize_session=False)
-        try:
-            db.session.commit()
-        except Exception as e:
-            print e
-            errorInfo = ErrorInfo['SPORTS_02']
-            errorInfo['detail'] = str(e)
-            db.session.rollback()
-            return (False, errorInfo)
-        days = (now - token.createTime).days
-        if days > token.validity:
-            errorInfo = ErrorInfo['SPORTS_01']
-            errorInfo['detail'] = result
-            return (False, errorInfo)
-        return (True, result.Token.userID)
-
     # 负责人推送
     def createPushedTenderByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
-        (status, userID) = self.__isTokenValid(info=info)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -78,7 +41,8 @@ class ResponsiblePersonManager(Util):
     # 负责人从经办人推送列表推送
     def updatePushedTenderByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
-        (status, userID) = self.__isTokenValid(info=info)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -112,7 +76,8 @@ class ResponsiblePersonManager(Util):
     # 创建经办人, 分配工作
     def createOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
-        (status, userID) = self.__isTokenValid(info=info)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -139,16 +104,17 @@ class ResponsiblePersonManager(Util):
     # 经办人被否定, 重新分配经办人
     def updateOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
-        (status, userID) = self.__isTokenValid(info=info)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         # 验证登录
         userID = info['userID']
-        operatorID = info['operatorID']
+        tenderID = info['tenderID']
         try:
             query = db.session.query(Operator).filter(
-                Operator.operatorID == operatorID
+                Operator.tenderID == tenderID
             )
             updateInfo = {
                 Operator.userID: userID
@@ -169,7 +135,8 @@ class ResponsiblePersonManager(Util):
     # 负责人 获取某个经办人的推送列表
     def getOperatorPushedListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
-        (status, userID) = self.__isTokenValid(info=info)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -204,7 +171,8 @@ class ResponsiblePersonManager(Util):
     # 负责人获取我的推送列表
     def getPushedListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
-        (status, userID) = self.__isTokenValid(info=info)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -216,5 +184,10 @@ class ResponsiblePersonManager(Util):
     # 负责人获取待分配列表
     def getUndistributedTenderListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = self.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getUndistributedTenderList(info=info)

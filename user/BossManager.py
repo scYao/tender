@@ -28,6 +28,11 @@ class BossManager(Util):
     # 审定人创建推送
     def createPushedTenderByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = self.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
         info['tag'] = USER_TAG_BOSS
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
@@ -35,8 +40,8 @@ class BossManager(Util):
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -47,8 +52,8 @@ class BossManager(Util):
     # 决定是否采用该经办人
     def validateOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -63,8 +68,8 @@ class BossManager(Util):
     # 审定人 获取负责人推送列表
     def getRespPushedListByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
@@ -75,8 +80,8 @@ class BossManager(Util):
     # 审定人获取 审核人的推送列表
     def getAuditorPushedListByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
