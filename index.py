@@ -34,6 +34,7 @@ from message.MessageManager import MessageManager
 from user.OperatorManager import OperatorManager
 from user.ResponsiblePersonManager import ResponsiblePersonManager
 from user.AuditorManager import AuditorManager
+from user.BossManager import BossManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -1496,6 +1497,52 @@ def get_operator_pushed_list_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = auditorManager.getOperatorPushedListByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+#负责人创建推送
+@app.route('/create_pushed_tender_by_resp/', methods=['POST', 'GET'])
+def create_pushed_tender_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.createPushedTenderByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+#审核人创建推送
+@app.route('/create_pushed_tender_by_auditor/', methods=['POST', 'GET'])
+def create_pushed_tender_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.createPushedTenderByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+#审定人创建推送
+@app.route('/create_pushed_tender_by_boss/', methods=['POST', 'GET'])
+def create_pushed_tender_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.createPushedTenderByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

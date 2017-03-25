@@ -153,18 +153,3 @@ class ResponsiblePersonManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
 
-    # 负责人从经办人列表推送
-    # def updatePushedTenderByResp(self, jsonInfo):
-    #     info = json.loads(jsonInfo)
-    #     tokenID = info['tokenID']
-    #     (status, userID) = self.isTokenValid(tokenID)
-    #     if status is not True:
-    #         errorInfo = ErrorInfo['TENDER_01']
-    #         return (False, errorInfo)
-    #     pushedTenderManager = PushedTenderManager()
-    #     info['userType'] = USER_TAG_RESPONSIBLEPERSON
-    #     return pushedTenderManager.getPushedTenderListByUserType(info=info)
-
-    # 负责人获取所有的招标信息列表
-    def getTenderListWithPushedTagByResp(self, jsonInfo):
-        pass

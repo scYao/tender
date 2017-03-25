@@ -25,6 +25,13 @@ class BossManager(Util):
     def __init__(self):
         pass
 
+    # 审定人创建推送
+    def createPushedTenderByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['tag'] = USER_TAG_BOSS
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.createPushedTender(info=info)
+
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):
         info = json.loads(jsonInfo)
