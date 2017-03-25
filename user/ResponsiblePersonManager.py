@@ -72,15 +72,8 @@ class ResponsiblePersonManager(Util):
     def createOperator(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
-        # 验证登录信息
-        (status, userID) = self.isTokenValid(tokenID)
-        if status is not True:
-            return (False, userID)
-        # 检查是否是负责人
-        info['userID'] = userID
-        (status, reason) = ResponsiblePersonManager.isResponsiblePerson(info=info)
-        if status is not True:
-            return (False, ErrorInfo['TENDER_24'])
+        #验证登录
+
         toUserID = info['userID'].replace('\'', '\\\'').replace('\"', '\\\"')
         tenderID = info['tenderID'].replace('\'', '\\\'').replace('\"', '\\\"')
         operatorID = self.generateID(tenderID)
@@ -102,30 +95,22 @@ class ResponsiblePersonManager(Util):
 
     # 经办人被否定, 重新分配经办人
     def updateOperator(self, jsonInfo):
-        pass
-
-    #获取经办人列表
-    def getOperatorList(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
-        # 验证登录信息
-        (status, userID) = self.isTokenValid(tokenID)
-        if status is not True:
-            return (False, userID)
+        # 验证登录
+        userID = info['userID']
+        operatorID = info['operatorID']
         try:
-            query = db.session.query(UserInfo).filter(
-                UserInfo, UserInfo.userType == USER_TAG_OPERATOR
+            query = db.session.query(Operator).filter(
+                Operator.operatorID == operatorID
             )
-            allResult = query.all()
-            countQuery = db.session.query(func.count(UserInfo.userID)).filter(
-                UserInfo.userType == USER_TAG_OPERATOR
+            updateInfo = {
+                Operator.userID: userID
+            }
+            query.update(
+                updateInfo, synchronize_session=False
             )
-            count = countQuery.first()[0]
-            dataList = [UserInfo.generate(result) for result in allResult]
-            callBackInfo = {}
-            callBackInfo['dataList'] = dataList
-            callBackInfo['count'] = count
-            return (True, callBackInfo)
+            db.session.commit()
         except Exception as e:
             print str(e)
             # traceback.print_stack()
@@ -133,8 +118,7 @@ class ResponsiblePersonManager(Util):
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
-
-
+        return (True, None)
 
     # 负责人 获取某个经办人的推送列表
     def getOperatorPushedListByResp(self, jsonInfo):
@@ -183,6 +167,7 @@ class ResponsiblePersonManager(Util):
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
+
 
     # 负责人获取待分配列表
     def getUndistributedTenderListByResp(self, jsonInfo):

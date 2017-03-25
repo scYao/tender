@@ -219,6 +219,35 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    def getAllTenderDoingList(self, info):
+        tokenID = info['tokenID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        step = info['step']
+        try:
+            query = db.session.query(
+                PushedTenderInfo, Tender
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).filter(PushedTenderInfo.step == step)
+            countQuery = db.session.query(
+                func.count(PushedTenderInfo.pushedID)
+            ).filter(PushedTenderInfo.step == step)
+            count = countQuery.first()
+            count = count[0]
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            dataList = [self.__generateBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
     # 审核人 负责人 获取我的推送
     def getPushedTenderListByUserType(self, info):
         startIndex = info['startIndex']

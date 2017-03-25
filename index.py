@@ -1348,6 +1348,21 @@ def get_undistributed_tender_list_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 重新分配经办人
+@app.route('/update_operator/', methods=['POST', 'GET'])
+def update_operator():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.updateOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 负责人获取我的推送列表
 @app.route('/get_pushed_list_by_resp/', methods=['POST', 'GET'])
 def get_pushed_list_by_resp():
@@ -1409,16 +1424,16 @@ def create_pushed_tender_by_operator():
         return json.dumps(data)
 
 
-# 获取经办人参与的, 正在进行中的列表
-@app.route('/get_tender_doing_list_by_operator/', methods=['POST', 'GET'])
-def get_tender_doing_list_by_operator():
+# 正在进行中的列表
+@app.route('/get_tender_doing_list/', methods=['POST', 'GET'])
+def get_tender_doing_list():
     operatorManager = OperatorManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = operatorManager.getTenderDoingListByOperator(paramsJson)
+        (status, result) = operatorManager.getTenderDoingList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1456,32 +1471,32 @@ def get_pushed_list_by_operator():
         return json.dumps(data)
 
 
-# 获取经办人参与的,已完成的列表
-@app.route('/get_tender_done_list_by_operator/', methods=['POST', 'GET'])
-def get_tender_done_list_by_operator():
+# 已完成的列表
+@app.route('/get_tender_done_list/', methods=['POST', 'GET'])
+def get_tender_done_list():
     operatorManager = OperatorManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = operatorManager.getTenderDoneListByOperator(paramsJson)
+        (status, result) = operatorManager.getTenderDoneList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
 
 
-# 获取经办人参与的, 历史记录
-@app.route('/get_tender_history_list_by_operator/', methods=['POST', 'GET'])
-def get_tender_history_list_by_operator():
+# 历史记录列表
+@app.route('/get_tender_history_list/', methods=['POST', 'GET'])
+def get_tender_history_list():
     operatorManager = OperatorManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = operatorManager.getTenderHistoryListByOperator(paramsJson)
+        (status, result) = operatorManager.getTenderHistoryList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

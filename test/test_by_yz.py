@@ -585,10 +585,39 @@ def get_pushed_list_by_operator():
     result = resultManager.getResult(params, upload_url)
     print result
 
+    # 获取经办人推送消息列表
+
+
+def get_operator_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_operator_list/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2016-12-171435141c5f22cb8420c728648529041d6b7427'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+def get_tender_doing_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_tender_doing_list/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2016-12-171435141c5f22cb8420c728648529041d6b7427'
+    info['userType'] = 2
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
 
 
 if __name__ == '__main__':
-    get_pushed_list_by_operator()
+    get_tender_doing_list()
+    # get_operator_list()
+    # get_pushed_list_by_operator()
+    # create_pushed_tender_by_operator()
     # create_pushed_tender_by_operator()
     # find_password()
     # get_grade_1_list_background()
