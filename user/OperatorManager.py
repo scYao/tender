@@ -62,8 +62,8 @@ class OperatorManager(Util):
     # 获取员工列表
     def getUserList(self, jsonInfo):
         info = json.loads(jsonInfo)
-        info['userType'] = USER_TAG_OPERATOR
-        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)

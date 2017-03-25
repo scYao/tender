@@ -1625,6 +1625,21 @@ def get_resp_pushed_list_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人 获取某个经办人的推送列表
+@app.route('/get_operator_pushed_list_by_boss/', methods=['POST', 'GET'])
+def get_operator_pushed_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getOperatorPushedListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 审定人获取 审核人的推送列表
 @app.route('/get_auditor_pushed_list_by_boss/', methods=['POST', 'GET'])
