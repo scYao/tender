@@ -76,7 +76,10 @@ class BossManager(Util):
             return (False, errorInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getPushedTenderListByUserType(info=info)
+        (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserType(info=info)
+        if status is True:
+            return self.getApprovedState(info=tenderResult)
+        return (False, tenderResult)
 
     # 审定人获取 审核人的推送列表
     def getAuditorPushedListByBoss(self, jsonInfo):
@@ -88,7 +91,10 @@ class BossManager(Util):
             return (False, errorInfo)
         info['userType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getPushedTenderListByUserType(info=info)
+        (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserType(info=info)
+        if status is True:
+            return self.getApprovedState(info=tenderResult)
+        return (False, tenderResult)
 
     # 判断是否已经投过该标
     def getApprovedState(self, info):
