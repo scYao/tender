@@ -17,6 +17,7 @@ from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_T
 from models.flask_app import db
 from models.UserInfo import UserInfo
 from models.Operator import Operator
+from models.PushedTenderInfo import PushedTenderInfo
 
 from pushedTender.PushedTenderManager import PushedTenderManager
 
@@ -84,7 +85,7 @@ class ResponsiblePersonManager(Util):
         tenderID = info['tenderID'].replace('\'', '\\\'').replace('\"', '\\\"')
         operatorID = self.generateID(tenderID)
         operator = Operator(
-            operatorID=operatorID, userID=toUserID, 
+            operatorID=operatorID, userID=toUserID,
             tenderID=tenderID, state=OPERATOR_TAG_CREATED
         )
         try:
@@ -115,7 +116,30 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         info['userID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getPushedTenderListByUserID(info=info)
+        (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
+        if status is True:
+            try:
+                dataList = tenderResult['dataList']
+                tenderIDTuple = (o['tenderID'] for o in dataList)
+
+                pushedResult = db.session.query(PushedTenderInfo).filter(and_(
+                    PushedTenderInfo.responsiblePersonPushedTime != None,
+                    PushedTenderInfo.tenderID.in_(tenderIDTuple)
+                )).all()
+                pushedTenderIDList = [o['tenderID'] for o in pushedResult]
+                for o in dataList:
+                    if o['tenderID'] in pushedTenderIDList:
+                        o['pushed'] = True
+                    else:
+                        o['pushed'] = False
+                return (True, tenderResult)
+            except Exception as e:
+                print str(e)
+                # traceback.print_stack()
+                db.session.rollback()
+                errorInfo = ErrorInfo['TENDER_02']
+                errorInfo['detail'] = str(e)
+                return (False, errorInfo)
 
     # 负责人获取我的推送列表
     def getPushedListByResp(self, jsonInfo):
@@ -128,3 +152,15 @@ class ResponsiblePersonManager(Util):
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
+
+    # 负责人从经办人列表推送
+    # def updatePushedTenderByResp(self, jsonInfo):
+    #     info = json.loads(jsonInfo)
+    #     tokenID = info['tokenID']
+    #     (status, userID) = self.isTokenValid(tokenID)
+    #     if status is not True:
+    #         errorInfo = ErrorInfo['TENDER_01']
+    #         return (False, errorInfo)
+    #     pushedTenderManager = PushedTenderManager()
+    #     info['userType'] = USER_TAG_RESPONSIBLEPERSON
+    #     return pushedTenderManager.getPushedTenderListByUserType(info=info)
