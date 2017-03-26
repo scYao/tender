@@ -1731,6 +1731,20 @@ def update_pushed_tender_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+# 获取operation信息列表
+@app.route('/get_operation_list_by_operator_id/', methods=['POST', 'GET'])
+def get_operation_list_by_operator_id():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.getOperationListByOperatorID(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
 
 
 # 决定是否采用该经办人
