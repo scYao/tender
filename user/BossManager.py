@@ -92,32 +92,6 @@ class BossManager(Util):
         info['userType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
-        # if status is True:
-        #     return self.getApprovedState(info=tenderResult)
-        # return (False, tenderResult)
-
-    # # 判断是否已经投过该标
-    # def getApprovedState(self, info):
-    #     dataList = info['dataList']
-    #     try:
-    #         tenderIDTuple = (o['tenderID'] for o in dataList)
-    #
-    #         pushedResult = db.session.query(PushedTenderInfo).filter(and_(
-    #             PushedTenderInfo.responsiblePersonPushedTime != None,
-    #             PushedTenderInfo.tenderID.in_(tenderIDTuple)
-    #         )).all()
-    #         pushedTenderIDList = [o.tenderID for o in pushedResult]
-    #         for o in dataList:
-    #             if o['tenderID'] not in pushedTenderIDList:
-    #                 o['state'] = -1
-    #         return (True, info)
-    #     except Exception as e:
-    #         print str(e)
-    #         # traceback.print_stack()
-    #         db.session.rollback()
-    #         errorInfo = ErrorInfo['TENDER_02']
-    #         errorInfo['detail'] = str(e)
-    #         return (False, errorInfo)
 
     # 审定人 获取某个经办人的推送列表
     def getOperatorPushedListByBoss(self, jsonInfo):
@@ -145,3 +119,14 @@ class BossManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getUndistributedTenderList(info=info)
+
+    # 审定人获取已分配列表
+    def getDistributedTenderListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDistributedTenderList(info=info)

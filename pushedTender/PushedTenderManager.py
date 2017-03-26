@@ -6,7 +6,7 @@ import poster
 import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
-    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING
+    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -152,6 +152,7 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
+        res.update(Operator.generate(c=result.Operator))
         return res
 
     def __generateUndistributedBrief(self, result):
@@ -333,7 +334,7 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            userIDTuple = (o.Operator.userID for o in allResult)
+            userIDTuple = (o.Operator.userID for o in allResult if o.Operator)
             cityIDTuple = (o.Tender.cityID for o in allResult)
             userQuery = db.session.query(UserInfo).filter(
                 UserInfo.userID.in_(userIDTuple)
@@ -351,7 +352,7 @@ class PushedTenderManager(Util):
                 cityDic[o.cityID] = o.cityName
             dataList = [self.__generateBrief(result=result) for result in allResult]
             for o in dataList:
-                o['cityName'] = cityDic[o['cityName']]
+                o['cityName'] = cityDic[o['cityID']]
                 if o['userID'] != '-1':
                     o['userName'] = userDic[o['userID']]
                 else:
@@ -362,6 +363,7 @@ class PushedTenderManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -410,7 +412,7 @@ class PushedTenderManager(Util):
             callBackInfo['count'] = count[0]
             return (True, callBackInfo)
         except Exception as e:
-
+            traceback.print_exc()
             print e
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
@@ -422,6 +424,7 @@ class PushedTenderManager(Util):
         tenderID = info['tenderID']
         state = info['state']
         try:
+            # 先将经办人的状态改为同意或驳回
             query = db.session.query(Operator).filter(
                 and_(Operator.tenderID == tenderID,
                      Operator.state == 0)
@@ -434,10 +437,18 @@ class PushedTenderManager(Util):
                 query.update(
                     updateInfo, synchronize_session=False
                 )
+                if state == OPERATOR_TAG_YES:
+                    pushedQuery = db.session.query(PushedTenderInfo).filter(
+                        PushedTenderInfo.tenderID == tenderID
+                    )
+                    pushedQuery.update({
+                        PushedTenderInfo.step : PUSH_TENDER_INFO_TAG_STEP_DOING
+                    }, synchronize_session=False)
                 db.session.commit()
                 return (True, None)
             else:
                 return (False, ErrorInfo['TENDER_26'])
+
         except Exception as e:
             print e
             errorInfo = ErrorInfo['TENDER_02']
@@ -481,7 +492,20 @@ class PushedTenderManager(Util):
                     o['userName'] = userDic[o['userID']]
                 else:
                     o['userName'] = ''
-            return (True, resultList)
+
+            countQuery = db.session.query(func.count(PushedTenderInfo.tenderID), Operator).outerjoin(
+                Operator, PushedTenderInfo.tenderID == Operator.tenderID
+            ).filter(and_(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
+                or_(Operator.userID == '-1',
+                    Operator.state == 2)
+            ))
+            count = countQuery.first()
+            callBackInfo = {}
+            callBackInfo['dataList'] = resultList
+            callBackInfo['count'] = count[0]
+            return (True, callBackInfo)
 
         except Exception as e:
             print e
@@ -503,8 +527,8 @@ class PushedTenderManager(Util):
         ).filter(and_(
             PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
             PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
-            or_(Operator.userID != '-1',
-                Operator.state == 0)
+            Operator.userID != '-1',
+            Operator.state == 0
         ))
 
         pushedInfoResult = query.offset(startIndex).limit(pageCount).all()
@@ -524,7 +548,25 @@ class PushedTenderManager(Util):
                 o['userName'] = userDic[o['userID']]
             else:
                 o['userName'] = ''
-        return (True, resultList)
+
+        countQuery = db.session.query(PushedTenderInfo).filter(and_(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
+                or_(Operator.userID != '-1',
+                        Operator.state == 0)
+                ))
+        countResult = countQuery.all()
+        countPushedIDTuple = (o.tenderID for o in countResult)
+        countQuery = db.session.query(func.count(Operator.operatorID)).filter(
+            and_(Operator.tenderID.in_(countPushedIDTuple),
+                or_(Operator.userID != '-1',
+                    Operator.state == 0))
+        )
+        count = countQuery.first()
+        callBackInfo = {}
+        callBackInfo['dataList'] = resultList
+        callBackInfo['count'] = count[0]
+        return (True, callBackInfo)
 
     # 经办人特殊, 获取自己参与的, 正在进行中的列表
     # 考虑策略模式

@@ -1624,6 +1624,21 @@ def get_undistributed_tender_list_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人获取已分配列表
+@app.route('/get_distributed_tender_list_by_boss/', methods=['POST', 'GET'])
+def get_distributed_tender_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getDistributedTenderListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 审定人 获取负责人推送列表
 @app.route('/get_resp_pushed_list_by_boss/', methods=['POST', 'GET'])
