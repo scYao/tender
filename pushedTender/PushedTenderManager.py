@@ -203,8 +203,7 @@ class PushedTenderManager(Util):
                 }
             elif userType == USER_TAG_BOSS:
                 updateInfo = {
-                    PushedTenderInfo.state : state,
-                    PushedTenderInfo.step : PUSH_TENDER_INFO_TAG_STEP_DOING
+                    PushedTenderInfo.state : state
                 }
             query.update(
                 updateInfo, synchronize_session=False
