@@ -16,7 +16,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
 from datetime import datetime
-from sqlalchemy import func, desc, and_
+from sqlalchemy import func, desc, and_, or_
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
 
@@ -157,15 +157,16 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
-        if result.Operator:
-            query = db.session.query(UserInfo).filter(UserInfo.userID == result.Operator.userID)
-            userInfo = query.first()
-            res.update(UserInfo.generateBrief(userInfo))
-            res.update(Operator.generate(c=result.Operator))
-        else:
-            res.update({'state': -1,
-                        'userName': '',
-                        'userID': ''})
+        res.update(Operator.generate(c=result.Operator))
+        # if result.Operator:
+        #     query = db.session.query(UserInfo).filter(UserInfo.userID == result.Operator.userID)
+        #     userInfo = query.first()
+        #     res.update(UserInfo.generateBrief(userInfo))
+        #     res.update(Operator.generate(c=result.Operator))
+        # else:
+        #     res.update({'state': -1,
+        #                 'userName': '',
+        #                 'userID': ''})
         return res
 
     # 负责人或审核人推送, 从上一级或上两级中继续推送
@@ -391,30 +392,60 @@ class PushedTenderManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         try:
+            # query = db.session.query(
+            #     PushedTenderInfo, Tender, Operator
+            # ).outerjoin(
+            #     Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            # ).outerjoin(
+            #     Operator, PushedTenderInfo.tenderID == Operator.tenderID
+            # ).filter(and_(
+            #     PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+            #     PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
+            # ))
+            # countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
+            #     PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+            #     PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
+            # ))
+            # count = countQuery.first()
+            # count = count[0]
+            # allResult = query.offset(startIndex).limit(pageCount).all()
+            # dataList = [self.__generateUndistributedBrief(result=result) for result in allResult]
+            # callBackInfo = {}
+            # callBackInfo['dataList'] = dataList
+            # callBackInfo['count'] = count
+            # return (True, callBackInfo)
+            # 获取所有已同意投标，并且状态时未开始的标段
             query = db.session.query(
-                PushedTenderInfo, Tender, Operator
-            ).outerjoin(
-                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+                PushedTenderInfo, Operator, Tender
             ).outerjoin(
                 Operator, PushedTenderInfo.tenderID == Operator.tenderID
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).filter(and_(
                 PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
-                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
+                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
+                or_(Operator.userID == '-1',
+                    Operator.state == 2)
             ))
-            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
-                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
-                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
-            ))
-            count = countQuery.first()
-            count = count[0]
-            allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [self.__generateUndistributedBrief(result=result) for result in allResult]
-            callBackInfo = {}
-            callBackInfo['dataList'] = dataList
-            callBackInfo['count'] = count
-            return (True, callBackInfo)
+
+            pushedInfoResult = query.offset(startIndex).limit(pageCount).all()
+            userIDTuple = (o.Operator.userID for o in pushedInfoResult)
+
+            userQuery = db.session.query(UserInfo).filter(
+                UserInfo.userID.in_(userIDTuple)
+            )
+            userResult = userQuery.all()
+            userDic = {}
+            for o in userResult:
+                userDic[o.userID] = o.userName
+
+            resultList = [self.__generateUndistributedBrief(result=o) for o in pushedInfoResult]
+            for o in resultList:
+                o['userName'] = userDic[o['userID']]
+            return (True, resultList)
+
         except Exception as e:
-            print e
+            print e.message
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
