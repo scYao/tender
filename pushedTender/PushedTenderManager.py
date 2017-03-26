@@ -152,6 +152,12 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
+        #添加经办人信息
+        res.update(Operator.generate(c=result.Operator))
+        query = db.session.query(UserInfo).filter(UserInfo.userID == res['userID'])
+        result = query.first()
+        res.update(UserInfo.generate(userInfo=result))
+        #添加城市信息
         if res['cityID']:
             query = db.session.query(City).filter(City.cityID == res['cityID'])
             result = query.first()
@@ -159,7 +165,6 @@ class PushedTenderManager(Util):
         else:
             res['cityID'] = ''
             res['cityName'] = ''
-        #添加城市信息
 
         return res
 
@@ -274,7 +279,9 @@ class PushedTenderManager(Util):
             userID = logInUserID
         try:
             query = db.session.query(
-                PushedTenderInfo, Tender
+                PushedTenderInfo, Tender, Operator
+            ).outerjoin(
+                Operator, PushedTenderInfo.tenderID == Operator.tenderID
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).filter(
@@ -307,9 +314,11 @@ class PushedTenderManager(Util):
         step = info['step']
         try:
             query = db.session.query(
-                PushedTenderInfo, Tender
+                PushedTenderInfo, Tender, Operator
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).outerjoin(
+                Operator, PushedTenderInfo.tenderID == Operator.tenderID
             ).filter(PushedTenderInfo.step == step)
             countQuery = db.session.query(
                 func.count(PushedTenderInfo.pushedID)
