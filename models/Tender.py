@@ -66,6 +66,7 @@ class Tender(db.Model):
         res['location'] = tender.location
         res['url'] = tender.url
         res['publishDate'] = str(tender.publishDate)
+        res['cityID'] = tender.cityID
         return res
 
     @staticmethod
