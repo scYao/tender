@@ -1471,6 +1471,21 @@ def get_operator_list():
         data['data'] = result
         return json.dumps(data)
 
+# 创建打保证金等记录
+@app.route('/create_operation/', methods=['POST', 'GET'])
+def create_operation():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.createOperation(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 获取经办人的推送
 @app.route('/get_pushed_list_by_operator/', methods=['POST', 'GET'])
 def get_pushed_list_by_operator():

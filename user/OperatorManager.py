@@ -14,6 +14,7 @@ from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_T
 
 from models.flask_app import db
 from models.Operator import Operator
+from models.Operation import Operation
 from models.Message import Message
 from models.UserInfo import UserInfo
 from models.Token import Token
@@ -39,7 +40,21 @@ class OperatorManager(Util):
 
     # 记录动作, 打保证金等
     def createOperation(self, jsonInfo):
-        pass
+        info = json.loads(jsonInfo)
+        operatorID = info['operatorID']
+        operationID = self.generateID(operatorID)
+        info['operationID'] = operationID
+        info['createTime'] = datetime.now()
+        try:
+            Operation.create(info=info)
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
 
     # 经办人获取我的推送列表
     def getPushedListByOperator(self, jsonInfo):
