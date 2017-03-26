@@ -175,7 +175,7 @@ class PushedTenderManager(Util):
     def updatePushedTenderInfo(self, info):
         pushedID = info['pushedID']
         userType = info['userType']
-        state = int(info['state'])
+
         try:
             query = db.session.query(PushedTenderInfo).filter(
                 PushedTenderInfo.pushedID == pushedID
@@ -194,20 +194,22 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.responsiblePersonPushedTime : datetime.now()
                 }
             elif userType == USER_TAG_BOSS:
+                state = int(info['state'])
                 updateInfo = {
                     PushedTenderInfo.state : state
                 }
+                #如果同意投标，创建一个默认的经办人
+                if state == 1:
+                    operatorInfo = {}
+                    operatorInfo['operatorID'] = self.generateID(tenderID)
+                    operatorInfo['tenderID'] = tenderID
+                    operatorInfo['userID'] = -1
+                    operatorInfo['state'] = 0
+                    Operator.create(info=operatorInfo)
             query.update(
                 updateInfo, synchronize_session=False
             )
-            #如果同意投标，创建一个默认的经办人
-            if state == 1:
-                operatorInfo = {}
-                operatorInfo['operatorID'] = self.generateID(tenderID)
-                operatorInfo['tenderID'] = tenderID
-                operatorInfo['userID'] = -1
-                operatorInfo['state'] = 0
-                Operator.create(info=operatorInfo)
+
             db.session.commit()
             return (True, None)
         except Exception as e:
@@ -217,6 +219,11 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    def __generatePushedBrief(self, result):
+        res = {}
+        res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
+        res.update(Tender.generateBrief(tender=result.Tender))
+        return res
 
     # 经办人 获取我的推送列表, 其他人获取经办人推送列表
     def getPushedTenderListByUserID(self, info):
@@ -238,7 +245,7 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [self.__generateBrief(result=result) for result in allResult]
+            dataList = [self.__generatePushedBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
@@ -300,7 +307,7 @@ class PushedTenderManager(Util):
                 cityDic[o.cityID] = o.cityName
             dataList = [self.__generateBrief(result=result) for result in allResult]
             for o in dataList:
-                o['cityName'] = cityDic[o['cityName']]
+                o['cityName'] = cityDic[o['cityID']]
                 if o['userID'] != '-1':
                     o['userName'] = userDic[o['userID']]
                 else:
@@ -311,6 +318,7 @@ class PushedTenderManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -406,7 +414,7 @@ class PushedTenderManager(Util):
                 )
             allResult = query.offset(startIndex).limit(pageCount).all()
             count = countQuery.first()
-            dataList = [self.__generateBrief(result=result) for result in allResult]
+            dataList = [self.__generatePushedBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count[0]

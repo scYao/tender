@@ -1,7 +1,7 @@
 # coding=utf8
 import sys
 import json
-
+import traceback
 
 sys.path.append("..")
 import os, random, requests
@@ -126,7 +126,7 @@ class AuditorManager(Util):
             return (False, errorInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         pushedTenderManager = PushedTenderManager()
-        (status, tenderResult) =  pushedTenderManager.getPushedTenderListByUserType(info=info)
+        (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserType(info=info)
         if status is True:
             try:
                 dataList = tenderResult['dataList']
@@ -145,8 +145,9 @@ class AuditorManager(Util):
                 return (True, tenderResult)
             except Exception as e:
                 print str(e)
-                # traceback.print_stack()
+                traceback.print_stack()
                 db.session.rollback()
                 errorInfo = ErrorInfo['TENDER_02']
                 errorInfo['detail'] = str(e)
                 return (False, errorInfo)
+        return (False, tenderResult)

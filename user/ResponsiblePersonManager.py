@@ -1,6 +1,8 @@
 # coding=utf8
 import sys
 import json
+import traceback
+
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -162,11 +164,12 @@ class ResponsiblePersonManager(Util):
                 return (True, tenderResult)
             except Exception as e:
                 print str(e)
-                # traceback.print_stack()
+                traceback.print_stack()
                 db.session.rollback()
                 errorInfo = ErrorInfo['TENDER_02']
                 errorInfo['detail'] = str(e)
                 return (False, errorInfo)
+        return (False, tenderResult)
 
     # 负责人获取我的推送列表
     def getPushedListByResp(self, jsonInfo):
