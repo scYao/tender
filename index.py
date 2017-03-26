@@ -1351,7 +1351,7 @@ def get_undistributed_tender_list_by_resp():
 
 # 负责人获取待分配列表
 @app.route('/get_distributed_tender_list_by_resp/', methods=['POST', 'GET'])
-def get_undistributed_tender_list_by_resp():
+def get_distributed_tender_list_by_resp():
     responsiblePersonManager = ResponsiblePersonManager()
     data = {}
     data['status'] = 'FAILED'
