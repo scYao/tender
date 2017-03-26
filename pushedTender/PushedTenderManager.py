@@ -26,6 +26,7 @@ from models.UserInfo import UserInfo
 from models.Tender import Tender
 from models.Operator import Operator
 from models.Token import Token
+from models.City import City
 
 from message.MessageManager import MessageManager
 
@@ -151,6 +152,15 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
+        if res['cityID']:
+            query = db.session.query(City).filter(City.cityID == res['cityID'])
+            result = query.first()
+            res.update(City.generate(city=result))
+        else:
+            res['cityID'] = ''
+            res['cityName'] = ''
+        #添加城市信息
+
         return res
 
     def __generateUndistributedBrief(self, result):
