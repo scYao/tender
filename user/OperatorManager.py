@@ -17,6 +17,7 @@ from models.Operator import Operator
 from models.Message import Message
 from models.UserInfo import UserInfo
 from models.Token import Token
+from models.Operation import Operation
 
 from ResponsiblePersonManager import ResponsiblePersonManager
 from pushedTender.PushedTenderManager import PushedTenderManager
@@ -96,3 +97,25 @@ class OperatorManager(Util):
     # 经办人获取所有的招标信息列表
     def getTenderListWithPushedTagByOperator(self, jsonInfo):
         pass
+
+    #根据operatorID获取operations信息
+    def getOperationListByOperatorID(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        operatorID = info['operatorID']
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        try:
+            query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
+            allResult = query.all()
+            dataList = [Operation.generate(c=result) for result in allResult]
+            return (True, dataList)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
