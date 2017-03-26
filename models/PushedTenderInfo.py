@@ -51,6 +51,7 @@ class PushedTenderInfo(db.Model):
         res['pushedID'] = c.pushedID
         res['createTime'] = str(c.createTime)
         res['tenderID'] = c.tenderID
+        res['state'] = c.state
         return res
 
     @staticmethod

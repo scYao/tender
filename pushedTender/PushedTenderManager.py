@@ -6,7 +6,7 @@ import poster
 import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
-    PUSH_TENDER_INFO_TAG_STEP_WAIT
+    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -203,7 +203,8 @@ class PushedTenderManager(Util):
                 }
             elif userType == USER_TAG_BOSS:
                 updateInfo = {
-                    PushedTenderInfo.state : state
+                    PushedTenderInfo.state : state,
+                    PushedTenderInfo.step : PUSH_TENDER_INFO_TAG_STEP_DOING
                 }
             query.update(
                 updateInfo, synchronize_session=False
@@ -301,7 +302,6 @@ class PushedTenderManager(Util):
             return (False, errorInfo)
 
     def __getAllTenderDoingList(self, info):
-        tokenID = info['tokenID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         step = info['step']

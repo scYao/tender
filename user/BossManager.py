@@ -91,33 +91,33 @@ class BossManager(Util):
             return (False, errorInfo)
         info['userType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
-        (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserType(info=info)
-        if status is True:
-            return self.getApprovedState(info=tenderResult)
-        return (False, tenderResult)
+        return pushedTenderManager.getPushedTenderListByUserType(info=info)
+        # if status is True:
+        #     return self.getApprovedState(info=tenderResult)
+        # return (False, tenderResult)
 
-    # 判断是否已经投过该标
-    def getApprovedState(self, info):
-        dataList = info['dataList']
-        try:
-            tenderIDTuple = (o['tenderID'] for o in dataList)
-
-            pushedResult = db.session.query(PushedTenderInfo).filter(and_(
-                PushedTenderInfo.responsiblePersonPushedTime != None,
-                PushedTenderInfo.tenderID.in_(tenderIDTuple)
-            )).all()
-            pushedTenderIDList = [o.tenderID for o in pushedResult]
-            for o in dataList:
-                if o['tenderID'] not in pushedTenderIDList:
-                    o['state'] = -1
-            return (True, info)
-        except Exception as e:
-            print str(e)
-            # traceback.print_stack()
-            db.session.rollback()
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            return (False, errorInfo)
+    # # 判断是否已经投过该标
+    # def getApprovedState(self, info):
+    #     dataList = info['dataList']
+    #     try:
+    #         tenderIDTuple = (o['tenderID'] for o in dataList)
+    #
+    #         pushedResult = db.session.query(PushedTenderInfo).filter(and_(
+    #             PushedTenderInfo.responsiblePersonPushedTime != None,
+    #             PushedTenderInfo.tenderID.in_(tenderIDTuple)
+    #         )).all()
+    #         pushedTenderIDList = [o.tenderID for o in pushedResult]
+    #         for o in dataList:
+    #             if o['tenderID'] not in pushedTenderIDList:
+    #                 o['state'] = -1
+    #         return (True, info)
+    #     except Exception as e:
+    #         print str(e)
+    #         # traceback.print_stack()
+    #         db.session.rollback()
+    #         errorInfo = ErrorInfo['TENDER_02']
+    #         errorInfo['detail'] = str(e)
+    #         return (False, errorInfo)
 
     # 审定人 获取某个经办人的推送列表
     def getOperatorPushedListByBoss(self, jsonInfo):
