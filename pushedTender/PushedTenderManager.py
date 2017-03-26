@@ -152,20 +152,6 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
-        #添加经办人信息
-        res.update(Operator.generate(c=result.Operator))
-        query = db.session.query(UserInfo).filter(UserInfo.userID == res['userID'])
-        result = query.first()
-        res.update(UserInfo.generate(userInfo=result))
-        #添加城市信息
-        if res['cityID']:
-            query = db.session.query(City).filter(City.cityID == res['cityID'])
-            result = query.first()
-            res.update(City.generate(city=result))
-        else:
-            res['cityID'] = ''
-            res['cityName'] = ''
-
         return res
 
     def __generateUndistributedBrief(self, result):
@@ -295,7 +281,29 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
+            userIDTuple = (o.Operator.userID for o in allResult)
+            cityIDTuple = (o.Tender.cityID for o in allResult)
+            userQuery = db.session.query(UserInfo).filter(
+                UserInfo.userID.in_(userIDTuple)
+            )
+            cityQuery = db.session.query(City).filter(
+                City.cityID.in_(cityIDTuple)
+            )
+            userResult = userQuery.all()
+            cityResult = cityQuery.all()
+            userDic = {}
+            cityDic = {}
+            for o in userResult:
+                userDic[o.userID] = o.userName
+            for o in cityResult:
+                cityDic[o.cityID] = o.cityName
             dataList = [self.__generateBrief(result=result) for result in allResult]
+            for o in dataList:
+                o['cityName'] = cityDic[o['cityName']]
+                if o['userID'] != '-1':
+                    o['userName'] = userDic[o['userID']]
+                else:
+                    o['userName'] = ''
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
@@ -325,7 +333,29 @@ class PushedTenderManager(Util):
             count = countQuery.first()
             count = count[0]
             allResult = query.offset(startIndex).limit(pageCount).all()
+            userIDTuple = (o.Operator.userID for o in allResult)
+            cityIDTuple = (o.Tender.cityID for o in allResult)
+            userQuery = db.session.query(UserInfo).filter(
+                UserInfo.userID.in_(userIDTuple)
+            )
+            cityQuery = db.session.query(City).filter(
+                City.cityID.in_(cityIDTuple)
+            )
+            userResult = userQuery.all()
+            cityResult = cityQuery.all()
+            userDic = {}
+            cityDic = {}
+            for o in userResult:
+                userDic[o.userID] = o.userName
+            for o in cityResult:
+                cityDic[o.cityID] = o.cityName
             dataList = [self.__generateBrief(result=result) for result in allResult]
+            for o in dataList:
+                o['cityName'] = cityDic[o['cityName']]
+                if o['userID'] != '-1':
+                    o['userName'] = userDic[o['userID']]
+                else:
+                    o['userName'] = ''
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
