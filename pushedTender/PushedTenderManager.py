@@ -464,35 +464,34 @@ class PushedTenderManager(Util):
     def getDistributedTenderList(self, info):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        try:
-            query = db.session.query(
-                PushedTenderInfo, Tender, Operator
-            ).outerjoin(
-                Tender, PushedTenderInfo.tenderID == Tender.tenderID
-            ).outerjoin(
-                Operator, PushedTenderInfo.tenderID == Operator.tenderID
-            ).filter(and_(
-                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
-                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
-            ))
-            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
-                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
-                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
-            ))
-            count = countQuery.first()
-            count = count[0]
-            allResult = query.offset(startIndex).limit(pageCount).all()
-            dataList = [self.__generateUndistributedBrief(result=result) for result in allResult]
-            callBackInfo = {}
-            callBackInfo['dataList'] = dataList
-            callBackInfo['count'] = count
-            return (True, callBackInfo)
-        except Exception as e:
-            print e
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            db.session.rollback()
-            return (False, errorInfo)
+        query = db.session.query(
+            PushedTenderInfo, Operator, Tender
+        ).outerjoin(
+            Operator, PushedTenderInfo.tenderID == Operator.tenderID
+        ).outerjoin(
+            Tender, PushedTenderInfo.tenderID == Tender.tenderID
+        ).filter(and_(
+            PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+            PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
+            or_(Operator.userID != '-1',
+                Operator.state == 0)
+        ))
+
+        pushedInfoResult = query.offset(startIndex).limit(pageCount).all()
+        userIDTuple = (o.Operator.userID for o in pushedInfoResult)
+
+        userQuery = db.session.query(UserInfo).filter(
+            UserInfo.userID.in_(userIDTuple)
+        )
+        userResult = userQuery.all()
+        userDic = {}
+        for o in userResult:
+            userDic[o.userID] = o.userName
+
+        resultList = [self.__generateUndistributedBrief(result=o) for o in pushedInfoResult]
+        for o in resultList:
+            o['userName'] = userDic[o['userID']]
+        return (True, resultList)
 
     # 经办人特殊, 获取自己参与的, 正在进行中的列表
     # 考虑策略模式
