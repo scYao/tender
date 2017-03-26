@@ -420,28 +420,6 @@ class PushedTenderManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         try:
-            # query = db.session.query(
-            #     PushedTenderInfo, Tender, Operator
-            # ).outerjoin(
-            #     Tender, PushedTenderInfo.tenderID == Tender.tenderID
-            # ).outerjoin(
-            #     Operator, PushedTenderInfo.tenderID == Operator.tenderID
-            # ).filter(and_(
-            #     PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
-            #     PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
-            # ))
-            # countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
-            #     PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
-            #     PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
-            # ))
-            # count = countQuery.first()
-            # count = count[0]
-            # allResult = query.offset(startIndex).limit(pageCount).all()
-            # dataList = [self.__generateUndistributedBrief(result=result) for result in allResult]
-            # callBackInfo = {}
-            # callBackInfo['dataList'] = dataList
-            # callBackInfo['count'] = count
-            # return (True, callBackInfo)
             # 获取所有已同意投标，并且状态时未开始的标段
             query = db.session.query(
                 PushedTenderInfo, Operator, Tender
@@ -469,11 +447,15 @@ class PushedTenderManager(Util):
 
             resultList = [self.__generateUndistributedBrief(result=o) for o in pushedInfoResult]
             for o in resultList:
-                o['userName'] = userDic[o['userID']]
+                if o['userID'] != '-1':
+                    o['userName'] = userDic[o['userID']]
+                else:
+                    o['userName'] = ''
             return (True, resultList)
 
         except Exception as e:
-            print e.message
+            print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -508,7 +490,10 @@ class PushedTenderManager(Util):
 
         resultList = [self.__generateUndistributedBrief(result=o) for o in pushedInfoResult]
         for o in resultList:
-            o['userName'] = userDic[o['userID']]
+            if o['userID'] != '-1':
+                o['userName'] = userDic[o['userID']]
+            else:
+                o['userName'] = ''
         return (True, resultList)
 
     # 经办人特殊, 获取自己参与的, 正在进行中的列表
