@@ -191,3 +191,14 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getUndistributedTenderList(info=info)
+
+    # 负责人获取分配列表
+    def getDistributedTenderListByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDistributedTenderList(info=info)

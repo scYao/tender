@@ -1349,6 +1349,21 @@ def get_undistributed_tender_list_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人获取待分配列表
+@app.route('/get_distributed_tender_list_by_resp/', methods=['POST', 'GET'])
+def get_undistributed_tender_list_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getDistributedTenderListByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 重新分配经办人
 @app.route('/update_operator/', methods=['POST', 'GET'])
 def update_operator():

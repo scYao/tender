@@ -173,11 +173,13 @@ class PushedTenderManager(Util):
     def updatePushedTenderInfo(self, info):
         pushedID = info['pushedID']
         userType = info['userType']
+        state = int(info['state'])
         try:
             query = db.session.query(PushedTenderInfo).filter(
                 PushedTenderInfo.pushedID == pushedID
             )
             result = query.first()
+            tenderID = result.tenderID
             if not result:
                 return (False, ErrorInfo['TENDER_25'])
             updateInfo = {}
@@ -191,11 +193,19 @@ class PushedTenderManager(Util):
                 }
             elif userType == USER_TAG_BOSS:
                 updateInfo = {
-                    PushedTenderInfo.state : int(info['state'])
+                    PushedTenderInfo.state : state
                 }
             query.update(
                 updateInfo, synchronize_session=False
             )
+            #如果同意投标，创建一个默认的经办人
+            if state == 1:
+                operatorInfo = {}
+                operatorInfo['operatorID'] = self.generateID(tenderID)
+                operatorInfo['tenderID'] = tenderID
+                operatorInfo['userID'] = -1
+                operatorInfo['state'] = 0
+                Operator.create(info=operatorInfo)
             db.session.commit()
             return (True, None)
         except Exception as e:
@@ -446,6 +456,39 @@ class PushedTenderManager(Util):
 
         except Exception as e:
             print e.message
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def getDistributedTenderList(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            query = db.session.query(
+                PushedTenderInfo, Tender, Operator
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).outerjoin(
+                Operator, PushedTenderInfo.tenderID == Operator.tenderID
+            ).filter(and_(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
+            ))
+            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(and_(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT
+            ))
+            count = countQuery.first()
+            count = count[0]
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            dataList = [self.__generateUndistributedBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
