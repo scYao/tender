@@ -11,10 +11,11 @@ from sqlalchemy import and_, text, func, desc
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
+from tool.tagconfig import OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT
+from tool.tagconfig import OPERATION_TAG_MAKE_BIDDING_BOOK, OPERATION_TAG_ATTEND
 
 from models.flask_app import db
 from models.Operator import Operator
-from models.Operation import Operation
 from models.Message import Message
 from models.UserInfo import UserInfo
 from models.Token import Token
@@ -126,7 +127,25 @@ class OperatorManager(Util):
             query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
             allResult = query.all()
             dataList = [Operation.generate(c=result) for result in allResult]
-            return (True, dataList)
+            l1 = []
+            l2 = []
+            l3 = []
+            l4 = []
+            for o in dataList:
+                if o['tag'] == OPERATION_TAG_ENLIST:
+                    l1.append(o)
+                elif o['tag'] == OPERATION_TAG_DEPOSIT:
+                    l2.append(o)
+                elif  o['tag'] == OPERATION_TAG_MAKE_BIDDING_BOOK:
+                    l3.append(o)
+                else:
+                    l4.append(o)
+            resultDic = {}
+            resultDic[OPERATION_TAG_ENLIST] = l1
+            resultDic[OPERATION_TAG_DEPOSIT] = l2
+            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = l3
+            resultDic[OPERATION_TAG_ATTEND] = l4
+            return (True, resultDic)
         except Exception as e:
             print e
             errorInfo = ErrorInfo['TENDER_02']
