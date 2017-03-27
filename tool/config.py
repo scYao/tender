@@ -158,7 +158,23 @@ ErrorInfo['TENDER_26'] = {
     'zhInfo' : '不存在经办人'
 }
 
+ErrorInfo['TENDER_27'] = {
+    'code' : 'TENDER_27',
+    'info' : 'you are not the right operator!',
+    'zhInfo' : '不是经办人，无法填写'
+}
 
+ErrorInfo['TENDER_28'] = {
+    'code' : 'TENDER_28',
+    'info' : 'the pushed tender info is not exist',
+    'zhInfo' : '推送消息不存在'
+}
+
+ErrorInfo['TENDER_29'] = {
+    'code' : 'TENDER_29',
+    'info' : 'you have create quoted price!',
+    'zhInfo' : '已经填写了报价信息'
+}
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRA\n

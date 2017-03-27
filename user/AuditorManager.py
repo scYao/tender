@@ -42,6 +42,18 @@ class AuditorManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
 
+    # 审核人填写进行中项目的报价信息
+    def createQuotedPriceByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.createQuotedPrice(info=info)
+
     # 推送经办人来的推送
     def pushedTenderByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -63,6 +75,8 @@ class AuditorManager(Util):
         info['userType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
+
+
 
     # 审核人 获取某个经办人的推送列表
     def getOperatorPushedListByAuditor(self, jsonInfo):

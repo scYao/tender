@@ -27,6 +27,7 @@ from models.Tender import Tender
 from models.Operator import Operator
 from models.Token import Token
 from models.City import City
+from models.QuotedPrice import QuotedPrice
 
 from message.MessageManager import MessageManager
 
@@ -141,6 +142,73 @@ class PushedTenderManager(Util):
             (status, result) = self.createMessage(info=info)
             db.session.commit()
             return (True, pushedID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+
+    # 添加项目信息，正在进行中
+    def updateDoingPushedTender(self, info):
+        userID = info['userID']
+        tenderID = info['tenderID']
+        query = db.session.query(Operator).filter(
+            Operator.tenderID == tenderID
+        )
+        result = query.first()
+        if result.userID != userID:
+            return (False, ErrorInfo['TENDER_27'])#不是经办人，无法填写
+        try:
+            query = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == tenderID
+            )
+            result = query.first()
+            if result:
+                updateInfo = {
+                    PushedTenderInfo.projectManagerName: info['projectManagerName'],
+                    PushedTenderInfo.openedDate: info['openedDate'],
+                    PushedTenderInfo.openedLocation: info['openedLocation'],
+                    PushedTenderInfo.ceilPrice: info['ceilPrice'],
+                    PushedTenderInfo.tenderInfoDescription: info['tenderInfoDescription'],
+                }
+                query.update(
+                    updateInfo, synchronize_session=False
+                )
+                db.session.commit()
+                return (True, None)
+            else:
+                return (False, ErrorInfo['TENDER_28'])#推送消息不存在
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+
+    # 添加报价信息,负责人，审核人，或者审定人
+    def createQuotedPrice(self, info):
+        userID = info['userID']
+        tenderID = info['tenderID']
+        createTime = datetime.now()
+        quotedID = self.generateID(userID + tenderID)
+        info['quoteID'] = quotedID
+        info['createTime'] = createTime
+        try:
+            query = db.session.query(QuotedPrice).filter(
+                and_(
+                    QuotedPrice.userID == userID,
+                    QuotedPrice.tenderID == tenderID
+                )
+            )
+            result = query.first()
+            if result is not None:
+                return (False, ErrorInfo['TENDER_29'])#已经填写了报价信息
+            QuotedPrice.create(info=info)
+            db.session.commit()
+            return (True, None)
         except Exception as e:
             print e
             errorInfo = ErrorInfo['TENDER_02']

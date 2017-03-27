@@ -38,6 +38,18 @@ class BossManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
 
+    # 审定人填写进行中项目的报价信息
+    def createQuotedPriceByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.createQuotedPrice(info=info)
+
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):
         info = json.loads(jsonInfo)
