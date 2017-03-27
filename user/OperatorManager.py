@@ -21,6 +21,7 @@ from models.Message import Message
 from models.UserInfo import UserInfo
 from models.Token import Token
 from models.Operation import Operation
+from models.ImgPath import ImgPath
 
 from ResponsiblePersonManager import ResponsiblePersonManager
 from pushedTender.PushedTenderManager import PushedTenderManager
@@ -53,6 +54,18 @@ class OperatorManager(Util):
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.updateDoingPushedTender(info)
+
+    # 已经完成，添加项目信息
+    def updateDonePushedTender(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.updateDonePushedTender(info)
 
     # 记录动作, 打保证金等
     def createOperation(self, jsonInfo):
@@ -135,6 +148,12 @@ class OperatorManager(Util):
     def getTenderListWithPushedTagByOperator(self, jsonInfo):
         pass
 
+    def __generateBookInfo(self, result):
+        mDic = {}
+        operation = result.Operation
+        imgPath = result.ImgPath
+
+
     #根据operatorID获取operations信息
     def getOperationListByOperatorID(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -147,24 +166,31 @@ class OperatorManager(Util):
         try:
             query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
             allResult = query.all()
+            bookQuery = db.session.query(Operation, ImgPath).outerjoin(
+                ImgPath, Operation.operationID == ImgPath.foreignID
+            ).filter(
+                and_(
+                    Operation.tag == OPERATION_TAG_MAKE_BIDDING_BOOK,
+                    Operation.operatorID == operatorID
+                )
+            )
+            bookResult = bookQuery.all()
             dataList = [Operation.generate(c=result) for result in allResult]
+            bookDataList = [self.__generateBookInfo(result=result) for result in allResult]
             l1 = []
             l2 = []
-            l3 = []
             l4 = []
             for o in dataList:
                 if o['tag'] == OPERATION_TAG_ENLIST:
                     l1.append(o)
                 elif o['tag'] == OPERATION_TAG_DEPOSIT:
                     l2.append(o)
-                elif  o['tag'] == OPERATION_TAG_MAKE_BIDDING_BOOK:
-                    l3.append(o)
-                else:
+                elif  o['tag'] == OPERATION_TAG_ATTEND:
                     l4.append(o)
             resultDic = {}
             resultDic[OPERATION_TAG_ENLIST] = l1
             resultDic[OPERATION_TAG_DEPOSIT] = l2
-            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = l3
+            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = bookDataList
             resultDic[OPERATION_TAG_ATTEND] = l4
             return (True, resultDic)
         except Exception as e:

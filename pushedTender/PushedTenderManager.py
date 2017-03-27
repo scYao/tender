@@ -188,6 +188,53 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    # 已经完成，添加项目信息
+    def updateDonePushedTender(self, info):
+        userID = info['userID']
+        tenderID = info['tenderID']
+        query = db.session.query(Operator).filter(
+            Operator.tenderID == tenderID
+        )
+        result = query.first()
+        if result.userID != userID:
+            return (False, ErrorInfo['TENDER_27'])  # 不是经办人，无法填写
+        try:
+            query = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == tenderID
+            )
+            result = query.first()
+            if result:
+                updateInfo = {
+                    PushedTenderInfo.averagePrice: info['averagePrice'],
+                    PushedTenderInfo.benchmarkPrice: info['benchmarkPrice'],
+                    PushedTenderInfo.K1: info['K1'],
+                    PushedTenderInfo.K2: info['K2'],
+                    PushedTenderInfo.Q1: info['Q1'],
+                    PushedTenderInfo.Q2: info['Q2'],
+                    PushedTenderInfo.deductedRate1: info['deductedRate1'],
+                    PushedTenderInfo.deductedRate2: info['deductedRate2'],
+                    PushedTenderInfo.workerName: info['workerName'],
+                    PushedTenderInfo.candidateName1: info['candidateName1'],
+                    PushedTenderInfo.candidatePrice1: info['candidatePrice1'],
+                    PushedTenderInfo.candidateName2: info['candidateName2'],
+                    PushedTenderInfo.candidatePrice2: info['candidatePrice2'],
+                    PushedTenderInfo.candidateName3: info['candidateName3'],
+                    PushedTenderInfo.candidatePrice3: info['candidatePrice3']
+                }
+                query.update(
+                    updateInfo, synchronize_session=False
+                )
+                db.session.commit()
+                return (True, None)
+            else:
+                return (False, ErrorInfo['TENDER_28'])  # 推送消息不存在
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
 
     # 添加报价信息,负责人，审核人，或者审定人
     def createQuotedPrice(self, info):

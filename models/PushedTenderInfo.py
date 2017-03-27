@@ -17,6 +17,7 @@ class PushedTenderInfo(db.Model):
     state = db.Column(db.Integer)
     step = db.Column(db.Integer)
     tenderID = db.Column(db.String(100))
+    #进行中字段
     projectManagerName = db.Column(db.String(100))
     openedDate = db.Column(db.Date)
     openedLocation = db.Column(db.Text)
@@ -25,13 +26,34 @@ class PushedTenderInfo(db.Model):
     quotedPrice = db.Column(db.Float)
     quotedDate = db.Column(db.Date)
     quotedDescription = db.Column(db.Text)
+    #已完成字段
+    averagePrice = db.Column(db.Float)
+    benchmarkPrice = db.Column(db.Float)
+    K1 = db.Column(db.Float)
+    K2 = db.Column(db.Float)
+    Q1 = db.Column(db.Float)
+    Q2 = db.Column(db.Float)
+    deductedRate1 = db.Column(db.Float)
+    deductedRate2 = db.Column(db.Float)
+    workerName = db.Column(db.String(100))
+    candidateName1 = db.Column(db.String(100))
+    candidatePrice1 = db.Column(db.Float)
+    candidateName2 = db.Column(db.String(100))
+    candidatePrice2 = db.Column(db.Float)
+    candidateName3 = db.Column(db.String(100))
+    candidatePrice3 = db.Column(db.Float)
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
                  tenderID=None, step=0, projectManagerName=None,
                  openedDate=None, openedLocation=None, ceilPrice=0,
                  tenderInfoDescription=None, quotedPrice=0, quotedDate=None,
-                 quotedDescription=None):
+                 quotedDescription=None, averagePrice=0, benchmarkPrice=0,
+                 K1=0, K2=0, Q1=0,
+                 Q2=0, deductedRate1=0, deductedRate2=0,
+                 workerName=None, candidateName1=None, candidatePrice1=0,
+                 candidateName2=None, candidatePrice2=0, candidateName3=None,
+                 candidatePrice3=0):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -48,6 +70,21 @@ class PushedTenderInfo(db.Model):
         self.quotedPrice = quotedPrice
         self.quotedDate = quotedDate
         self.quotedDescription = quotedDescription
+        self.averagePrice = averagePrice
+        self.benchmarkPrice = benchmarkPrice
+        self.K1 = K1
+        self.K2 = K2
+        self.Q1 = Q1
+        self.Q2 = Q2
+        self.deductedRate1 = deductedRate1
+        self.deductedRate2 = deductedRate2
+        self.workerName = workerName
+        self.candidateName1 = candidateName1
+        self.candidatePrice1 = candidatePrice1
+        self.candidateName2 = candidateName2
+        self.candidatePrice2 = candidatePrice2
+        self.candidateName3 = candidateName3
+        self.candidatePrice3 = candidatePrice3
 
     @staticmethod
     def create(info):
@@ -100,6 +137,21 @@ class PushedTenderInfo(db.Model):
         res['quotedPrice'] = c.quotedPrice
         res['quotedDate'] = c.quotedDate
         res['quotedDescription'] = c.quotedDescription
+        res['averagePrice'] = c.averagePrice
+        res['benchmarkPrice'] = c.benchmarkPrice
+        res['K1'] = c.K1
+        res['K2'] = c.K2
+        res['Q1'] = c.Q1
+        res['Q2'] = c.Q2
+        res['deductedRate1'] = c.deductedRate1
+        res['deductedRate2'] = c.deductedRate2
+        res['workerName'] = c.workerName
+        res['candidateName1'] = c.candidateName1
+        res['candidatePrice1'] = c.candidatePrice1
+        res['candidateName2'] = c.candidateName2
+        res['candidatePrice2'] = c.candidatePrice2
+        res['candidateName3'] = c.candidateName3
+        res['candidatePrice3'] = c.candidatePrice3
         return res
 
     def __repr__(self):
