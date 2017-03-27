@@ -153,10 +153,14 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''		commentID nvarchar(100) primary key comment '领导批注ID',
-	userID nvarchar(100) comment '批注人ID',
-    createTime datetime comment '批注时间',
-    description text comment '批注内容' '''
+    sql = '''		quotedID nvarchar(100) primary key comment '报价ID',
+	tenderID nvarchar(100) comment '标段ID',
+	userID nvarchar(100) comment '用户ID',
+	quotedPrice float comment '预估价',
+	price float comment '定价',
+	costPrice float comment '成本价',
+	createTime datetime comment '创建时间',
+	description text comment '备注' '''
     # sql_to_model_members(sql)
     # sql_to_model_init(sql)
     # sql_to_model_generate(sql, 'c')
