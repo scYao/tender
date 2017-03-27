@@ -1349,6 +1349,21 @@ def get_undistributed_tender_list_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人填写进行中项目的报价信息
+@app.route('/create_quoted_price_by_resp/', methods=['POST', 'GET'])
+def create_quoted_price_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.createQuotedPriceByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 负责人获取待分配列表
 @app.route('/get_distributed_tender_list_by_resp/', methods=['POST', 'GET'])
 def get_distributed_tender_list_by_resp():
@@ -1434,6 +1449,21 @@ def create_pushed_tender_by_operator():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = operatorManager.createPushedTenderByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 添加项目信息
+@app.route('/update_doing_pushed_tender/', methods=['POST', 'GET'])
+def update_doing_pushed_tender():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.updateDoingPushedTender(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1548,6 +1578,21 @@ def get_pushed_list_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+# 审核人填写进行中项目的报价信息
+@app.route('/create_quoted_price_by_auditor/', methods=['POST', 'GET'])
+def create_quoted_price_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.createQuotedPriceByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 审核人 获取负责人推送列表
 @app.route('/get_resp_pushed_list_by_auditor/', methods=['POST', 'GET'])
 def get_resp_pushed_list_by_auditor():
@@ -1619,6 +1664,21 @@ def create_pushed_tender_by_boss():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.createPushedTenderByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人填写进行中项目的报价信息
+@app.route('/create_quoted_price_by_boss/', methods=['POST', 'GET'])
+def create_quoted_price_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.createQuotedPriceByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

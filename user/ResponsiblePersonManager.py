@@ -40,6 +40,17 @@ class ResponsiblePersonManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
 
+    def createQuotedPriceByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.createQuotedPrice(info=info)
+
     # 负责人从经办人推送列表推送
     def updatePushedTenderByResp(self, jsonInfo):
         info = json.loads(jsonInfo)

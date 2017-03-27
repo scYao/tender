@@ -18,7 +18,7 @@ create table pushedTenderInfo(
 	openedLocation text comment '开标地点',
 	ceilPrice float comment '最高限价',
 	tenderInfoDescription text comment '项目信息备注',
-	quotedPrice float comment '报价',
+	quotedPrice float comment '报价,定价',
 	quotedDate date comment '报价时间',
 	quotedDescription text comment '报价备注'
 );

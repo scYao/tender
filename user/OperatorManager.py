@@ -40,6 +40,18 @@ class OperatorManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info)
 
+    #添加项目信息
+    def updateDoingPushedTender(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.updateDoingPushedTender(info)
+
     # 记录动作, 打保证金等
     def createOperation(self, jsonInfo):
         info = json.loads(jsonInfo)
