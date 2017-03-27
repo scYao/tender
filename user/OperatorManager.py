@@ -10,13 +10,15 @@ from datetime import datetime
 from sqlalchemy import and_, text, func, desc
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
+from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS, \
+    PUSH_TENDER_INFO_TAG_STEP_DONE, PUSH_TENDER_INFO_TAG_STEP_HISTORY
 from tool.tagconfig import OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, BID_DOC_DIRECTORY
 from tool.tagconfig import OPERATION_TAG_MAKE_BIDDING_BOOK, OPERATION_TAG_ATTEND
 
 
 from models.flask_app import db
 from models.Operator import Operator
+from models.PushedTenderInfo import PushedTenderInfo
 from models.Message import Message
 from models.UserInfo import UserInfo
 from models.Token import Token
@@ -176,7 +178,7 @@ class OperatorManager(Util):
             )
             bookResult = bookQuery.all()
             dataList = [Operation.generate(c=result) for result in allResult]
-            bookDataList = [self.__generateBookInfo(result=result) for result in allResult]
+            # bookDataList = [self.__generateBookInfo(result=result) for result in allResult]
             l1 = []
             l2 = []
             l4 = []
@@ -190,7 +192,7 @@ class OperatorManager(Util):
             resultDic = {}
             resultDic[OPERATION_TAG_ENLIST] = l1
             resultDic[OPERATION_TAG_DEPOSIT] = l2
-            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = bookDataList
+            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = []
             resultDic[OPERATION_TAG_ATTEND] = l4
             return (True, resultDic)
         except Exception as e:
@@ -200,3 +202,49 @@ class OperatorManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    def __updatePushedTenderInfoStep(self, info):
+        operatorID = info['operatorID']
+        step = info['step']
+        try:
+            operatorResult = db.session.query(Operator).filter(
+                Operator.operatorID == operatorID
+            ).fisrt()
+
+            if operatorResult is None:
+                return (False, ErrorInfo['TENDER_30'])
+            tenderID = operatorResult.tenderID
+            db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == tenderID
+            ).update({
+                PushedTenderInfo.step : step
+            }, synchronize_session=False)
+            db.session.commit()
+            return (True, None)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    # 由进行中 变为已完成
+    def completePushedTenderInfo(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['step'] = PUSH_TENDER_INFO_TAG_STEP_DONE
+        return self.__updatePushedTenderInfoStep(info=info)
+
+    # 由已完成变为历史记录
+    def updateToHistory(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['step'] = PUSH_TENDER_INFO_TAG_STEP_HISTORY
+        return self.__updatePushedTenderInfoStep(info=info)

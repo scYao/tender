@@ -1821,6 +1821,36 @@ def get_operation_list_by_operator_id():
         data['data'] = result
         return json.dumps(data)
 
+# 由进行中 变为已完成
+@app.route('/complete_pushed_tender_info/', methods=['POST', 'GET'])
+def complete_pushed_tender_info():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.completePushedTenderInfo(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 由已完成变为历史记录
+@app.route('/update_to_history/', methods=['POST', 'GET'])
+def update_to_history():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.updateToHistory(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 决定是否采用该经办人
 @app.route('/validate_operator/', methods=['POST', 'GET'])

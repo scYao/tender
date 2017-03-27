@@ -175,6 +175,12 @@ ErrorInfo['TENDER_29'] = {
     'info' : 'you have create quoted price!',
     'zhInfo' : '已经填写了报价信息'
 }
+
+ErrorInfo['TENDER_30'] = {
+    'code' : 'TENDER_30',
+    'info' : 'update pushed tender info step error!',
+    'zhInfo' : '更新进度失败'
+}
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRA\n
