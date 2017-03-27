@@ -13,6 +13,7 @@ from models.flask_app import db
 from models.Operator import Operator
 from models.Message import Message
 from models.PushedTenderInfo import PushedTenderInfo
+from models.TenderComment import TenderComment
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
@@ -49,6 +50,34 @@ class BossManager(Util):
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createQuotedPrice(info=info)
+
+    # 审定人批注正在进行中的项目
+    def createTenderComment(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        tenderID = info['tenderID']
+        commentID = self.generateID(userID + tenderID)
+        createTime = datetime.now()
+        commentInfo = {}
+        commentInfo['userID'] = userID
+        commentInfo['createTime'] = createTime
+        commentInfo['tenderID'] = tenderID
+        commentInfo['commentID'] = commentID
+        commentInfo['description'] = info['description'].replace('\'', '\\\'').replace('\"', '\\\"')
+        try:
+            TenderComment.generate(c=commentInfo)
+            db.session.commit()
+            return (True, None)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):
