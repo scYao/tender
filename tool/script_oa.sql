@@ -23,6 +23,17 @@ create table pushedTenderInfo(
 	quotedDescription text comment '报价备注'
 );
 
+create table quotedPrice(
+	quotedID nvarchar(100) primary key comment '报价ID',
+	tenderID nvarchar(100) comment '标段ID',
+	userID nvarchar(100) comment '用户ID',
+	quotedPrice float comment '预估价',
+	price float comment '定价',
+	costPrice float comment '成本价',
+	createTime datetime comment '创建时间',
+	description text comment '备注'
+);
+
 -- 领导批注
 create table tenderComment(
 	commentID nvarchar(100) primary key comment '领导批注ID',
@@ -91,6 +102,7 @@ ALTER TABLE biddingDocPushInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_
 ALTER TABLE customizedTender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE message CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tenderComment CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE quotedPrice CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);
@@ -98,3 +110,5 @@ alter table customizedTender add constraint customized_T_FK_operator foreign key
 alter table message add constraint message_FK_T_user foreign key(toUserID) references userInfo(userID);
 alter table message add constraint message_FK_F_user foreign key(fromUserID) references userInfo(userID);
 alter table tenderComment add constraint comment_FK_F_user foreign key(userID) references userInfo(userID);
+alter table quotedPrice add constraint quote_FK_F_user foreign key(userID) references userInfo(userID);
+alter table quotedPrice add constraint quote_FK_tender foreign key(tenderID) references tender(tenderID);
