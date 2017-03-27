@@ -76,6 +76,7 @@ class OperatorManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+        return (True, operationID)
 
 
     # 经办人获取我的推送列表

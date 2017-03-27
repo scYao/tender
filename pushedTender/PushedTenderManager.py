@@ -144,6 +144,7 @@ class PushedTenderManager(Util):
             return (True, pushedID)
         except Exception as e:
             print e
+            traceback.print_stack()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()

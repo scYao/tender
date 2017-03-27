@@ -59,15 +59,15 @@ class PushedTenderInfo(db.Model):
             auditorPushedTime=info['auditorPushedTime'],
             state=info['state'],
             step=info['step'],
-            tenderID=info['tenderID'],
-            projectManagerName=info['projectManagerName'],
-            openedDate=info['openedDate'],
-            openedLocation=info['openedLocation'],
-            ceilPrice=info['ceilPrice'],
-            tenderInfoDescription=info['tenderInfoDescription'],
-            quotedPrice=info['quotedPrice'],
-            quotedDate=info['quotedDate'],
-            quotedDescription=info['quotedDescription']
+            tenderID=info['tenderID']
+            # projectManagerName=info['projectManagerName'],
+            # openedDate=info['openedDate'],
+            # openedLocation=info['openedLocation'],
+            # ceilPrice=info['ceilPrice'],
+            # tenderInfoDescription=info['tenderInfoDescription'],
+            # quotedPrice=info['quotedPrice'],
+            # quotedDate=info['quotedDate'],
+            # quotedDescription=info['quotedDescription']
         )
         db.session.add(pushedTenderInfo)
         return (True, info['pushedID'])
