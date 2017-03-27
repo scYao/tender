@@ -208,7 +208,7 @@ class OperatorManager(Util):
         try:
             operatorResult = db.session.query(Operator).filter(
                 Operator.operatorID == operatorID
-            ).fisrt()
+            ).first()
 
             if operatorResult is None:
                 return (False, ErrorInfo['TENDER_30'])

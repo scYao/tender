@@ -242,7 +242,7 @@ class PushedTenderManager(Util):
         tenderID = info['tenderID']
         createTime = datetime.now()
         quotedID = self.generateID(userID + tenderID)
-        info['quoteID'] = quotedID
+        info['quotedID'] = quotedID
         info['createTime'] = createTime
         try:
             query = db.session.query(QuotedPrice).filter(
