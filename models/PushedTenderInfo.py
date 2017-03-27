@@ -17,10 +17,21 @@ class PushedTenderInfo(db.Model):
     state = db.Column(db.Integer)
     step = db.Column(db.Integer)
     tenderID = db.Column(db.String(100))
+    projectManagerName = db.Column(db.String(100))
+    openedDate = db.Column(db.Date)
+    openedLocation = db.Column(db.Text)
+    ceilPrice = db.Column(db.Float)
+    tenderInfoDescription = db.Column(db.Text)
+    quotedPrice = db.Column(db.Float)
+    quotedDate = db.Column(db.Date)
+    quotedDescription = db.Column(db.Text)
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
-                 tenderID=None, step=0):
+                 tenderID=None, step=0, projectManagerName=None,
+                 openedDate=None, openedLocation=None, ceilPrice=0,
+                 tenderInfoDescription=None, quotedPrice=0, quotedDate=None,
+                 quotedDescription=None):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -29,6 +40,14 @@ class PushedTenderInfo(db.Model):
         self.state = state
         self.step = step
         self.tenderID = tenderID
+        self.projectManagerName = projectManagerName
+        self.openedDate = openedDate
+        self.openedLocation = openedLocation
+        self.ceilPrice = ceilPrice
+        self.tenderInfoDescription = tenderInfoDescription
+        self.quotedPrice = quotedPrice
+        self.quotedDate = quotedDate
+        self.quotedDescription = quotedDescription
 
     @staticmethod
     def create(info):
@@ -41,6 +60,14 @@ class PushedTenderInfo(db.Model):
             state=info['state'],
             step=info['step'],
             tenderID=info['tenderID'],
+            projectManagerName=info['projectManagerName'],
+            openedDate=info['openedDate'],
+            openedLocation=info['openedLocation'],
+            ceilPrice=info['ceilPrice'],
+            tenderInfoDescription=info['tenderInfoDescription'],
+            quotedPrice=info['quotedPrice'],
+            quotedDate=info['quotedDate'],
+            quotedDescription=info['quotedDescription']
         )
         db.session.add(pushedTenderInfo)
         return (True, info['pushedID'])
@@ -65,6 +92,14 @@ class PushedTenderInfo(db.Model):
         res['state'] = c.state
         res['step'] = c.step
         res['tenderID'] = c.tenderID
+        res['projectManagerName'] = c.projectManagerName
+        res['openedDate'] = c.openedDate
+        res['openedLocation'] = c.openedLocation
+        res['ceilPrice'] = c.ceilPrice
+        res['tenderInfoDescription'] = c.tenderInfoDescription
+        res['quotedPrice'] = c.quotedPrice
+        res['quotedDate'] = c.quotedDate
+        res['quotedDescription'] = c.quotedDescription
         return res
 
     def __repr__(self):
