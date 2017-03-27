@@ -150,11 +150,26 @@ class OperatorManager(Util):
     def getTenderListWithPushedTagByOperator(self, jsonInfo):
         pass
 
-    def __generateBookInfo(self, result):
+    def __generateBookInfo(self, bookResult):
         mDic = {}
-        operation = result.Operation
-        imgPath = result.ImgPath
-
+        ossInfo = {}
+        ossInfo['bucket'] = 'tender'
+        def generateInfo(result):
+            operation = result.Operation
+            imgPath = result.ImgPath
+            operationID = operation.operationID
+            if not mDic.has_key(operationID):
+                res = Operation.generate(c=operation)
+                imgList = []
+                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
+                res['fileList'] = imgList
+                mDic[operationID] = imgList
+                return res
+            else:
+                imgList = mDic[operationID]
+                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
+        bookDataList = [generateInfo(result=result) for result in bookResult]
+        return bookDataList
 
     #根据operatorID获取operations信息
     def getOperationListByOperatorID(self, jsonInfo):
@@ -178,7 +193,7 @@ class OperatorManager(Util):
             )
             bookResult = bookQuery.all()
             dataList = [Operation.generate(c=result) for result in allResult]
-            # bookDataList = [self.__generateBookInfo(result=result) for result in allResult]
+            bookDataList = self.__generateBookInfo(bookResult=bookResult)
             l1 = []
             l2 = []
             l4 = []

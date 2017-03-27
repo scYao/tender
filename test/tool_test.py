@@ -153,25 +153,14 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''averagePrice float comment 'A 平均价',
-	benchmarkPrice float comment 'C(评标基准价)',
-	K1 float comment 'K1 值',
-	K2 float comment 'K2 值',
-	Q1 float comment 'Q1 值',
-	Q2 float comment 'Q2 值',
-	deductedRate1 float comment '啟勋下浮率',
-	deductedRate2 float comment '下浮率',
-	workerName nvarchar(100) comment '开标人',
-	candidateName1 nvarchar(100) comment '候选人1',
-	candidatePrice1 float comment '候选人1报价',
-	candidateName2 nvarchar(100) comment '候选人2',
-	candidatePrice2 float comment '候选人2报价',
-	candidateName3 nvarchar(100) comment '候选人3',
-	candidatePrice3 float comment '候选人3报价' '''
+    sql = '''commentID nvarchar(100) primary key comment '领导批注ID',
+	userID nvarchar(100) comment '批注人ID',
+    createTime datetime comment '批注时间',
+    description text comment '批注内容' '''
     # sql_to_model_members(sql)
     # sql_to_model_init(sql)
-    sql_to_model_generate(sql, 'c')
+    # sql_to_model_generate(sql, 'c')
     # create_tender(sql)
     # sql_to_model_init_model_param(sql)
     # sql_to_generate_info(sql)
-    # sql_to_create_info(sql)
+    sql_to_create_info(sql)

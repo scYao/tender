@@ -1684,6 +1684,21 @@ def create_pushed_tender_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+#审定人批注正在进行中的项目
+@app.route('/create_tender_comment/', methods=['POST', 'GET'])
+def create_tender_comment():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.createTenderComment(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 审定人填写进行中项目的报价信息
 @app.route('/create_quoted_price_by_boss/', methods=['POST', 'GET'])
 def create_quoted_price_by_boss():
