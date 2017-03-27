@@ -12,7 +12,23 @@ create table pushedTenderInfo(
 	auditorPushedTime datetime comment '审核人',
 	state int comment 'boss决定是否投标, 0 未确定, 1 投, 2 放弃',
 	step int comment '0表示未开始，１表示正在进行中，２表示已经完成，３表示历史记录',
-	tenderID nvarchar(100) comment '哪一个标, 不设外键'
+	tenderID nvarchar(100) comment '哪一个标, 不设外键',
+	projectManagerName nvarchar(100) comment '项目经理姓名',
+	openedDate date comment '开标时间',
+	openedLocation text comment '开标地点',
+	ceilPrice float comment '最高限价',
+	tenderInfoDescription text comment '项目信息备注',
+	quotedPrice float comment '报价',
+	quotedDate date comment '报价时间',
+	quotedDescription text comment '报价备注'
+);
+
+-- 领导批注
+create table tenderComment(
+	commentID nvarchar(100) primary key comment '领导批注ID',
+	userID nvarchar(100) comment '批注人ID',
+    createTime datetime comment '批注时间',
+    description text comment '批注内容'
 );
 
 -- 经办人表
@@ -74,9 +90,11 @@ ALTER TABLE operation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_c
 ALTER TABLE biddingDocPushInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE customizedTender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE message CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE tenderComment CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);
 alter table customizedTender add constraint customized_T_FK_operator foreign key(userID) references UserInfo(userID);
 alter table message add constraint message_FK_T_user foreign key(toUserID) references userInfo(userID);
 alter table message add constraint message_FK_F_user foreign key(fromUserID) references userInfo(userID);
+alter table tenderComment add constraint comment_FK_F_user foreign key(userID) references userInfo(userID);
