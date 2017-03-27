@@ -56,3 +56,6 @@ OPERATION_TAG_DEPOSIT = 2   # 打保证金
 OPERATION_TAG_MAKE_BIDDING_BOOK = 3   # 制作标书
 OPERATION_TAG_ATTEND = 4   # 现场开标
 
+#标书OSS目录
+BID_DOC_DIRECTORY = 'biddocument'
+

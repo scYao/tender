@@ -11,8 +11,9 @@ from sqlalchemy import and_, text, func, desc
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
-from tool.tagconfig import OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT
+from tool.tagconfig import OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, BID_DOC_DIRECTORY
 from tool.tagconfig import OPERATION_TAG_MAKE_BIDDING_BOOK, OPERATION_TAG_ATTEND
+
 
 from models.flask_app import db
 from models.Operator import Operator
@@ -23,6 +24,7 @@ from models.Operation import Operation
 
 from ResponsiblePersonManager import ResponsiblePersonManager
 from pushedTender.PushedTenderManager import PushedTenderManager
+from image.ImageManager import ImageManager
 
 
 class OperatorManager(Util):
@@ -61,6 +63,12 @@ class OperatorManager(Util):
         info['createTime'] = datetime.now()
         try:
             Operation.create(info=info)
+            #如果状态是制作标书，需要上传标书文件
+            if info['tag'] == OPERATION_TAG_MAKE_BIDDING_BOOK:
+                info['directory'] = BID_DOC_DIRECTORY
+                info['foreignID'] = operationID
+                imageManager = ImageManager()
+                imageManager.addImagesWithOSS(info=info)
             db.session.commit()
         except Exception as e:
             print e
