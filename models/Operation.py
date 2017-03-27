@@ -46,7 +46,7 @@ class Operation(db.Model):
         res['operatorID'] = c.operatorID
         res['state'] = c.state
         res['description'] = c.description
-        res['createTime'] = c.createTime
+        res['createTime'] = str(c.createTime)
         return res
 
     def __repr__(self):
