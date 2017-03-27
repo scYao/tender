@@ -13,14 +13,32 @@ create table pushedTenderInfo(
 	state int comment 'boss决定是否投标, 0 未确定, 1 投, 2 放弃',
 	step int comment '0表示未开始，１表示正在进行中，２表示已经完成，３表示历史记录',
 	tenderID nvarchar(100) comment '哪一个标, 不设外键',
+	-- 经办人填写的 在投标中详情中的字段
 	projectManagerName nvarchar(100) comment '项目经理姓名',
 	openedDate date comment '开标时间',
 	openedLocation text comment '开标地点',
-	ceilPrice float comment '最高限价',
+	ceilPrice float comment 'B 最高限价',
 	tenderInfoDescription text comment '项目信息备注',
+	-- 老板填写的报价字段
 	quotedPrice float comment '报价,定价',
 	quotedDate date comment '报价时间',
-	quotedDescription text comment '报价备注'
+	quotedDescription text comment '报价备注',
+	-- 投标已完成详情字段
+	averagePrice float comment 'A 平均价',
+	benchmarkPrice float comment 'C(评标基准价)',
+	K1 float comment 'K1 值',
+	K2 float comment 'K2 值',
+	Q1 float comment 'Q1 值',
+	Q2 float comment 'Q2 值',
+	deductedRate1 float comment '啟勋下浮率',
+	deductedRate2 float comment '下浮率',
+	workerName nvarchar(100) comment '开标人',
+	candidateName1 nvarchar(100) comment '候选人1',
+	candidatePrice1 float comment '候选人1报价',
+	candidateName2 nvarchar(100) comment '候选人2',
+	candidatePrice2 float comment '候选人2报价',
+	candidateName3 nvarchar(100) comment '候选人3',
+	candidatePrice3 float comment '候选人3报价'
 );
 
 create table quotedPrice(
