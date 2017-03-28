@@ -231,3 +231,14 @@ class ResponsiblePersonManager(Util):
         info['userID'] = userID
         tenderCommentManager = TenderCommentManager()
         return tenderCommentManager.createTenderComment(info=info)
+
+     # 负责人获取 正在进行中的招标详情
+    def getDoingDetailByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getTenderDoingDetail(info=info)

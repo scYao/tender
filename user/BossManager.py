@@ -151,3 +151,15 @@ class BossManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getDistributedTenderList(info=info)
+
+
+    # 审定人获取 正在进行中的招标详情
+    def getDoingDetailByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getTenderDoingDetail(info=info)

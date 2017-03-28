@@ -150,101 +150,16 @@ class OperatorManager(Util):
     def getTenderListWithPushedTagByOperator(self, jsonInfo):
         pass
 
-    def __generateBookInfo(self, bookResult):
-        mDic = {}
-        ossInfo = {}
-        ossInfo['bucket'] = 'tender'
-        def generateInfo(result):
-            operation = result.Operation
-            imgPath = result.ImgPath
-            operationID = operation.operationID
-            if not mDic.has_key(operationID):
-                res = Operation.generate(c=operation)
-                imgList = []
-                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
-                res['fileList'] = imgList
-                mDic[operationID] = imgList
-                return res
-            else:
-                imgList = mDic[operationID]
-                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
-        bookDataList = [generateInfo(result=result) for result in bookResult]
-        return bookDataList
-
     #根据operatorID获取operations信息
     def getOperationListByOperatorID(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_OPERATOR
-        operatorID = info['operatorID']
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        try:
-            query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
-            allResult = query.all()
-            bookQuery = db.session.query(Operation, ImgPath).outerjoin(
-                ImgPath, Operation.operationID == ImgPath.foreignID
-            ).filter(
-                and_(
-                    Operation.tag == OPERATION_TAG_MAKE_BIDDING_BOOK,
-                    Operation.operatorID == operatorID
-                )
-            )
-            bookResult = bookQuery.all()
-            dataList = [Operation.generate(c=result) for result in allResult]
-            bookDataList = self.__generateBookInfo(bookResult=bookResult)
-            l1 = []
-            l2 = []
-            l4 = []
-            for o in dataList:
-                if o['tag'] == OPERATION_TAG_ENLIST:
-                    l1.append(o)
-                elif o['tag'] == OPERATION_TAG_DEPOSIT:
-                    l2.append(o)
-                elif  o['tag'] == OPERATION_TAG_ATTEND:
-                    l4.append(o)
-            resultDic = {}
-            resultDic[OPERATION_TAG_ENLIST] = l1
-            resultDic[OPERATION_TAG_DEPOSIT] = l2
-            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = bookDataList
-            resultDic[OPERATION_TAG_ATTEND] = l4
-
-            (status, projectInfo) = self.__getProjectInfoInDoingDetail(info=info)
-            resultDic['projectInfo'] = projectInfo
-            return (True, resultDic)
-        except Exception as e:
-            print e
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            db.session.rollback()
-            return (False, errorInfo)
-
-    def __getProjectInfoInDoingDetail(self, info):
-        operatorID = info['operatorID']
-
-        res = {}
-        res['projectManagerName'] = ''
-        res['openedDate'] = ''
-        res['openedLocation'] = ''
-        res['ceilPrice'] = ''
-        res['tenderInfoDescription'] = ''
-
-        OperatorResult = db.session.query(Operator).filter(
-            Operator.operatorID == operatorID
-        ).first()
-        tenderID = OperatorResult.tenderID
-
-        result = db.session.query(PushedTenderInfo).filter(
-            PushedTenderInfo.tenderID == tenderID
-        ).first()
-        if result is not None:
-            res['projectManagerName'] = result.projectManagerName
-            res['openedDate'] = str(result.openedDate)
-            res['openedLocation'] = result.openedLocation
-            res['ceilPrice'] = result.ceilPrice
-            res['tenderInfoDescription'] = result.tenderInfoDescription
-        return (True, res)
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getTenderDoingDetail(info=info)
 
     def __updatePushedTenderInfoStep(self, info):
         operatorID = info['operatorID']

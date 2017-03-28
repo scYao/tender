@@ -6,7 +6,8 @@ import poster
 import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
-    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES
+    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_MAKE_BIDDING_BOOK, \
+    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -28,6 +29,8 @@ from models.Operator import Operator
 from models.Token import Token
 from models.City import City
 from models.QuotedPrice import QuotedPrice
+from models.Operation import Operation
+from models.ImgPath import ImgPath
 
 from message.MessageManager import MessageManager
 
@@ -708,8 +711,101 @@ class PushedTenderManager(Util):
         else:
             return self.__getAllTenderDoingList(info=info)
 
-    def getTenderDoingDetail(self, jsonInfo):
-        pass
+    def __generateBookInfo(self, bookResult):
+        mDic = {}
+        ossInfo = {}
+        ossInfo['bucket'] = 'tender'
+        def generateInfo(result):
+            operation = result.Operation
+            imgPath = result.ImgPath
+            operationID = operation.operationID
+            if not mDic.has_key(operationID):
+                res = Operation.generate(c=operation)
+                imgList = []
+                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
+                res['fileList'] = imgList
+                mDic[operationID] = imgList
+                return res
+            else:
+                imgList = mDic[operationID]
+                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
+        bookDataList = [generateInfo(result=result) for result in bookResult]
+        return bookDataList
+
+    def getTenderDoingDetail(self, info):
+        operatorID = info['operatorID']
+        try:
+            query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
+            allResult = query.all()
+            bookQuery = db.session.query(Operation, ImgPath).outerjoin(
+                ImgPath, Operation.operationID == ImgPath.foreignID
+            ).filter(
+                and_(
+                    Operation.tag == OPERATION_TAG_MAKE_BIDDING_BOOK,
+                    Operation.operatorID == operatorID
+                )
+            )
+            bookResult = bookQuery.all()
+            dataList = [Operation.generate(c=result) for result in allResult]
+            bookDataList = self.__generateBookInfo(bookResult=bookResult)
+            l1 = []
+            l2 = []
+            l4 = []
+            for o in dataList:
+                if o['tag'] == OPERATION_TAG_ENLIST:
+                    l1.append(o)
+                elif o['tag'] == OPERATION_TAG_DEPOSIT:
+                    l2.append(o)
+                elif  o['tag'] == OPERATION_TAG_ATTEND:
+                    l4.append(o)
+            resultDic = {}
+            resultDic[OPERATION_TAG_ENLIST] = l1
+            resultDic[OPERATION_TAG_DEPOSIT] = l2
+            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = bookDataList
+            resultDic[OPERATION_TAG_ATTEND] = l4
+            # 获取项目信息模块
+            (status, projectInfo) = self.__getProjectInfoInDoingDetail(info=info)
+            resultDic['projectInfo'] = projectInfo
+            return (True, resultDic)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def __getProjectInfoInDoingDetail(self, info):
+        operatorID = info['operatorID']
+
+        res = {}
+        res['projectManagerName'] = ''
+        res['openedDate'] = ''
+        res['openedLocation'] = ''
+        res['ceilPrice'] = ''
+        res['tenderInfoDescription'] = ''
+        res['quotedPrice'] = ''
+        res['quotedDate'] = ''
+        res['quotedDescription'] = ''
+
+
+        OperatorResult = db.session.query(Operator).filter(
+            Operator.operatorID == operatorID
+        ).first()
+        tenderID = OperatorResult.tenderID
+
+        result = db.session.query(PushedTenderInfo).filter(
+            PushedTenderInfo.tenderID == tenderID
+        ).first()
+        if result is not None:
+            res['projectManagerName'] = result.projectManagerName
+            res['openedDate'] = str(result.openedDate)
+            res['openedLocation'] = result.openedLocation
+            res['ceilPrice'] = result.ceilPrice
+            res['tenderInfoDescription'] = result.tenderInfoDescription
+            res['quotedPrice'] = result.quotedPrice
+            res['quotedDate'] = result.quotedDate
+            res['quotedDescription'] = result.quotedDescription
+        return (True, res)
 
         # 经办人特殊, 获取自己参与的, 已完成的列表
 

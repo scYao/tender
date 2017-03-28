@@ -1334,6 +1334,21 @@ def create_operator():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人获取 正在进行中的招标详情
+@app.route('/get_doing_detail_by_resp/', methods=['POST', 'GET'])
+def get_doing_detail_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getDoingDetailByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 经办人, 批注进行中的项目
 @app.route('/create_tender_comment_by_resp/', methods=['POST', 'GET'])
 def create_tender_comment_by_resp():
@@ -1603,6 +1618,21 @@ def get_pushed_list_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = auditorManager.getPushedListByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审核人获取 正在进行中的招标详情
+@app.route('/get_doing_detail_by_auditor/', methods=['POST', 'GET'])
+def get_doing_detail_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getDoingDetailByAuditor(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1907,6 +1937,21 @@ def validate_operator():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.validateOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 决定是否采用该经办人
+@app.route('/get_doing_detail_by_boss/', methods=['POST', 'GET'])
+def get_doing_detail_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getDoingDetailByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
