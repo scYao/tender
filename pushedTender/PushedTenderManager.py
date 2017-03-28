@@ -859,7 +859,22 @@ class PushedTenderManager(Util):
             return self.__getAllTenderDoingList(info=info)
 
     def getTenderDoneDetail(self, jsonInfo):
-        pass
+        info = json.loads(jsonInfo)
+        tenderID = info['tenderID']
+        try:
+            query = db.session.query(PushedTenderInfo).filter(PushedTenderInfo.tenderID == tenderID)
+            result = query.first()
+            if result:
+                callBackInfo = PushedTenderInfo.generate(c=result)
+                return (True, callBackInfo)
+            else:
+                return (False, None)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
         # 经办人特殊, 获取自己参与的, 历史记录
 
@@ -878,3 +893,5 @@ class PushedTenderManager(Util):
 
     def getTenderHistoryDetail(self, jsonInfo):
         pass
+
+

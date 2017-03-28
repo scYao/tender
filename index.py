@@ -1515,6 +1515,22 @@ def update_done_pushed_tender():
         return json.dumps(data)
 
 
+#已经完成的项目信息详情
+
+@app.route('/get_tender_done_detail/', methods=['POST', 'GET'])
+def get_tender_done_detail():
+    pushedTenderManager = PushedTenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = pushedTenderManager.getTenderDoneDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 正在进行中的列表
 @app.route('/get_tender_doing_list/', methods=['POST', 'GET'])
 def get_tender_doing_list():
