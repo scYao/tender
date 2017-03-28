@@ -130,7 +130,8 @@ class ResponsiblePersonManager(Util):
                 Operator.tenderID == tenderID
             )
             updateInfo = {
-                Operator.userID: userID
+                Operator.userID: userID,
+                Operator.state : OPERATOR_TAG_CREATED
             }
             query.update(
                 updateInfo, synchronize_session=False

@@ -45,14 +45,14 @@ class PushedTenderInfo(db.Model):
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
-                 tenderID=None, step=0, projectManagerName=None,
-                 openedDate=None, openedLocation=None, ceilPrice=0,
-                 tenderInfoDescription=None, quotedPrice=0, quotedDate=None,
-                 quotedDescription=None, averagePrice=0, benchmarkPrice=0,
+                 tenderID=None, step=0, projectManagerName='',
+                 openedDate=None, openedLocation='', ceilPrice=0,
+                 tenderInfoDescription='', quotedPrice=0, quotedDate=None,
+                 quotedDescription='', averagePrice=0, benchmarkPrice=0,
                  K1=0, K2=0, Q1=0,
                  Q2=0, deductedRate1=0, deductedRate2=0,
-                 workerName=None, candidateName1=None, candidatePrice1=0,
-                 candidateName2=None, candidatePrice2=0, candidateName3=None,
+                 workerName='', candidateName1='', candidatePrice1=0,
+                 candidateName2='', candidatePrice2=0, candidateName3='',
                  candidatePrice3=0):
         self.pushedID = pushedID
         self.userID = userID

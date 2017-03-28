@@ -207,8 +207,11 @@ class OperatorManager(Util):
             resultDic = {}
             resultDic[OPERATION_TAG_ENLIST] = l1
             resultDic[OPERATION_TAG_DEPOSIT] = l2
-            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = []
+            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = bookDataList
             resultDic[OPERATION_TAG_ATTEND] = l4
+
+            (status, projectInfo) = self.__getProjectInfoInDoingDetail(info=info)
+            resultDic['projectInfo'] = projectInfo
             return (True, resultDic)
         except Exception as e:
             print e
@@ -216,6 +219,32 @@ class OperatorManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+    def __getProjectInfoInDoingDetail(self, info):
+        operatorID = info['operatorID']
+
+        res = {}
+        res['projectManagerName'] = ''
+        res['openedDate'] = ''
+        res['openedLocation'] = ''
+        res['ceilPrice'] = ''
+        res['tenderInfoDescription'] = ''
+
+        OperatorResult = db.session.query(Operator).filter(
+            Operator.operatorID == operatorID
+        ).first()
+        tenderID = OperatorResult.tenderID
+
+        result = db.session.query(PushedTenderInfo).filter(
+            PushedTenderInfo.tenderID == tenderID
+        ).first()
+        if result is not None:
+            res['projectManagerName'] = result.projectManagerName
+            res['openedDate'] = str(result.openedDate)
+            res['openedLocation'] = result.openedLocation
+            res['ceilPrice'] = result.ceilPrice
+            res['tenderInfoDescription'] = result.tenderInfoDescription
+        return (True, res)
 
     def __updatePushedTenderInfoStep(self, info):
         operatorID = info['operatorID']
