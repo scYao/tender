@@ -223,7 +223,8 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.candidateName2: info['candidateName2'],
                     PushedTenderInfo.candidatePrice2: info['candidatePrice2'],
                     PushedTenderInfo.candidateName3: info['candidateName3'],
-                    PushedTenderInfo.candidatePrice3: info['candidatePrice3']
+                    PushedTenderInfo.candidatePrice3: info['candidatePrice3'],
+                    PushedTenderInfo.ceilPrice: info['ceilPrice']
                 }
                 query.update(
                     updateInfo, synchronize_session=False
@@ -735,7 +736,7 @@ class PushedTenderManager(Util):
 
     def getTenderDoingDetail(self, info):
         operatorID = info['operatorID']
-        userType = info['userType']
+
         try:
             query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
             allResult = query.all()
@@ -758,7 +759,7 @@ class PushedTenderManager(Util):
                     l1.append(o)
                 elif o['tag'] == OPERATION_TAG_DEPOSIT:
                     l2.append(o)
-                elif  o['tag'] == OPERATION_TAG_ATTEND:
+                elif o['tag'] == OPERATION_TAG_ATTEND:
                     l4.append(o)
             resultDic = {}
             resultDic[OPERATION_TAG_ENLIST] = l1
@@ -773,6 +774,7 @@ class PushedTenderManager(Util):
             return (True, resultDic)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -780,6 +782,7 @@ class PushedTenderManager(Util):
 
     def __getProjectInfoInDoingDetail(self, info):
         operatorID = info['operatorID']
+        userID = info['userID']
 
         res = {}
         res['projectManagerName'] = ''
@@ -796,6 +799,7 @@ class PushedTenderManager(Util):
             Operator.operatorID == operatorID
         ).first()
         tenderID = OperatorResult.tenderID
+        info['tenderID'] = tenderID
 
         result = db.session.query(PushedTenderInfo).filter(
             PushedTenderInfo.tenderID == tenderID
@@ -812,7 +816,132 @@ class PushedTenderManager(Util):
                 res['quotedPrice'] = result.quotedPrice
                 res['quotedDate'] = result.quotedDate
                 res['quotedDescription'] = result.quotedDescription
+            elif info['userType'] == USER_TAG_RESPONSIBLEPERSON:
+                (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
+                res['respQuotedPrice'] = respQuotedPrice
+            elif info['userType'] == USER_TAG_AUDITOR:
+                (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
+                res['respQuotedPrice'] = respQuotedPrice
+                (status, auditorQuotedPrice) = self.__getAuditorQuotedPrice(info=info)
+                res['auditorQuotedPrice'] = auditorQuotedPrice
+            elif info['userType'] == USER_TAG_BOSS:
+                (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
+                res['respQuotedPrice'] = respQuotedPrice
+                (status, auditorQuotedPrice) = self.__getAuditorQuotedPrice(info=info)
+                res['auditorQuotedPrice'] = auditorQuotedPrice
+                (status, bossQuotedPrice) = self.__getBossQuotedPrice(info=info)
+                res['bossQuotedPrice'] = bossQuotedPrice
+
         return (True, res)
+
+    def __getRespQuotedPrice(self, info):
+        userID = info['userID']
+        tenderID = info['tenderID']
+        userType = info['userType']
+        if userType != USER_TAG_RESPONSIBLEPERSON:
+            # 先获取负责人的报价 再获取自己的报价
+            selfResult = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+            companyID = selfResult.customizedCompanyID
+            respResult = db.session.query(UserInfo).filter(and_(
+                UserInfo.customizedCompanyID == companyID,
+                UserInfo.userType == USER_TAG_RESPONSIBLEPERSON
+            )).first()
+            respUserID = respResult.userID
+            userName = respResult.userName
+        else:
+            respUserID = userID
+            userName = ''
+
+        # 获取负责人的报价
+        respQuotedPrice = {}
+        respQuotedPrice['quotedPrice'] = ''
+        respQuotedPrice['price'] = ''
+        respQuotedPrice['costPrice'] = ''
+        respQuotedPrice['createTime'] = ''
+        respQuotedPrice['description'] = ''
+
+        respQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
+            QuotedPrice.tenderID == tenderID,
+            QuotedPrice.userID == respUserID
+        )).first()
+        if respQuotedPriceResult is not None:
+            respQuotedPrice['quotedPrice'] = respQuotedPriceResult.quotedPrice
+            respQuotedPrice['price'] = respQuotedPriceResult.price
+            respQuotedPrice['costPrice'] = respQuotedPriceResult.costPrice
+            respQuotedPrice['createTime'] = str(respQuotedPriceResult.createTime)
+            respQuotedPrice['description'] = respQuotedPriceResult.description
+            respQuotedPrice['userName'] = userName
+        return (True, respQuotedPrice)
+
+    def __getAuditorQuotedPrice(self, info):
+        userID = info['userID']
+        tenderID = info['tenderID']
+        userType = info['userType']
+        # 先获取负责人的报价 再获取自己的报价
+        if userType != USER_TAG_AUDITOR:
+            selfResult = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+            companyID = selfResult.customizedCompanyID
+            auditorResult = db.session.query(UserInfo).filter(and_(
+                UserInfo.customizedCompanyID == companyID,
+                UserInfo.userType == USER_TAG_AUDITOR
+            )).first()
+            auditorUserID = auditorResult.userID
+            userName = auditorResult.userName
+        else:
+            auditorUserID = userID
+            userName = ''
+
+        # 获取负责人的报价
+        selfQuotedPrice = {}
+        selfQuotedPrice['quotedPrice'] = ''
+        selfQuotedPrice['price'] = ''
+        selfQuotedPrice['costPrice'] = ''
+        selfQuotedPrice['createTime'] = ''
+        selfQuotedPrice['description'] = ''
+
+
+        # 获取自己的报价
+        selfQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
+            QuotedPrice.tenderID == tenderID,
+            QuotedPrice.userID == auditorUserID
+        )).first()
+        if selfQuotedPriceResult is not None:
+            selfQuotedPrice['quotedPrice'] = selfQuotedPriceResult.quotedPrice
+            selfQuotedPrice['price'] = selfQuotedPriceResult.price
+            selfQuotedPrice['costPrice'] = selfQuotedPriceResult.costPrice
+            selfQuotedPrice['createTime'] = str(selfQuotedPriceResult.createTime)
+            selfQuotedPrice['description'] = selfQuotedPriceResult.description
+            selfQuotedPrice['userName'] = userName
+
+        return (True, selfQuotedPrice)
+
+
+    def __getBossQuotedPrice(self, info):
+        userID = info['userID']
+        tenderID = info['tenderID']
+
+        selfQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
+            QuotedPrice.tenderID == tenderID,
+            QuotedPrice.userID == userID
+        )).first()
+        selfQuotedPrice = {}
+        selfQuotedPrice['quotedPrice'] = ''
+        selfQuotedPrice['price'] = ''
+        selfQuotedPrice['costPrice'] = ''
+        selfQuotedPrice['createTime'] = ''
+        selfQuotedPrice['description'] = ''
+        if selfQuotedPriceResult is not None:
+            selfQuotedPrice['quotedPrice'] = selfQuotedPriceResult.quotedPrice
+            selfQuotedPrice['price'] = selfQuotedPriceResult.price
+            selfQuotedPrice['costPrice'] = selfQuotedPriceResult.costPrice
+            selfQuotedPrice['createTime'] = str(selfQuotedPriceResult.createTime)
+            selfQuotedPrice['description'] = selfQuotedPriceResult.description
+            selfQuotedPrice['userName'] = ''
+        return (True, selfQuotedPrice)
 
 
     def __getTenderCommentInDoingDetail(self, info):

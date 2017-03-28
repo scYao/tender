@@ -159,6 +159,7 @@ class OperatorManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
+        info['userID'] = userID
         return pushedTenderManager.getTenderDoingDetail(info=info)
 
     def __updatePushedTenderInfoStep(self, info):

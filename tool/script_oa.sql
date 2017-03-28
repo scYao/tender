@@ -131,3 +131,4 @@ alter table message add constraint message_FK_F_user foreign key(fromUserID) ref
 alter table tenderComment add constraint comment_FK_F_user foreign key(userID) references userInfo(userID);
 alter table quotedPrice add constraint quote_FK_F_user foreign key(userID) references userInfo(userID);
 alter table quotedPrice add constraint quote_FK_tender foreign key(tenderID) references tender(tenderID);
+alter table tenderComment add constraint comment_FK_user foreign key(userID) references userInfo(userID);
