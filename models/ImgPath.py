@@ -15,14 +15,16 @@ class ImgPath(db.Model):
     foreignID = db.Column(db.String(100))
     tag = db.Column(db.Integer)
     imgNum = db.Column(db.String(100))
+    imgName = db.Column(db.Text)
 
     def __init__(self, imgPathID=None, path=None, foreignID=None,
-                 tag=0, imgNum=None):
+                 tag=0, imgNum=None, imgName=None):
         self.imgPathID = imgPathID
         self.path = path
         self.foreignID = foreignID
         self.tag = tag
         self.imgNum = imgNum
+        self.imgName = imgName
 
     @staticmethod
     def generate(img, ossInfo, directory, hd=None):
@@ -35,6 +37,7 @@ class ImgPath(db.Model):
         util = Util()
         res['imgPath'] = util.getSecurityUrl(ossInfo)
         res['tag'] = img.tag
+        res['imgName'] = img.imgName
         return res
 
 

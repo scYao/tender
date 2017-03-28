@@ -228,7 +228,6 @@ class ResponsiblePersonManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         info['userID'] = userID
-        info['userID'] = userID
         tenderCommentManager = TenderCommentManager()
         return tenderCommentManager.createTenderComment(info=info)
 

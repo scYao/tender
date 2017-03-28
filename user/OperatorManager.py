@@ -93,6 +93,43 @@ class OperatorManager(Util):
             return (False, errorInfo)
         return (True, operationID)
 
+    # 上传标书
+    def createOperationBiddingBook(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        operatorID = info['operatorID']
+        info['createTime'] = datetime.now()
+
+        (status, operationID) = self.createOperation(jsonInfo=jsonInfo)
+        if status is not True:
+            return (False, operationID)
+
+        operationID = self.generateID(operatorID)
+        info['operationID'] = operationID
+        ossInfo = {}
+        ossInfo['bucket'] = 'sjsecondhand'
+        try:
+            index = 0
+            for i in imgFileList:
+                imgID = self.generateID(str(index) + i['imgName'])
+                postFix = str(i['imgName']).split('.')
+                if len(postFix) > 0:
+                    postFix = postFix[-1]
+                else:
+                    postFix = ''
+                imgPath = imgID + postFix
+                imagePath = ImgPath(imgPathID=imgID, path=imgPath,
+                                    foreignID=operationID, imgName=i['imgName'])
+                db.session.add(imagePath)
+                index = index + 1
+                self.uploadOSSImage('biddocument/%s' % imgPath, ossInfo, i['file'])
+        except Exception as e:
+            print e
+            print 'upload file to oss error'
+            errorInfo = ErrorInfo['SPORTS_16']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
+
 
     # 经办人获取我的推送列表
     def getPushedListByOperator(self, jsonInfo):

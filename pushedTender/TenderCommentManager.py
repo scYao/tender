@@ -38,7 +38,6 @@ class TenderCommentManager(Util):
     def createTenderComment(self, info):
         userID = info['userID']
         tenderID = info['tenderID']
-        pushedID = info['pushedID']
         commentID = self.generateID(userID + tenderID)
         createTime = datetime.now()
         commentInfo = {}

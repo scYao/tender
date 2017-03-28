@@ -40,7 +40,7 @@ class TenderComment(db.Model):
         res = {}
         res['commentID'] = c.commentID
         res['userID'] = c.userID
-        res['createTime'] = c.createTime
+        res['createTime'] = str(c.createTime)
         res['description'] = c.description
         return res
 

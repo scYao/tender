@@ -162,4 +162,5 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
+        info['userID'] = userID
         return pushedTenderManager.getTenderDoingDetail(info=info)

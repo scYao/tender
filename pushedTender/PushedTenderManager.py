@@ -400,7 +400,7 @@ class PushedTenderManager(Util):
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).filter(
-                and_(PushedTenderInfo.userID == userID,
+                and_(Operator.userID == userID,
                      PushedTenderInfo.step == step)
             )
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
@@ -948,7 +948,7 @@ class PushedTenderManager(Util):
         operatorID = info['operatorID']
         query = db.session.query(Operator).filter(Operator.operatorID == operatorID)
         result = query.first()
-        if result:
+        if result is not None:
             tenderID = result.tenderID
             query = db.session.query(TenderComment, UserInfo).outerjoin(
                 UserInfo, TenderComment.userID == UserInfo.userID
@@ -965,6 +965,7 @@ class PushedTenderManager(Util):
                 res['description'] = ''
                 res.update(TenderComment.generate(result.TenderComment))
                 res.update(UserInfo.generateBrief(result.UserInfo))
+                return res
 
             dataList = [generateInfo(result=result) for result in allResult]
             return (True, dataList)
@@ -997,7 +998,7 @@ class PushedTenderManager(Util):
                 callBackInfo = PushedTenderInfo.generate(c=result)
                 return (True, callBackInfo)
             else:
-                return (False, None)
+                return (False, ErrorInfo['TENDER_28'])
         except Exception as e:
             print e
             errorInfo = ErrorInfo['TENDER_02']

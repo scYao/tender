@@ -1577,6 +1577,31 @@ def create_operation():
         data['data'] = result
         return json.dumps(data)
 
+# 上传标书
+@app.route('/create_operation_bidding_book/', methods=['POST', 'GET'])
+def create_operation_bidding_book():
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        info = json.loads(paramsJson)
+        imgNameList = info['imgNameList']
+        imgList = []
+        for img in imgNameList:
+            f = request.files[img]
+            imgName = f.filename
+            imgDic = {}
+            imgDic['imgName'] = imgName
+            imgDic['file'] = f
+            imgList.append(imgDic)
+        operatorManager = OperatorManager()
+        (status, ret) = operatorManager.createOperationBiddingBook(paramsJson, imgList)
+        result = {}
+        result['status'] = 'FAILED'
+        result['data'] = 'NULL'
+        if status is True:
+            result['status'] = 'SUCCESS'
+        result['data'] = ret
+        return json.dumps(result)
+
 # 获取经办人的推送
 @app.route('/get_pushed_list_by_operator/', methods=['POST', 'GET'])
 def get_pushed_list_by_operator():
