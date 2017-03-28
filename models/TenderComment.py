@@ -10,15 +10,18 @@ class TenderComment(db.Model):
 
     __tablename__ = 'TenderComment'
     commentID = db.Column(db.String(100), primary_key=True)
-    userID = db.Column(db.String(100))
+    userID = db.Column(db.String(100), db.ForeignKey('UserInfo.userID'))
+    tenderID = db.Column(db.String(100))
     createTime = db.Column(db.DateTime)
     description = db.Column(db.Text)
 
-    def __init__(self, commentID=None, userID=None, createTime=None, description=None):
+    def __init__(self, commentID=None, userID=None, createTime=None,
+                 description=None, tenderID=None):
         self.commentID = commentID
         self.userID = userID
         self.createTime = createTime
         self.description = description
+        self.tenderID = tenderID
 
     @staticmethod
     def create(info):
@@ -26,7 +29,8 @@ class TenderComment(db.Model):
             commentID=info['commentID'],
             userID=info['userID'],
             createTime=info['createTime'],
-            description=info['description']
+            description=info['description'],
+            tenderID=info['tenderID']
         )
         db.session.add(tenderComment)
         return (True, info['commentID'])

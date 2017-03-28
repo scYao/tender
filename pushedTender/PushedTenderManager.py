@@ -31,6 +31,7 @@ from models.City import City
 from models.QuotedPrice import QuotedPrice
 from models.Operation import Operation
 from models.ImgPath import ImgPath
+from models.TenderComment import TenderComment
 
 from message.MessageManager import MessageManager
 
@@ -734,6 +735,7 @@ class PushedTenderManager(Util):
 
     def getTenderDoingDetail(self, info):
         operatorID = info['operatorID']
+        userType = info['userType']
         try:
             query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
             allResult = query.all()
@@ -765,7 +767,9 @@ class PushedTenderManager(Util):
             resultDic[OPERATION_TAG_ATTEND] = l4
             # 获取项目信息模块
             (status, projectInfo) = self.__getProjectInfoInDoingDetail(info=info)
+            (status, tenderComment) = self.__getTenderCommentInDoingDetail(info=info)
             resultDic['projectInfo'] = projectInfo
+            resultDic['tenderComment'] = tenderComment
             return (True, resultDic)
         except Exception as e:
             print e
@@ -802,10 +806,27 @@ class PushedTenderManager(Util):
             res['openedLocation'] = result.openedLocation
             res['ceilPrice'] = result.ceilPrice
             res['tenderInfoDescription'] = result.tenderInfoDescription
-            res['quotedPrice'] = result.quotedPrice
-            res['quotedDate'] = result.quotedDate
-            res['quotedDescription'] = result.quotedDescription
+            res['pushedID'] = result.pushedID
+            # 只有经办人能看到
+            if info['userType'] == USER_TAG_OPERATOR:
+                res['quotedPrice'] = result.quotedPrice
+                res['quotedDate'] = result.quotedDate
+                res['quotedDescription'] = result.quotedDescription
         return (True, res)
+
+    def __getTenderCommentInDoingDetail(self, info):
+        operatorID = info['operatorID']
+        query = db.session.query(Operator).filter(Operator.operatorID == operatorID)
+        result = query.first()
+        if result:
+            tenderID = result.tenderID
+            query = db.session.query(TenderComment).filter(TenderComment.tenderID == tenderID)
+            allResult = query.all()
+            dataList = [TenderComment.generate(result) for result in allResult]
+            return (True, dataList)
+        else:
+            return (False, None)
+
 
         # 经办人特殊, 获取自己参与的, 已完成的列表
 

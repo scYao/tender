@@ -57,7 +57,8 @@ create table tenderComment(
 	commentID nvarchar(100) primary key comment '领导批注ID',
 	userID nvarchar(100) comment '批注人ID',
     createTime datetime comment '批注时间',
-    description text comment '批注内容'
+    description text comment '批注内容',
+    tenderID nvarchar(100) comment 'tenderID'
 );
 
 -- 经办人表
