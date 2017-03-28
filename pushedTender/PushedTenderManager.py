@@ -828,8 +828,14 @@ class PushedTenderManager(Util):
 
             def generateInfo(result):
                 res = {}
+                res['userID'] = ''
+                res['userName'] = ''
+                res['commentID'] = ''
+                res['userID'] = ''
+                res['createTime'] = ''
+                res['description'] = ''
                 res.update(TenderComment.generate(result.TenderComment))
-                res.update(UserInfo.generate(result.UserInfo))
+                res.update(UserInfo.generateBrief(result.UserInfo))
 
             dataList = [generateInfo(result=result) for result in allResult]
             return (True, dataList)
