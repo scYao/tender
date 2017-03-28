@@ -814,15 +814,24 @@ class PushedTenderManager(Util):
                 res['quotedDescription'] = result.quotedDescription
         return (True, res)
 
+
     def __getTenderCommentInDoingDetail(self, info):
         operatorID = info['operatorID']
         query = db.session.query(Operator).filter(Operator.operatorID == operatorID)
         result = query.first()
         if result:
             tenderID = result.tenderID
-            query = db.session.query(TenderComment).filter(TenderComment.tenderID == tenderID)
+            query = db.session.query(TenderComment, UserInfo).outerjoin(
+                UserInfo, TenderComment.userID == UserInfo.userID
+            ).filter(TenderComment.tenderID == tenderID)
             allResult = query.all()
-            dataList = [TenderComment.generate(result) for result in allResult]
+
+            def generateInfo(result):
+                res = {}
+                res.update(TenderComment.generate(result.TenderComment))
+                res.update(UserInfo.generate(result.UserInfo))
+
+            dataList = [generateInfo(result=result) for result in allResult]
             return (True, dataList)
         else:
             return (False, None)
