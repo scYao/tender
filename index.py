@@ -1334,6 +1334,21 @@ def create_operator():
         data['data'] = result
         return json.dumps(data)
 
+# 经办人, 批注进行中的项目
+@app.route('/create_tender_comment_by_resp/', methods=['POST', 'GET'])
+def create_tender_comment_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.createTenderCommentByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 负责人获取待分配列表
 @app.route('/get_undistributed_tender_list_by_resp/', methods=['POST', 'GET'])
 def get_undistributed_tender_list_by_resp():
@@ -1684,16 +1699,16 @@ def create_pushed_tender_by_boss():
         data['data'] = result
         return json.dumps(data)
 
-#审定人批注正在进行中的项目
-@app.route('/create_tender_comment/', methods=['POST', 'GET'])
-def create_tender_comment():
+# 审定人批注正在进行中的项目
+@app.route('/create_tender_comment_by_boss/', methods=['POST', 'GET'])
+def create_tender_comment_by_boss():
     bossManager = BossManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = bossManager.createTenderComment(paramsJson)
+        (status, result) = bossManager.createTenderCommentByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1816,6 +1831,21 @@ def update_pushed_tender_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = auditorManager.updatePushedTenderByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审核人 批注正在进行中的项目
+@app.route('/create_tender_comment_by_auditor/', methods=['POST', 'GET'])
+def create_tender_comment_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.createTenderCommentByAuditor(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

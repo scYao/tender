@@ -23,6 +23,7 @@ from models.PushedTenderInfo import PushedTenderInfo
 from models.Token import Token
 
 from pushedTender.PushedTenderManager import PushedTenderManager
+from pushedTender.TenderCommentManager import TenderCommentManager
 
 class ResponsiblePersonManager(Util):
     def __init__(self):
@@ -217,3 +218,16 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getDistributedTenderList(info=info)
+
+    # 负责人 批注正在进行中的项目
+    def createTenderCommentByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        info['userID'] = userID
+        tenderCommentManager = TenderCommentManager()
+        return tenderCommentManager.createTenderComment(info=info)

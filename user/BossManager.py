@@ -18,6 +18,7 @@ from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
+from pushedTender.TenderCommentManager import TenderCommentManager
 
 from pushedTender.PushedTenderManager import PushedTenderManager
 
@@ -52,32 +53,17 @@ class BossManager(Util):
         return pushedTenderManager.createQuotedPrice(info=info)
 
     # 审定人批注正在进行中的项目
-    def createTenderComment(self, jsonInfo):
+    def createTenderCommentByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_BOSS
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        tenderID = info['tenderID']
-        commentID = self.generateID(userID + tenderID)
-        createTime = datetime.now()
-        commentInfo = {}
-        commentInfo['userID'] = userID
-        commentInfo['createTime'] = createTime
-        commentInfo['tenderID'] = tenderID
-        commentInfo['commentID'] = commentID
-        commentInfo['description'] = info['description'].replace('\'', '\\\'').replace('\"', '\\\"')
-        try:
-            TenderComment.generate(c=commentInfo)
-            db.session.commit()
-            return (True, None)
-        except Exception as e:
-            print e
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            db.session.rollback()
-            return (False, errorInfo)
+        info['userID'] = userID
+        info['userID'] = userID
+        tenderCommentManager = TenderCommentManager()
+        return tenderCommentManager.createTenderComment(info=info)
 
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):

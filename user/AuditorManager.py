@@ -24,6 +24,7 @@ from models.Token import Token
 from models.PushedTenderInfo import PushedTenderInfo
 
 from pushedTender.PushedTenderManager import PushedTenderManager
+from pushedTender.TenderCommentManager import TenderCommentManager
 
 class AuditorManager(Util):
 
@@ -165,3 +166,16 @@ class AuditorManager(Util):
                 errorInfo['detail'] = str(e)
                 return (False, errorInfo)
         return (False, tenderResult)
+
+    # 负责人 批注正在进行中的项目
+    def createTenderCommentByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        info['userID'] = userID
+        tenderCommentManager = TenderCommentManager()
+        return tenderCommentManager.createTenderComment(info=info)
