@@ -27,7 +27,9 @@ create table tender(
     typeID nvarchar(100) comment '招标类型, type3类型',
     -- 新增字段
     biddingNum nvarchar(100) comment '标段编号',
-    reviewType nvarchar(100) comment "评审方式"
+    reviewType nvarchar(100) comment "评审方式",
+    tenderTag int default 0 comment '标识自定义1 或爬取 0',
+    userID nvarchar(100) comment '如果是自定义 记录创建者的ID'
 );
 
 -- 关键词库

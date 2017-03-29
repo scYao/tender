@@ -18,10 +18,12 @@ class Tender(db.Model):
     typeID = db.Column(db.String(100))
     biddingNum = db.Column(db.String(100))
     reviewType = db.Column(db.String(100))
+    tenderTag = db.Column(db.Integer)
+    userID = db.Column(db.String(100))
 
     def __init__(self, tenderID=None, title=None, cityID=None, location=None,
                  url=None, publishDate=None, detail=None, typeID=None, biddingNum=None,
-                 reviewType=None):
+                 reviewType=None, tenderTag=0, userID=None):
         self.tenderID = tenderID
         self.title = title
         self.cityID = cityID
@@ -32,6 +34,8 @@ class Tender(db.Model):
         self.typeID = typeID
         self.biddingNum = biddingNum
         self.reviewType = reviewType
+        self.tenderTag = tenderTag
+        self.userID = userID
 
     @staticmethod
     def create(createInfo):
@@ -56,6 +60,8 @@ class Tender(db.Model):
         res['detail'] = tender.detail
         res['biddingNum'] = tender.biddingNum
         res['reviewType'] = tender.reviewType
+        res['tenderTag'] = tender.tenderTag
+        res['userID'] = tender.userID
         return res
 
     @staticmethod

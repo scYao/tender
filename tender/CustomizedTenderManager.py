@@ -18,6 +18,7 @@ from tool.config import ErrorInfo
 from models.SearchKey import SearchKey
 from models.PushedTenderInfo import PushedTenderInfo
 from models.ImgPath import ImgPath
+from models.Tender import Tender
 from models.CustomizedTender import CustomizedTender
 from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
 from sqlalchemy import desc, and_, func
@@ -31,8 +32,14 @@ class CustomizedTenderManager(Util):
         userID = info['userID']
         tenderID = self.generateID(title + userID)
         info['tenderID'] = tenderID
-        info['createTime'] = datetime.now()
-        return CustomizedTender.create(info=info)
+        now = datetime.now()
+        # return CustomizedTender.create(info=info)
+        url = info['url']
+        tender = Tender(tenderID=tenderID, title=title, userID=userID, url=url,
+                        publishDate=now, typeID='-1')
+        db.session.query(tender)
+        return (True, tenderID)
+
 
 
     def createCustomizedTender(self, info, imgFileList):
