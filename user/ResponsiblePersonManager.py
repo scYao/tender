@@ -176,6 +176,7 @@ class ResponsiblePersonManager(Util):
         operatorUserID = info['userID']
         info['userID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
+        info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
         if status is True:
             try:

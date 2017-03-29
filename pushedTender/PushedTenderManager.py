@@ -368,6 +368,7 @@ class PushedTenderManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         userID = info['userID']
+        tenderTag = info['tenderTag']
 
         try:
             query = db.session.query(
@@ -376,7 +377,7 @@ class PushedTenderManager(Util):
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).filter(
                 and_(PushedTenderInfo.userID == userID,
-                     PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_TENDER)
+                     Tender.tenderTag == tenderTag)
             )
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
                 PushedTenderInfo.userID == userID
@@ -391,45 +392,6 @@ class PushedTenderManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            db.session.rollback()
-            return (False, errorInfo)
-
-    # 自定义的招标信息，　经办人 获取我的推送列表, 其他人获取经办人推送列表
-    def getCustomizedPushedTenderListByUserID(self, info):
-        startIndex = info['startIndex']
-        pageCount = info['pageCount']
-        userID = info['userID']
-
-        try:
-            query = db.session.query(
-                PushedTenderInfo, CustomizedTender
-            ).outerjoin(
-                CustomizedTender, PushedTenderInfo.tenderID == CustomizedTender.tenderID
-            ).filter(
-                and_(PushedTenderInfo.userID == userID,
-                     PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_CUS)
-            )
-            countQuery = db.session.query(
-                func.count(PushedTenderInfo.pushedID), CustomizedTender
-            ).outerjoin(
-                CustomizedTender, CustomizedTender.tenderID == PushedTenderInfo.tenderID
-            ).filter(
-                PushedTenderInfo.userID == userID
-            )
-            count = countQuery.first()
-            count = count[0]
-            allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(
-                pageCount).all()
-            dataList = [self.__generateCustomizedPushedBrief(result=result) for result in allResult]
-            callBackInfo = {}
-            callBackInfo['dataList'] = dataList
-            callBackInfo['count'] = count
-            return (True, callBackInfo)
-        except Exception as e:
-            print e
-            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()

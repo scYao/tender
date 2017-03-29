@@ -20,7 +20,8 @@ from models.PushedTenderInfo import PushedTenderInfo
 from models.TenderComment import TenderComment
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS
+from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS, \
+    PUSH_TENDER_INFO_TAG_TENDER
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from pushedTender.TenderCommentManager import TenderCommentManager
 
@@ -149,6 +150,7 @@ class BossManager(Util):
             return (False, errorInfo)
         info['userID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
+        info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
     # 审定人获取待分配列表

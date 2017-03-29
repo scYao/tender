@@ -20,7 +20,7 @@ from models.PushedTenderInfo import PushedTenderInfo
 from models.ImgPath import ImgPath
 from models.Tender import Tender
 from models.CustomizedTender import CustomizedTender
-from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
+from tool.tagconfig import SEARCH_KEY_TAG_TENDRE, PUSH_TENDER_INFO_TAG_CUS
 from sqlalchemy import desc, and_, func
 
 class CustomizedTenderManager(Util):
@@ -35,9 +35,10 @@ class CustomizedTenderManager(Util):
         now = datetime.now()
         # return CustomizedTender.create(info=info)
         url = info['url']
+        tenderTag = info['tenderTag']
         tender = Tender(tenderID=tenderID, title=title, userID=userID, url=url,
-                        publishDate=now, typeID='-1')
-        db.session.query(tender)
+                        publishDate=now, typeID='-1', cityID='63', tenderTag=tenderTag)
+        db.session.add(tender)
         return (True, tenderID)
 
 
@@ -48,6 +49,7 @@ class CustomizedTenderManager(Util):
         ossInfo['bucket'] = 'sjtender'
         try:
             info['userID'] = userID
+            info['tenderTag'] = PUSH_TENDER_INFO_TAG_CUS
             (status, tenderID) = self.__doCreateCustomizedTender(info=info)
             index = 0
             for i in imgFileList:
@@ -67,6 +69,7 @@ class CustomizedTenderManager(Util):
             return (True, tenderID)
         except Exception as e:
             print e
+            traceback.print_exc()
             print 'upload file to oss error'
             errorInfo = ErrorInfo['TENDER_31']
             errorInfo['detail'] = str(e)

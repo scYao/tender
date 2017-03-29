@@ -60,6 +60,8 @@ class OperatorManager(Util):
         info['userID'] = userID
         customizedTenderManager = CustomizedTenderManager()
         (status, tenderID) = customizedTenderManager.createCustomizedTender(info=info, imgFileList=imgFileList)
+        if status is not True:
+            return (False, tenderID)
         info['tenderID'] = tenderID
         pushedTenderManager = PushedTenderManager()
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_CUS
@@ -159,6 +161,7 @@ class OperatorManager(Util):
             return (False, errorInfo)
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
+        info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
     # 获取经办人的推送列表,其他途经
@@ -171,7 +174,8 @@ class OperatorManager(Util):
             return (False, errorInfo)
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getCustomizedPushedTenderListByUserID(info=info)
+        info['tenderTag'] = PUSH_TENDER_INFO_TAG_CUS
+        return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
     def __generateUserInfo(self, o):
         res = {}
