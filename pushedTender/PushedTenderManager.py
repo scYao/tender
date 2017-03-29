@@ -20,12 +20,13 @@ from datetime import datetime
 from sqlalchemy import func, desc, and_, or_
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
-from tool.tagconfig import  MESSAGE_PUSH_DIC
+from tool.tagconfig import  MESSAGE_PUSH_DIC, MESSAGE_ASSIGN_DIC
 
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
 from models.UserInfo import UserInfo
 from models.Tender import Tender
+from models.CustomizedTender import CustomizedTender
 from models.Operator import Operator
 from models.Token import Token
 from models.City import City
@@ -279,18 +280,18 @@ class PushedTenderManager(Util):
         return res
 
     #
-    def createUpdateMessage(self, info):
-        userType = info['userType']
+    def createAssignMessage(self, info):
+        tag = info['tag']
         pushedID = info['pushedID']
         messageManager = MessageManager()
         toUserQuery = db.session.query(UserInfo).filter(
-            UserInfo.userType == MESSAGE_PUSH_TOUSER_TYPE[userType]
+            UserInfo.userType == MESSAGE_ASSIGN_DIC[tag]
         )
         toUserResult = toUserQuery.first()
         if toUserResult:
             info['toUserID'] = toUserResult.userID
-            info['description'] = MESSAGE_PUSH_TOUSER_TYPE['description']
-            info['messageTag'] = MESSAGE_PUSH_TOUSER_TYPE['tag']
+            info['description'] = MESSAGE_ASSIGN_DIC['description']
+            info['messageTag'] = MESSAGE_ASSIGN_DIC['tag']
             info['foreignID'] = pushedID
             (status, result) = messageManager.createOAMessage(info=info)
             return (True, None)
@@ -336,7 +337,7 @@ class PushedTenderManager(Util):
                 updateInfo, synchronize_session=False
             )
             if userType == USER_TAG_BOSS:
-                self.createUpdateMessage(info=info)
+                self.createAssignMessage(info=info)
             else:
                 self.createPushMessage(info=info)
             db.session.commit()
@@ -353,6 +354,13 @@ class PushedTenderManager(Util):
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
         return res
+
+    def __generateCustomizedPushedBrief(self, result):
+        res = {}
+        res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
+        res.update(CustomizedTender.generate(c=result.Tender))
+        return res
+
 
     # 经办人 获取我的推送列表, 其他人获取经办人推送列表
     def getPushedTenderListByUserID(self, info):
@@ -376,6 +384,41 @@ class PushedTenderManager(Util):
             count = count[0]
             allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(pageCount).all()
             dataList = [self.__generatePushedBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    # 自定义的招标信息，　经办人 获取我的推送列表, 其他人获取经办人推送列表
+    def getCustomizedPushedTenderListByUserID(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        userID = info['userID']
+
+        try:
+            query = db.session.query(
+                PushedTenderInfo
+            ).filter(
+                PushedTenderInfo.userID == userID
+            )
+            countQuery = db.session.query(
+                func.count(PushedTenderInfo.pushedID), CustomizedTender
+            ).outerjoin(
+                CustomizedTender, CustomizedTender.tenderID == PushedTenderInfo.tenderID
+            ).filter(
+                PushedTenderInfo.userID == userID
+            )
+            count = countQuery.first()
+            count = count[0]
+            allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(
+                pageCount).all()
+            dataList = [self.__generateCustomizedPushedBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
@@ -990,7 +1033,7 @@ class PushedTenderManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['step'] = DOING_STEP
+        info['step'] = DONE_STEP
         if userType == USER_TAG_OPERATOR:
             return self.__getTenderDoingList(info=info)
         else:
@@ -1025,12 +1068,13 @@ class PushedTenderManager(Util):
     # 经办人特殊, 获取自己参与的, 历史记录
     def getTenderHistoryList(self, jsonInfo):
         info = json.loads(jsonInfo)
+        print info
         userType = info['userType']
         (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['step'] = DOING_STEP
+        info['step'] = HISTORY_STEP
         if userType == USER_TAG_OPERATOR:
             return self.__getTenderDoingList(info=info)
         else:

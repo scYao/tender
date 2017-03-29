@@ -161,6 +161,18 @@ class OperatorManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
+    # 获取经办人的推送列表,其他途经
+    def getCustomizedPushedListByOperator(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getCustomizedPushedTenderListByUserID(info=info)
+
     def __generateUserInfo(self, o):
         res = {}
         res['userID'] = o.userID
