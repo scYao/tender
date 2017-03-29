@@ -42,6 +42,14 @@ MESSAGE_PUSH_DIC = {
     'tag': 1
 }
 
+MESSAGE_ASSIGN_DIC = {
+    'title': '分配消息',
+    3: USER_TAG_BOSS,
+    1: USER_TAG_RESPONSIBLEPERSON,
+    'description': '新的分配消息',
+    'tag': 1
+}
+
 
 # 创建经办人, 是否同意
 OPERATOR_TAG_CREATED = 0

@@ -20,7 +20,7 @@ from datetime import datetime
 from sqlalchemy import func, desc, and_, or_
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
-from tool.tagconfig import  MESSAGE_PUSH_DIC
+from tool.tagconfig import  MESSAGE_PUSH_DIC, MESSAGE_ASSIGN_DIC
 
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
@@ -283,18 +283,18 @@ class PushedTenderManager(Util):
         return res
 
     #
-    def createUpdateMessage(self, info):
-        userType = info['userType']
+    def createAssignMessage(self, info):
+        tag = info['tag']
         pushedID = info['pushedID']
         messageManager = MessageManager()
         toUserQuery = db.session.query(UserInfo).filter(
-            UserInfo.userType == MESSAGE_PUSH_TOUSER_TYPE[userType]
+            UserInfo.userType == MESSAGE_ASSIGN_DIC[tag]
         )
         toUserResult = toUserQuery.first()
         if toUserResult:
             info['toUserID'] = toUserResult.userID
-            info['description'] = MESSAGE_PUSH_TOUSER_TYPE['description']
-            info['messageTag'] = MESSAGE_PUSH_TOUSER_TYPE['tag']
+            info['description'] = MESSAGE_ASSIGN_DIC['description']
+            info['messageTag'] = MESSAGE_ASSIGN_DIC['tag']
             info['foreignID'] = pushedID
             (status, result) = messageManager.createOAMessage(info=info)
             return (True, None)
@@ -340,7 +340,7 @@ class PushedTenderManager(Util):
                 updateInfo, synchronize_session=False
             )
             if userType == USER_TAG_BOSS:
-                self.createUpdateMessage(info=info)
+                self.createAssignMessage(info=info)
             else:
                 self.createPushMessage(info=info)
             db.session.commit()
