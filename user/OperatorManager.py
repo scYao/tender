@@ -28,6 +28,7 @@ from models.ImgPath import ImgPath
 from ResponsiblePersonManager import ResponsiblePersonManager
 from pushedTender.PushedTenderManager import PushedTenderManager
 from image.ImageManager import ImageManager
+from tender.CustomizedTenderManager import CustomizedTenderManager
 
 
 class OperatorManager(Util):
@@ -44,6 +45,21 @@ class OperatorManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         info['userID'] = userID
+        return pushedTenderManager.createPushedTender(info)
+
+    # 创建推送, 自定义标
+    def createCustomizedTenderByOperator(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        customizedTenderManager = CustomizedTenderManager()
+        (status, tenderID) = customizedTenderManager.createCustomizedTender(info=info, imgFileList=imgFileList)
+        info['tenderID'] = tenderID
+        pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info)
 
     #添加项目信息
