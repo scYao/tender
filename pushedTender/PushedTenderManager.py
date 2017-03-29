@@ -1036,7 +1036,7 @@ class PushedTenderManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['step'] = DOING_STEP
+        info['step'] = DONE_STEP
         if userType == USER_TAG_OPERATOR:
             return self.__getTenderDoingList(info=info)
         else:
@@ -1071,12 +1071,13 @@ class PushedTenderManager(Util):
     # 经办人特殊, 获取自己参与的, 历史记录
     def getTenderHistoryList(self, jsonInfo):
         info = json.loads(jsonInfo)
+        print info
         userType = info['userType']
         (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['step'] = DOING_STEP
+        info['step'] = HISTORY_STEP
         if userType == USER_TAG_OPERATOR:
             return self.__getTenderDoingList(info=info)
         else:
