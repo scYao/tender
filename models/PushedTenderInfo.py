@@ -16,6 +16,7 @@ class PushedTenderInfo(db.Model):
     auditorPushedTime = db.Column(db.DateTime)
     state = db.Column(db.Integer)
     step = db.Column(db.Integer)
+    tag = db.Column(db.Integer)
     tenderID = db.Column(db.String(100))
     #进行中字段
     projectManagerName = db.Column(db.String(100))
@@ -53,7 +54,7 @@ class PushedTenderInfo(db.Model):
                  Q2=0, deductedRate1=0, deductedRate2=0,
                  workerName='', candidateName1='', candidatePrice1=0,
                  candidateName2='', candidatePrice2=0, candidateName3='',
-                 candidatePrice3=0):
+                 candidatePrice3=0, tag=0):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -85,6 +86,7 @@ class PushedTenderInfo(db.Model):
         self.candidatePrice2 = candidatePrice2
         self.candidateName3 = candidateName3
         self.candidatePrice3 = candidatePrice3
+        self.tag = tag
 
     @staticmethod
     def create(info):

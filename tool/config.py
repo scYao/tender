@@ -181,6 +181,12 @@ ErrorInfo['TENDER_30'] = {
     'info' : 'update pushed tender info step error!',
     'zhInfo' : '更新进度失败'
 }
+
+ErrorInfo['TENDER_31'] = {
+    'code' : 'TENDER_31',
+    'info' : 'upload file error!',
+    'zhInfo' : '上传文件错误'
+}
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRA\n
