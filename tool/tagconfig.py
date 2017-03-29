@@ -32,15 +32,16 @@ USER_TAG_DIC = {
 #添加消息场景，
 # 1,推送消息　create_pushed_tender_by_operator, create_pushed_tender_by_resp, create_pushed_tender_by_auditor,
 #create_pushed_tender_by_boss
-MESSAGE_PUSH_TOUSER_TYPE = {
+MESSAGE_PUSH_DIC = {
     'title': '推送消息',
     4: USER_TAG_RESPONSIBLEPERSON,
     3: USER_TAG_AUDITOR,
     2: USER_TAG_BOSS,
-    1: USER_TAG_RESPONSIBLEPERSON,
+    1: USER_TAG_BOSS,
     'description': '推送了一条新的消息',
     'tag': 1
 }
+
 
 # 创建经办人, 是否同意
 OPERATOR_TAG_CREATED = 0

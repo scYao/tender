@@ -20,7 +20,7 @@ from datetime import datetime
 from sqlalchemy import func, desc, and_, or_
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
-from tool.tagconfig import  MESSAGE_PUSH_TOUSER_TYPE
+from tool.tagconfig import  MESSAGE_PUSH_DIC
 
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
@@ -84,23 +84,26 @@ class PushedTenderManager(Util):
         #     return (False, errorInfo)
         # return (True, result.Token.userID)
 
-    def createMessage(self, info):
+    def createPushMessage(self, info):
         tag = info['tag']
         pushedID = info['pushedID']
         messageManager = MessageManager()
         toUserQuery = db.session.query(UserInfo).filter(
-            UserInfo.userType == MESSAGE_PUSH_TOUSER_TYPE[tag]
+            UserInfo.userType == MESSAGE_PUSH_DIC[tag]
         )
         toUserResult = toUserQuery.first()
         if toUserResult:
             info['toUserID'] = toUserResult.userID
-            info['description'] = MESSAGE_PUSH_TOUSER_TYPE['description']
-            info['messageTag'] = MESSAGE_PUSH_TOUSER_TYPE['tag']
+            info['description'] = MESSAGE_PUSH_DIC['description']
+            info['messageTag'] = MESSAGE_PUSH_DIC['tag']
             info['foreignID'] = pushedID
             (status, result) = messageManager.createOAMessage(info=info)
             return (True, None)
         else:
             return (False, None)
+
+
+
 
 
     # 经办人 负责人 审核人 创建推送
@@ -130,7 +133,7 @@ class PushedTenderManager(Util):
             if result:
                 return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
-            self.createMessage(info=info)
+            self.createPushMessage(info=info)
             db.session.commit()
             return (True, pushedID)
         except Exception as e:
@@ -279,11 +282,30 @@ class PushedTenderManager(Util):
         #                 'userID': ''})
         return res
 
+    #
+    def createUpdateMessage(self, info):
+        userType = info['userType']
+        pushedID = info['pushedID']
+        messageManager = MessageManager()
+        toUserQuery = db.session.query(UserInfo).filter(
+            UserInfo.userType == MESSAGE_PUSH_TOUSER_TYPE[userType]
+        )
+        toUserResult = toUserQuery.first()
+        if toUserResult:
+            info['toUserID'] = toUserResult.userID
+            info['description'] = MESSAGE_PUSH_TOUSER_TYPE['description']
+            info['messageTag'] = MESSAGE_PUSH_TOUSER_TYPE['tag']
+            info['foreignID'] = pushedID
+            (status, result) = messageManager.createOAMessage(info=info)
+            return (True, None)
+        else:
+            return (False, None)
+
     # 负责人或审核人推送, 从上一级或上两级中继续推送
     def updatePushedTenderInfo(self, info):
         pushedID = info['pushedID']
         userType = info['userType']
-
+        info['tag'] = userType
         try:
             query = db.session.query(PushedTenderInfo).filter(
                 PushedTenderInfo.pushedID == pushedID
@@ -317,7 +339,10 @@ class PushedTenderManager(Util):
             query.update(
                 updateInfo, synchronize_session=False
             )
-
+            if userType == USER_TAG_BOSS:
+                self.createUpdateMessage(info=info)
+            else:
+                self.createPushMessage(info=info)
             db.session.commit()
             return (True, None)
         except Exception as e:
@@ -979,13 +1004,16 @@ class PushedTenderManager(Util):
         tenderID = info['tenderID']
         try:
             query = db.session.query(PushedTenderInfo).filter(PushedTenderInfo.tenderID == tenderID)
-            tenderQuery = db.session.query(Tender).filter(Tender.tenderID == tenderID)
+            tenderQuery = db.session.query(Tender, City).outerjoin(
+                City, Tender.cityID == City.cityID
+            ).filter(Tender.tenderID == tenderID)
             result = query.first()
             tenderResult = tenderQuery.first()
             if result and tenderResult:
                 callBackInfo = {}
                 callBackInfo.update(PushedTenderInfo.generate(c=result))
-                callBackInfo.update(Tender.generateBrief(tender=tenderResult))
+                callBackInfo.update(Tender.generateBrief(tender=tenderResult.Tender))
+                callBackInfo.update(City.generate(city=tenderResult.City))
                 return (True, callBackInfo)
             else:
                 return (False, ErrorInfo['TENDER_28'])
