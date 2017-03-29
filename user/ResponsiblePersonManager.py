@@ -13,8 +13,7 @@ from sqlalchemy import and_, text, func, desc
 
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS, \
-    PUSH_TENDER_INFO_TAG_TENDER
+from tool.tagconfig import OPERATOR_TAG_CREATED, PUSH_TENDER_INFO_TAG_CUS, PUSH_TENDER_INFO_TAG_TENDER
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 
 from models.flask_app import db
@@ -23,6 +22,7 @@ from models.Operator import Operator
 from models.PushedTenderInfo import PushedTenderInfo
 from models.Token import Token
 
+from tender.CustomizedTenderManager import CustomizedTenderManager
 from pushedTender.PushedTenderManager import PushedTenderManager
 from pushedTender.TenderCommentManager import TenderCommentManager
 
@@ -43,6 +43,22 @@ class ResponsiblePersonManager(Util):
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.createPushedTender(info=info)
 
+    # 创建推送, 自定义标
+    def createCustomizedTenderByResp(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        customizedTenderManager = CustomizedTenderManager()
+        (status, tenderID) = customizedTenderManager.createCustomizedTender(info=info, imgFileList=imgFileList)
+        info['tenderID'] = tenderID
+        pushedTenderManager = PushedTenderManager()
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_CUS
+        return pushedTenderManager.createPushedTender(info)
+
     def createQuotedPriceByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
@@ -52,7 +68,6 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
-        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_CUS
         return pushedTenderManager.createQuotedPrice(info=info)
 
     # 负责人从经办人推送列表推送

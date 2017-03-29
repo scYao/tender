@@ -40,7 +40,7 @@ class CustomizedTender(db.Model):
         res = {}
         res['tenderID'] = c.tenderID
         res['title'] = c.title
-        res['createTime'] = c.createTime
+        res['createTime'] = str(c.createTime)[0:10]
         res['userID'] = c.userID
         res['url'] = c.url
         return res

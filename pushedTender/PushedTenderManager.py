@@ -7,7 +7,8 @@ import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
     PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_MAKE_BIDDING_BOOK, \
-    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY, PUSH_TENDER_INFO_TAG_TENDER
+    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY, PUSH_TENDER_INFO_TAG_TENDER, \
+    PUSH_TENDER_INFO_TAG_CUS
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -265,19 +266,22 @@ class PushedTenderManager(Util):
 
     def __generateUndistributedBrief(self, result):
         res = {}
-        res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
+        # res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
         res.update(Operator.generate(c=result.Operator))
-        # if result.Operator:
-        #     query = db.session.query(UserInfo).filter(UserInfo.userID == result.Operator.userID)
-        #     userInfo = query.first()
-        #     res.update(UserInfo.generateBrief(userInfo))
-        #     res.update(Operator.generate(c=result.Operator))
-        # else:
-        #     res.update({'state': -1,
-        #                 'userName': '',
-        #                 'userID': ''})
+        res['customized'] = False
         return res
+
+    def __generateCusUndistributedBrief(self, result):
+        res = {}
+        # res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
+        res.update(CustomizedTender.generate(c=result.CustomizedTender))
+        res.update(Operator.generate(c=result.Operator))
+        res['publishDate'] = res['createTime']
+        res['customized'] = True
+        return res
+
+
 
     #
     def createAssignMessage(self, info):
@@ -358,7 +362,7 @@ class PushedTenderManager(Util):
     def __generateCustomizedPushedBrief(self, result):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
-        res.update(CustomizedTender.generate(c=result.Tender))
+        res.update(CustomizedTender.generate(c=result.CustomizedTender))
         return res
 
 
@@ -403,9 +407,12 @@ class PushedTenderManager(Util):
 
         try:
             query = db.session.query(
-                PushedTenderInfo
+                PushedTenderInfo, CustomizedTender
+            ).outerjoin(
+                CustomizedTender, PushedTenderInfo.tenderID == CustomizedTender.tenderID
             ).filter(
-                PushedTenderInfo.userID == userID
+                and_(PushedTenderInfo.userID == userID,
+                     PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_CUS)
             )
             countQuery = db.session.query(
                 func.count(PushedTenderInfo.pushedID), CustomizedTender
@@ -425,6 +432,7 @@ class PushedTenderManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -568,22 +576,26 @@ class PushedTenderManager(Util):
             # 负责人查询
             if userType == USER_TAG_RESPONSIBLEPERSON:
                 query = query.filter(
-                    PushedTenderInfo.responsiblePersonPushedTime != None
+                    and_(PushedTenderInfo.responsiblePersonPushedTime != None,
+                         PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_TENDER)
                 ).order_by(desc(
                     PushedTenderInfo.responsiblePersonPushedTime
                 ))
                 countQuery = countQuery.filter(
-                    PushedTenderInfo.responsiblePersonPushedTime != None
+                    and_(PushedTenderInfo.responsiblePersonPushedTime != None,
+                         PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_TENDER)
                 )
             #     审核人查询
             elif userType == USER_TAG_AUDITOR:
                 query = query.filter(
-                    PushedTenderInfo.auditorPushedTime != None
+                    and_(PushedTenderInfo.auditorPushedTime != None,
+                         PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_TENDER)
                 ).order_by(desc(
                     PushedTenderInfo.auditorPushedTime
                 ))
                 countQuery = countQuery.filter(
-                    PushedTenderInfo.auditorPushedTime != None
+                    and_(PushedTenderInfo.auditorPushedTime != None,
+                         PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_TENDER)
                 )
             allResult = query.offset(startIndex).limit(pageCount).all()
             count = countQuery.first()
@@ -642,21 +654,44 @@ class PushedTenderManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         try:
-            # 获取所有已同意投标，并且状态时未开始的标段
-            query = db.session.query(
-                PushedTenderInfo, Operator, Tender
+            # 区分出tender cus
+            result = db.session.query(
+                PushedTenderInfo, Operator
             ).outerjoin(
                 Operator, PushedTenderInfo.tenderID == Operator.tenderID
-            ).outerjoin(
-                Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).filter(and_(
                 PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
                 PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
                 or_(Operator.userID == '-1',
                     Operator.state == 2)
-            ))
+            )).order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(pageCount).all()
+            allTenderIDList = [o.PushedTenderInfo.tenderID for o in result]
 
-            pushedInfoResult = query.offset(startIndex).limit(pageCount).all()
+            tenderIDInCusResult = db.session.query(CustomizedTender).filter(
+                CustomizedTender.tenderID.in_(tuple(allTenderIDList))
+            ).all()
+
+            cusTenderList = [o.tenderID for o in tenderIDInCusResult]
+
+            tenderIDList = [o for o in allTenderIDList if o not in cusTenderList]
+
+
+            # 获取所有已同意投标，并且状态时未开始的标段
+            query = db.session.query(
+                Tender, Operator
+            ).outerjoin(
+                Operator, Tender.tenderID == Operator.tenderID
+            ).filter(Tender.tenderID.in_(tuple(tenderIDList)))
+            # tender表中的
+            pushedInfoResult = query.all()
+
+            cusQuery = db.session.query(
+                CustomizedTender, Operator
+            ).outerjoin(
+                Operator, Operator.tenderID == CustomizedTender.tenderID
+            ).filter(CustomizedTender.tenderID.in_(tuple(cusTenderList)))
+            cusPushedInfoResult = cusQuery.all()
+
             userIDTuple = (o.Operator.userID for o in pushedInfoResult)
 
             userQuery = db.session.query(UserInfo).filter(
@@ -668,6 +703,10 @@ class PushedTenderManager(Util):
                 userDic[o.userID] = o.userName
 
             resultList = [self.__generateUndistributedBrief(result=o) for o in pushedInfoResult]
+            cusResultList = [self.__generateCusUndistributedBrief(result=o) for o in cusPushedInfoResult]
+
+            resultList.extend(cusResultList)
+
             for o in resultList:
                 if o['userID'] != '-1':
                     o['userName'] = userDic[o['userID']]
@@ -1083,4 +1122,11 @@ class PushedTenderManager(Util):
     def getTenderHistoryDetail(self, jsonInfo):
         pass
 
+if __name__ == '__main__':
+    l = [i for i in xrange(0, 10)]
 
+    l1 = [i for i in xrange(0, 5)]
+
+    l2 = [i for i in l if i not in l1]
+    print l1
+    print l2

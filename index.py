@@ -1783,6 +1783,33 @@ def create_pushed_tender_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+
+# 创建推送, 自定义标, 负责人
+@app.route('/create_customized_tender_by_resp/', methods=['POST', 'GET'])
+def create_customized_tender_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        info = json.loads(paramsJson)
+        imgNameList = info['imgNameList']
+        imgList = []
+        for img in imgNameList:
+            _imgName = img['imgName']
+            f = request.files[_imgName]
+            imgName = f.filename
+            imgDic = {}
+            imgDic['imgName'] = imgName
+            imgDic['file'] = f
+            imgList.append(imgDic)
+        (status, result) = responsiblePersonManager.createCustomizedTenderByResp(jsonInfo=paramsJson, imgFileList=imgList)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 #审核人创建推送
 @app.route('/create_pushed_tender_by_auditor/', methods=['POST', 'GET'])
 def create_pushed_tender_by_auditor():
@@ -1834,6 +1861,33 @@ def create_pushed_tender_by_boss():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.createPushedTenderByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人创建推送, 自定义标段
+@app.route('/create_customized_tender_by_boss/', methods=['POST', 'GET'])
+def create_customized_tender_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        info = json.loads(paramsJson)
+        imgNameList = info['imgNameList']
+        imgList = []
+        for img in imgNameList:
+            _imgName = img['imgName']
+            f = request.files[_imgName]
+            imgName = f.filename
+            imgDic = {}
+            imgDic['imgName'] = imgName
+            imgDic['file'] = f
+            imgList.append(imgDic)
+        (status, result) = bossManager.createCustomizedTenderByBoss(jsonInfo=paramsJson, imgFileList=imgList)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

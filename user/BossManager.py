@@ -1,6 +1,7 @@
 # coding=utf8
 import sys
 import json
+from tender.CustomizedTenderManager import CustomizedTenderManager
 
 from user.UserManager import UserManager
 
@@ -19,7 +20,7 @@ from models.PushedTenderInfo import PushedTenderInfo
 from models.TenderComment import TenderComment
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
+from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from pushedTender.TenderCommentManager import TenderCommentManager
 
@@ -42,6 +43,22 @@ class BossManager(Util):
         info['tag'] = USER_TAG_BOSS
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
+
+    # 创建推送, 自定义标
+    def createCustomizedTenderByBoss(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        customizedTenderManager = CustomizedTenderManager()
+        (status, tenderID) = customizedTenderManager.createCustomizedTender(info=info, imgFileList=imgFileList)
+        info['tenderID'] = tenderID
+        pushedTenderManager = PushedTenderManager()
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_CUS
+        return pushedTenderManager.createPushedTender(info)
 
     # 审定人填写进行中项目的报价信息
     def createQuotedPriceByBoss(self, jsonInfo):
@@ -78,6 +95,7 @@ class BossManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         info['userType'] = USER_TAG_BOSS
+        info['userID'] = userID
         return pushedTenderManager.updatePushedTenderInfo(info=info)
 
     # 决定是否采用该经办人
