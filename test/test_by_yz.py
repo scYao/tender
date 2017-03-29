@@ -677,11 +677,24 @@ def create_user_info_by_boss():
     result = resultManager.getResult(params, upload_url)
     print result
 
+def get_tender_done_detail():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_tender_done_detail/' % LOCALHOST
+    info = {}
+    info['tenderID'] = '2017-03-2715392891b4d932fe879d6f28337e0056054488'
+    info['tokenID'] = '2017-03-290925266599dde9d20f818b7b7c77ddece10adf'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
 
 
 
 if __name__ == '__main__':
-    create_user_info_by_boss()
+    get_tender_done_detail()
+    # create_user_info_by_boss()
     # get_user_info_list_by_boss()
     # operate_pushed_tender_info()
     # get_resp_pushed_list_by_boss()

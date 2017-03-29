@@ -130,12 +130,12 @@ class PushedTenderInfo(db.Model):
         res['step'] = c.step
         res['tenderID'] = c.tenderID
         res['projectManagerName'] = c.projectManagerName
-        res['openedDate'] = c.openedDate
+        res['openedDate'] = str(c.openedDate)
         res['openedLocation'] = c.openedLocation
         res['ceilPrice'] = c.ceilPrice
         res['tenderInfoDescription'] = c.tenderInfoDescription
         res['quotedPrice'] = c.quotedPrice
-        res['quotedDate'] = c.quotedDate
+        res['quotedDate'] = str(c.quotedDate)
         res['quotedDescription'] = c.quotedDescription
         res['averagePrice'] = c.averagePrice
         res['benchmarkPrice'] = c.benchmarkPrice
