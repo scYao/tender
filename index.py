@@ -36,6 +36,7 @@ from user.ResponsiblePersonManager import ResponsiblePersonManager
 from user.AuditorManager import AuditorManager
 from user.BossManager import BossManager
 from pushedTender.PushedTenderManager import PushedTenderManager
+from tender.CustomizedTenderManager import CustomizedTenderManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -1479,6 +1480,32 @@ def create_pushed_tender_by_operator():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = operatorManager.createPushedTenderByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建推送, 自定义标
+@app.route('/create_customized_tender_by_operator/', methods=['POST', 'GET'])
+def create_customized_tender_by_operator():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        info = json.loads(paramsJson)
+        imgNameList = info['imgNameList']
+        imgList = []
+        for img in imgNameList:
+            _imgName = img['imgName']
+            f = request.files[_imgName]
+            imgName = f.filename
+            imgDic = {}
+            imgDic['imgName'] = imgName
+            imgDic['file'] = f
+            imgList.append(imgDic)
+        (status, result) = operatorManager.createCustomizedTenderByOperator(jsonInfo=paramsJson, imgFileList=imgList)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

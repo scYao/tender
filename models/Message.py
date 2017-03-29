@@ -18,7 +18,7 @@ class Message(db.Model):
     description = db.Column(db.Text)
     createTime = db.Column(db.DateTime)
     tag = db.Column(db.Integer)
-    state = db.Column(db.Boolean)
+    state = db.Column(db.Integer)
 
     fromUserID_FK = relationship("UserInfo", foreign_keys=[fromUserID])
     toUserID_FK = relationship("UserInfo", foreign_keys=[toUserID])

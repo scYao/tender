@@ -112,7 +112,7 @@ create table message(
     description text comment '回复的文本内容',
     createTime datetime comment '回复时间',
     tag int comment '消息类型, 1 推送消息',
-    state tinyint(1) comment '是否已读，0未读, 1已读'
+    state int comment '是否已读，0未读, 1已读'
 );
 
 ALTER TABLE pushedTenderInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
