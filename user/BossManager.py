@@ -1,6 +1,9 @@
 # coding=utf8
 import sys
 import json
+
+from user.UserManager import UserManager
+
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -164,3 +167,28 @@ class BossManager(Util):
         pushedTenderManager = PushedTenderManager()
         info['userID'] = userID
         return pushedTenderManager.getTenderDoingDetail(info=info)
+
+
+    #账号管理,获取员工列表
+    def getUserInfoListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        userManager = UserManager()
+        return userManager.getOAUserInfoList(info=info)
+
+    #账号管理，创建新员工
+    def createUserInfoByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['OAUserType'] = info['userType']
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        userManager = UserManager()
+        return userManager.createOAUserInfo(info=info)
+

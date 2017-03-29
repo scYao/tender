@@ -20,6 +20,7 @@ from datetime import datetime
 from sqlalchemy import func, desc, and_, or_
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
+from tool.tagconfig import MESSAGE_TAG_PUSH
 
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
@@ -83,42 +84,10 @@ class PushedTenderManager(Util):
         #     return (False, errorInfo)
         # return (True, result.Token.userID)
 
-    def createMessage(self, info):
-        userID = info['userID']
-        pushedID = info['pushedID']
-        tag = info['tag']
-        userResult = db.session.query(UserInfo).filter(
-            UserInfo.userID == userID
-        ).first()
-        if userResult is None:
-            return (False, ErrorInfo['TENDER_23'])
-        companyID = userResult.customizedCompanyID
-        query = db.session.query(UserInfo).filter(
-            and_(UserInfo.customizedCompanyID == companyID,
-                 UserInfo.userType == tag)
-        )
-        responResult = query.first()
-        if responResult:
-            toUserID = responResult.userID
-            # 发送消息给负责人
-            messageInfo = {}
-            messageInfo['fromUserID'] = userID
-            messageInfo['pushedID'] = pushedID
-            messageInfo['toUserID'] = toUserID
-            messageInfo['tag'] = 1
-            messageInfo['description'] = ''
-            messageInfo['foreignID'] = info['tenderID']
-            messageManager = MessageManager()
-            return messageManager.createMessage(messageInfo)
-        return (False, None)
-
     # 经办人 负责人 审核人 创建推送
     def createPushedTender(self, info):
         tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
+        userID = info['userID']
         pushedID = self.generateID(userID + info['tenderID'])
         info['pushedID'] = pushedID
         info['userID'] = userID
@@ -143,7 +112,12 @@ class PushedTenderManager(Util):
                 return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
             #推送消息
-            (status, result) = self.createMessage(info=info)
+            messageManager = MessageManager()
+            info['messageTag'] = MESSAGE_TAG_PUSH
+            toUserQuery = db.session.query(UserInfo).filter(
+                UserInfo.userType == ''
+            )
+            (status, result) = messageManager.createOAMessage(info=info)
             db.session.commit()
             return (True, pushedID)
         except Exception as e:
@@ -783,8 +757,6 @@ class PushedTenderManager(Util):
 
     def __getProjectInfoInDoingDetail(self, info):
         operatorID = info['operatorID']
-        userID = info['userID']
-
         res = {}
         res['projectManagerName'] = ''
         res['openedDate'] = ''

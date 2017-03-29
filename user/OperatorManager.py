@@ -43,6 +43,7 @@ class OperatorManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
+        info['userID'] = userID
         return pushedTenderManager.createPushedTender(info)
 
     #添加项目信息
@@ -98,10 +99,6 @@ class OperatorManager(Util):
         info = json.loads(jsonInfo)
         operatorID = info['operatorID']
         info['createTime'] = datetime.now()
-
-        (status, operationID) = self.createOperation(jsonInfo=jsonInfo)
-        if status is not True:
-            return (False, operationID)
 
         operationID = self.generateID(operatorID)
         info['operationID'] = operationID

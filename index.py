@@ -1999,3 +1999,32 @@ def get_doing_detail_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+#企业账号管理，成员列表
+@app.route('/get_user_info_list_by_boss/', methods=['POST', 'GET'])
+def get_user_info_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getUserInfoListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+#企业账号管理，新建成员
+@app.route('/create_user_info_by_boss/', methods=['POST', 'GET'])
+def create_user_info_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.createUserInfoByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
