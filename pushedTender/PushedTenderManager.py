@@ -26,6 +26,7 @@ from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
 from models.UserInfo import UserInfo
 from models.Tender import Tender
+from models.CustomizedTender import CustomizedTender
 from models.Operator import Operator
 from models.Token import Token
 from models.City import City
@@ -358,6 +359,13 @@ class PushedTenderManager(Util):
         res.update(Tender.generateBrief(tender=result.Tender))
         return res
 
+    def __generateCustomizedPushedBrief(self, result):
+        res = {}
+        res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
+        res.update(CustomizedTender.generate(c=result.Tender))
+        return res
+
+
     # 经办人 获取我的推送列表, 其他人获取经办人推送列表
     def getPushedTenderListByUserID(self, info):
         startIndex = info['startIndex']
@@ -379,6 +387,41 @@ class PushedTenderManager(Util):
             count = count[0]
             allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(pageCount).all()
             dataList = [self.__generatePushedBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    # 自定义的招标信息，　经办人 获取我的推送列表, 其他人获取经办人推送列表
+    def getCustomizedPushedTenderListByUserID(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        userID = info['userID']
+
+        try:
+            query = db.session.query(
+                PushedTenderInfo
+            ).filter(
+                PushedTenderInfo.userID == userID
+            )
+            countQuery = db.session.query(
+                func.count(PushedTenderInfo.pushedID), CustomizedTender
+            ).outerjoin(
+                CustomizedTender, CustomizedTender.tenderID == PushedTenderInfo.tenderID
+            ).filter(
+                PushedTenderInfo.userID == userID
+            )
+            count = countQuery.first()
+            count = count[0]
+            allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(
+                pageCount).all()
+            dataList = [self.__generateCustomizedPushedBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
