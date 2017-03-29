@@ -98,7 +98,8 @@ class PushedTenderInfo(db.Model):
             auditorPushedTime=info['auditorPushedTime'],
             state=info['state'],
             step=info['step'],
-            tenderID=info['tenderID']
+            tenderID=info['tenderID'],
+            tag=info['pushedTenderInfoTag']
             # projectManagerName=info['projectManagerName'],
             # openedDate=info['openedDate'],
             # openedLocation=info['openedLocation'],

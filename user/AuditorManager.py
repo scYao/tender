@@ -13,7 +13,8 @@ from sqlalchemy import and_, text, func, desc
 
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
+from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS, PUSH_TENDER_INFO_TAG_TENDER, \
+    PUSH_TENDER_INFO_TAG_CUS
 
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
@@ -37,6 +38,7 @@ class AuditorManager(Util):
             return (False, errorInfo)
         info['tag'] = USER_TAG_BOSS
         pushedTenderManager = PushedTenderManager()
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.createPushedTender(info=info)
 
     # 创建推送, 自定义标
@@ -52,6 +54,7 @@ class AuditorManager(Util):
         (status, tenderID) = customizedTenderManager.createCustomizedTender(info=info, imgFileList=imgFileList)
         info['tenderID'] = tenderID
         pushedTenderManager = PushedTenderManager()
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_CUS
         return pushedTenderManager.createPushedTender(info)
 
     # 审核人填写进行中项目的报价信息

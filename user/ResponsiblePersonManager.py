@@ -13,7 +13,8 @@ from sqlalchemy import and_, text, func, desc
 
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
+from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS, \
+    PUSH_TENDER_INFO_TAG_TENDER
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 
 from models.flask_app import db
@@ -39,6 +40,7 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         info['tag'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.createPushedTender(info=info)
 
     def createQuotedPriceByResp(self, jsonInfo):
@@ -50,6 +52,7 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_CUS
         return pushedTenderManager.createQuotedPrice(info=info)
 
     # 负责人从经办人推送列表推送

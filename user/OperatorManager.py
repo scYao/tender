@@ -11,7 +11,8 @@ from sqlalchemy import and_, text, func, desc
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS, \
-    PUSH_TENDER_INFO_TAG_STEP_DONE, PUSH_TENDER_INFO_TAG_STEP_HISTORY
+    PUSH_TENDER_INFO_TAG_STEP_DONE, PUSH_TENDER_INFO_TAG_STEP_HISTORY, PUSH_TENDER_INFO_TAG_CUS, \
+    PUSH_TENDER_INFO_TAG_TENDER
 from tool.tagconfig import OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, BID_DOC_DIRECTORY
 from tool.tagconfig import OPERATION_TAG_MAKE_BIDDING_BOOK, OPERATION_TAG_ATTEND
 
@@ -45,6 +46,7 @@ class OperatorManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         info['userID'] = userID
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.createPushedTender(info)
 
     # 创建推送, 自定义标
@@ -60,6 +62,7 @@ class OperatorManager(Util):
         (status, tenderID) = customizedTenderManager.createCustomizedTender(info=info, imgFileList=imgFileList)
         info['tenderID'] = tenderID
         pushedTenderManager = PushedTenderManager()
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_CUS
         return pushedTenderManager.createPushedTender(info)
 
     #添加项目信息
