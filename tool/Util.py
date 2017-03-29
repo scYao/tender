@@ -38,6 +38,11 @@ class Util:
         bucket = self._getBucket(ossInfo, endpoint='img-cn-hangzhou.aliyuncs.com')
         return bucket.sign_url('GET', obj, 3600)
 
+    def getSecurityFileUrl(self, ossInfo):
+        obj = ossInfo['objectKey']
+        bucket = self._getBucket(ossInfo, endpoint='oss-cn-hangzhou.aliyuncs.com')
+        return bucket.sign_url('GET', obj, 3600)
+
     def _getBucket(self, ossInfo, endpoint='oss-cn-hangzhou.aliyuncs.com'):
         bucketStr = ossInfo['bucket']
         OSSAccessKeyId = 'HReEC1sQufBRLcQC'

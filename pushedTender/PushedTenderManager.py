@@ -716,7 +716,7 @@ class PushedTenderManager(Util):
     def __generateBookInfo(self, bookResult):
         mDic = {}
         ossInfo = {}
-        ossInfo['bucket'] = 'tender'
+        ossInfo['bucket'] = 'sjtender'
         def generateInfo(result):
             operation = result.Operation
             imgPath = result.ImgPath
@@ -724,7 +724,8 @@ class PushedTenderManager(Util):
             if not mDic.has_key(operationID):
                 res = Operation.generate(c=operation)
                 imgList = []
-                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
+                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo,
+                                                hd=True, isFile=True))
                 res['fileList'] = imgList
                 mDic[operationID] = imgList
                 return res
@@ -1006,8 +1007,8 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-        # 经办人特殊, 获取自己参与的, 历史记录
 
+    # 经办人特殊, 获取自己参与的, 历史记录
     def getTenderHistoryList(self, jsonInfo):
         info = json.loads(jsonInfo)
         userType = info['userType']

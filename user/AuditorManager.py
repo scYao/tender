@@ -13,14 +13,9 @@ from sqlalchemy import and_, text, func, desc
 
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
-from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
+from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 
 from models.flask_app import db
-from models.Operator import Operator
-from models.Message import Message
-from models.UserInfo import UserInfo
-from models.Token import Token
 from models.PushedTenderInfo import PushedTenderInfo
 
 from pushedTender.PushedTenderManager import PushedTenderManager
@@ -189,4 +184,5 @@ class AuditorManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
+        info['userID'] = userID
         return pushedTenderManager.getTenderDoingDetail(info=info)

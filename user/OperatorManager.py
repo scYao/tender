@@ -78,12 +78,12 @@ class OperatorManager(Util):
         info['createTime'] = datetime.now()
         try:
             Operation.create(info=info)
-            #如果状态是制作标书，需要上传标书文件
-            if info['tag'] == OPERATION_TAG_MAKE_BIDDING_BOOK:
-                info['directory'] = BID_DOC_DIRECTORY
-                info['foreignID'] = operationID
-                imageManager = ImageManager()
-                imageManager.addImagesWithOSS(info=info)
+            # #如果状态是制作标书，需要上传标书文件
+            # if info['tag'] == OPERATION_TAG_MAKE_BIDDING_BOOK:
+            #     info['directory'] = BID_DOC_DIRECTORY
+            #     info['foreignID'] = operationID
+            #     imageManager = ImageManager()
+            #     imageManager.addImagesWithOSS(info=info)
             db.session.commit()
         except Exception as e:
             print e
@@ -106,14 +106,14 @@ class OperatorManager(Util):
         operationID = self.generateID(operatorID)
         info['operationID'] = operationID
         ossInfo = {}
-        ossInfo['bucket'] = 'sjsecondhand'
+        ossInfo['bucket'] = 'sjtender'
         try:
             index = 0
             for i in imgFileList:
                 imgID = self.generateID(str(index) + i['imgName'])
                 postFix = str(i['imgName']).split('.')
                 if len(postFix) > 0:
-                    postFix = postFix[-1]
+                    postFix = '.' + postFix[-1]
                 else:
                     postFix = ''
                 imgPath = imgID + postFix
@@ -122,6 +122,8 @@ class OperatorManager(Util):
                 db.session.add(imagePath)
                 index = index + 1
                 self.uploadOSSImage('biddocument/%s' % imgPath, ossInfo, i['file'])
+            db.session.commit()
+            return (True, operationID)
         except Exception as e:
             print e
             print 'upload file to oss error'
