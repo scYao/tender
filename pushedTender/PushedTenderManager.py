@@ -7,7 +7,7 @@ import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
     PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_MAKE_BIDDING_BOOK, \
-    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY
+    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY, PUSH_TENDER_INFO_TAG_TENDER
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -103,12 +103,8 @@ class PushedTenderManager(Util):
             return (False, None)
 
 
-
-
-
     # 经办人 负责人 审核人 创建推送
     def createPushedTender(self, info):
-        tokenID = info['tokenID']
         userID = info['userID']
         pushedID = self.generateID(userID + info['tenderID'])
         info['pushedID'] = pushedID
@@ -118,12 +114,12 @@ class PushedTenderManager(Util):
         info['auditorPushedTime'] = None
         info['state'] = 0
         info['step'] = 0
-        tag = info['tag']
-        if tag == USER_TAG_OPERATOR:
+        userType = info['userType']
+        if userType == USER_TAG_OPERATOR:
             info['createTime'] = datetime.now()
-        if tag == USER_TAG_AUDITOR:
+        if userType == USER_TAG_AUDITOR:
             info['auditorPushedTime'] = datetime.now()
-        if tag == USER_TAG_RESPONSIBLEPERSON:
+        if userType == USER_TAG_RESPONSIBLEPERSON:
             info['responsiblePersonPushedTime'] = datetime.now()
         try:
             #判断是否已经创建过推送消息
@@ -133,7 +129,7 @@ class PushedTenderManager(Util):
             if result:
                 return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
-            self.createPushMessage(info=info)
+            # self.createPushMessage(info=info)
             db.session.commit()
             return (True, pushedID)
         except Exception as e:
@@ -370,7 +366,8 @@ class PushedTenderManager(Util):
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).filter(
-                PushedTenderInfo.userID == userID
+                and_(PushedTenderInfo.userID == userID,
+                     PushedTenderInfo.tag == PUSH_TENDER_INFO_TAG_TENDER)
             )
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
                 PushedTenderInfo.userID == userID

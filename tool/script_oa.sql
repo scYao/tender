@@ -12,6 +12,7 @@ create table pushedTenderInfo(
 	auditorPushedTime datetime comment '审核人',
 	state int comment 'boss决定是否投标, 0 未确定, 1 投, 2 放弃',
 	step int comment '0表示未开始，１表示正在进行中，２表示已经完成，３表示历史记录',
+	tag int default 0 comment '0 tender表中的数据, 1 自定义标数据',
 	tenderID nvarchar(100) comment '哪一个标, 不设外键',
 	-- 经办人填写的 在投标中详情中的字段
 	projectManagerName nvarchar(100) comment '项目经理姓名',

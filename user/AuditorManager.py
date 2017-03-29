@@ -20,6 +20,7 @@ from models.PushedTenderInfo import PushedTenderInfo
 
 from pushedTender.PushedTenderManager import PushedTenderManager
 from pushedTender.TenderCommentManager import TenderCommentManager
+from tender.CustomizedTenderManager import CustomizedTenderManager
 
 class AuditorManager(Util):
 
@@ -37,6 +38,21 @@ class AuditorManager(Util):
         info['tag'] = USER_TAG_BOSS
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
+
+    # 创建推送, 自定义标
+    def createCustomizedTenderByAuditor(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        customizedTenderManager = CustomizedTenderManager()
+        (status, tenderID) = customizedTenderManager.createCustomizedTender(info=info, imgFileList=imgFileList)
+        info['tenderID'] = tenderID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.createPushedTender(info)
 
     # 审核人填写进行中项目的报价信息
     def createQuotedPriceByAuditor(self, jsonInfo):

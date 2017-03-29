@@ -61,6 +61,6 @@ class CustomizedTenderManager(Util):
         except Exception as e:
             print e
             print 'upload file to oss error'
-            errorInfo = ErrorInfo['SPORTS_16']
+            errorInfo = ErrorInfo['TENDER_31']
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
