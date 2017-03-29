@@ -1012,11 +1012,8 @@ class PushedTenderManager(Util):
             if result and tenderResult:
                 callBackInfo = {}
                 callBackInfo.update(PushedTenderInfo.generate(c=result))
-                print '2222', callBackInfo
                 callBackInfo.update(Tender.generateBrief(tender=tenderResult.Tender))
-                print '3333', callBackInfo
                 callBackInfo.update(City.generate(city=tenderResult.City))
-                print '4444', callBackInfo
                 return (True, callBackInfo)
             else:
                 return (False, ErrorInfo['TENDER_28'])
