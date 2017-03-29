@@ -197,13 +197,14 @@ class MessageManager(Util):
         description = info['description']
         # 用以区分消息类型 1 代表推送消息
         tag = info['messageTag']
-        fromUserID = info['fromUserID']
+        fromUserID = info['userID']
         toUserID = info['toUserID']
         messageID = self.generateID(foreignID + description)
+        createTime = datetime.now()
         try:
-            message = Message(messageID=messageID, foreignID=foreignID,
-                              fromUserID=fromUserID, toUserID=toUserID,
-                              description=description, tag=tag)
+            message = Message(messageID=messageID, foreignID=foreignID, fromUserID=fromUserID,
+                              toUserID=toUserID, description=description, tag=tag,
+                              createTime=createTime)
             db.session.add(message)
             db.session.commit()
             return (True, messageID)

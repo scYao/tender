@@ -29,14 +29,17 @@ USER_TAG_DIC = {
 }
 
 # 消息类型
-MESSAGE_TAG_PUSH = 1 # 推送消息
 #添加消息场景，
-# 1,推送消息　create_pushed_tender_by_operator
+# 1,推送消息　create_pushed_tender_by_operator, create_pushed_tender_by_resp, create_pushed_tender_by_auditor,
+#create_pushed_tender_by_boss
 MESSAGE_PUSH_TOUSER_TYPE = {
+    'title': '推送消息',
     4: USER_TAG_RESPONSIBLEPERSON,
     3: USER_TAG_AUDITOR,
     2: USER_TAG_BOSS,
-    1: USER_TAG_RESPONSIBLEPERSON
+    1: USER_TAG_RESPONSIBLEPERSON,
+    'description': '推送了一条新的消息',
+    'tag': 1
 }
 
 # 创建经办人, 是否同意

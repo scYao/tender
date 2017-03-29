@@ -20,7 +20,7 @@ from datetime import datetime
 from sqlalchemy import func, desc, and_, or_
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP
-from tool.tagconfig import MESSAGE_TAG_PUSH
+from tool.tagconfig import  MESSAGE_PUSH_TOUSER_TYPE
 
 from models.flask_app import db
 from models.PushedTenderInfo import PushedTenderInfo
@@ -84,6 +84,25 @@ class PushedTenderManager(Util):
         #     return (False, errorInfo)
         # return (True, result.Token.userID)
 
+    def createMessage(self, info):
+        tag = info['tag']
+        pushedID = info['pushedID']
+        messageManager = MessageManager()
+        toUserQuery = db.session.query(UserInfo).filter(
+            UserInfo.userType == MESSAGE_PUSH_TOUSER_TYPE[tag]
+        )
+        toUserResult = toUserQuery.first()
+        if toUserResult:
+            info['toUserID'] = toUserResult.userID
+            info['description'] = MESSAGE_PUSH_TOUSER_TYPE['description']
+            info['messageTag'] = MESSAGE_PUSH_TOUSER_TYPE['tag']
+            info['foreignID'] = pushedID
+            (status, result) = messageManager.createOAMessage(info=info)
+            return (True, None)
+        else:
+            return (False, None)
+
+
     # 经办人 负责人 审核人 创建推送
     def createPushedTender(self, info):
         tokenID = info['tokenID']
@@ -111,13 +130,7 @@ class PushedTenderManager(Util):
             if result:
                 return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
-            #推送消息
-            messageManager = MessageManager()
-            info['messageTag'] = MESSAGE_TAG_PUSH
-            toUserQuery = db.session.query(UserInfo).filter(
-                UserInfo.userType == ''
-            )
-            (status, result) = messageManager.createOAMessage(info=info)
+            self.createMessage(info=info)
             db.session.commit()
             return (True, pushedID)
         except Exception as e:
@@ -339,7 +352,7 @@ class PushedTenderManager(Util):
             )
             count = countQuery.first()
             count = count[0]
-            allResult = query.offset(startIndex).limit(pageCount).all()
+            allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(pageCount).all()
             dataList = [self.__generatePushedBrief(result=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
@@ -966,9 +979,13 @@ class PushedTenderManager(Util):
         tenderID = info['tenderID']
         try:
             query = db.session.query(PushedTenderInfo).filter(PushedTenderInfo.tenderID == tenderID)
+            tenderQuery = db.session.query(Tender).filter(Tender.tenderID == tenderID)
             result = query.first()
-            if result:
-                callBackInfo = PushedTenderInfo.generate(c=result)
+            tenderResult = tenderQuery.first()
+            if result and tenderResult:
+                callBackInfo = {}
+                callBackInfo.update(PushedTenderInfo.generate(c=result))
+                callBackInfo.update(Tender.generateBrief(tender=tenderResult))
                 return (True, callBackInfo)
             else:
                 return (False, ErrorInfo['TENDER_28'])
