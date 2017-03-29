@@ -1586,7 +1586,8 @@ def create_operation_bidding_book():
         imgNameList = info['imgNameList']
         imgList = []
         for img in imgNameList:
-            f = request.files[img]
+            _imgName = img['imgName']
+            f = request.files[_imgName]
             imgName = f.filename
             imgDic = {}
             imgDic['imgName'] = imgName

@@ -27,7 +27,7 @@ class ImgPath(db.Model):
         self.imgName = imgName
 
     @staticmethod
-    def generate(img, ossInfo, directory, hd=None):
+    def generate(img, ossInfo, directory, hd=None, isFile=False):
         res = {}
         res['imgPathID'] = img.imgPathID
         if hd is not None:
@@ -35,7 +35,10 @@ class ImgPath(db.Model):
         else:
             ossInfo['objectKey'] = '%s/%s@!constrain-300h' % (directory, img.path)
         util = Util()
-        res['imgPath'] = util.getSecurityUrl(ossInfo)
+        if isFile is True:
+            res['imgPath'] = util.getSecurityFileUrl(ossInfo)
+        else:
+            res['imgPath'] = util.getSecurityUrl(ossInfo)
         res['tag'] = img.tag
         res['imgName'] = img.imgName
         return res
