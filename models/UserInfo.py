@@ -6,6 +6,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 from flask_app import db
 from tool.Util import Util
+from tool.tagconfig import USER_TAG_DIC
 
 class UserInfo(db.Model):
     __tablename__ = 'UserInfo'
@@ -82,3 +83,23 @@ class UserInfo(db.Model):
         res['userID'] = userInfo.userID
         res['userName'] = userInfo.userName
         return res
+
+    @staticmethod
+    def generateOAInfo(userInfo):
+        res = {}
+        res['userID'] = userInfo.userID
+        res['userName'] = userInfo.userName
+        res['userType'] = USER_TAG_DIC[userInfo.userType]
+        res['tel'] = userInfo.tel
+        return res
+
+    @staticmethod
+    def create(createInfo):
+        userInfo = UserInfo(
+            userID=createInfo['userID'], userName=createInfo['userName'],
+            tel=createInfo['tel'], userType=createInfo['userType'],
+            customizedCompanyID=createInfo['customizedCompanyID'],
+            password=createInfo['password']
+        )
+        db.session.add(userInfo)
+        return (True, None)

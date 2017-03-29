@@ -18,12 +18,14 @@ class Message(db.Model):
     description = db.Column(db.Text)
     createTime = db.Column(db.DateTime)
     tag = db.Column(db.Integer)
+    state = db.Column(db.Boolean)
 
     fromUserID_FK = relationship("UserInfo", foreign_keys=[fromUserID])
     toUserID_FK = relationship("UserInfo", foreign_keys=[toUserID])
 
     def __init__(self, messageID=None, foreignID=None, fromUserID=None,
-                 toUserID=None, description=None, createTime=None, tag=0):
+                 toUserID=None, description=None, createTime=None, tag=0,
+                 state = False):
         self.messageID = messageID
         self.foreignID = foreignID
         self.fromUserID = fromUserID
@@ -31,6 +33,7 @@ class Message(db.Model):
         self.description = description
         self.createTime = createTime
         self.tag = tag
+        self.state = state
 
     def __repr__(self):
         return self.messageID

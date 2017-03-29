@@ -189,3 +189,28 @@ class MessageManager(Util):
         result['count'] = count[0]
 
         return (True, result)
+
+
+    #创建OA消息
+    def createOAMessage(self, info):
+        foreignID = info['foreignID']
+        description = info['description']
+        # 用以区分消息类型 1 代表推送消息
+        tag = info['messageTag']
+        fromUserID = info['fromUserID']
+        toUserID = info['toUserID']
+        messageID = self.generateID(foreignID + description)
+        try:
+            message = Message(messageID=messageID, foreignID=foreignID,
+                              fromUserID=fromUserID, toUserID=toUserID,
+                              description=description, tag=tag)
+            db.session.add(message)
+            db.session.commit()
+            return (True, messageID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+

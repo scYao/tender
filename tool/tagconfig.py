@@ -21,11 +21,18 @@ USER_TAG_BOSS = 1
 USER_TAG_AUDITOR = 2
 USER_TAG_RESPONSIBLEPERSON = 3
 USER_TAG_OPERATOR = 4
+USER_TAG_DIC = {
+    1: '审定人',
+    2: '审核人',
+    3: '负责人',
+    4: '经办人'
+}
 
 # 消息类型
 MESSAGE_TAG_PUSH = 1 # 推送消息
 MESSAGE_TAG_OPERATOR = 2 # 成功分配经办人
-
+#添加消息场景，
+# 1,推送消息　create_pushed_tender_by_operator
 
 # 创建经办人, 是否同意
 OPERATOR_TAG_CREATED = 0
@@ -58,4 +65,13 @@ OPERATION_TAG_ATTEND = 4   # 现场开标
 
 #标书OSS目录
 BID_DOC_DIRECTORY = 'biddocument'
+
+#公司ID
+CUSTOMIZEDCOMPANYID = '1'
+
+#新建员工默认密码
+DEFAULT_PWD = '123456'
+
+
+
 

@@ -7,7 +7,9 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 from datetime import datetime
+import hashlib
 from sqlalchemy import and_, text, func, desc
+from tool.tagconfig import CUSTOMIZEDCOMPANYID, DEFAULT_PWD
 
 from models.flask_app import db
 from models.UserInfo import UserInfo
@@ -432,3 +434,57 @@ class UserManager(Util):
         resultDic['tokenID'] = tokenID
         resultDic['userType'] = userType
         return (True, resultDic)
+
+    #获取OA用户列表
+    def getOAUserInfoList(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            query = db.session.query(UserInfo).filter(
+                UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID
+            )
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            dataList = [UserInfo.generateOAInfo(result) for result in allResult]
+            countQuery = db.session.query(
+                func.count(UserInfo.userID)
+            ).filter(
+                UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID
+            )
+            count = countQuery.first()
+            count = count[0]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    #创建OA用户
+    def createOAUserInfo(self, info):
+        userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        tel = info['tel'].replace('\'', '\\\'').replace('\"', '\\\"')
+        userID = self.generateID(userName)
+        info['userID'] = userID
+        info['customizedCompanyID'] = CUSTOMIZEDCOMPANYID
+        info['tel'] = tel
+        info['password'] = hashlib.md5(DEFAULT_PWD).hexdigest()
+        info['userType'] = info['OAUserType']
+        try:
+            #判断是否已经存在该员工
+            query = db.session.query(UserInfo).filter(UserInfo.tel == tel)
+            result = query.first()
+            if result is not None:
+                return (False, ErrorInfo['TENDER_07'])
+            UserInfo.create(createInfo=info)
+            db.session.commit()
+            return (True, userID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
