@@ -212,7 +212,6 @@ class ResponsiblePersonManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userType'] = USER_TAG_RESPONSIBLEPERSON
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
 

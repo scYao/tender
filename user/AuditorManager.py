@@ -138,7 +138,7 @@ class AuditorManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
-        info['userType'] = USER_TAG_AUDITOR
+        info['userID'] = userID
         return pushedTenderManager.updatePushedTenderInfo(info=info)
 
     # 审核人获取所有的招标信息列表

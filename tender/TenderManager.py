@@ -21,7 +21,7 @@ from models.Tender import Tender
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from models.PushedTenderInfo import PushedTenderInfo
-from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
+from tool.tagconfig import SEARCH_KEY_TAG_TENDRE, PUSH_TENDER_INFO_TAG_TENDER
 from sqlalchemy import desc, and_, func
 from user.AdminManager import AdminManager
 
@@ -240,6 +240,10 @@ class TenderManager(Util):
             query = query.filter(
                 Tender.publishDate < endDate
             ).filter(Tender.publishDate > startDate)
+
+        query = query.filter(
+            Tender.tenderTag == PUSH_TENDER_INFO_TAG_TENDER
+        )
         info['query'] = query
         return query
 

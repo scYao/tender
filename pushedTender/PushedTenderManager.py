@@ -522,6 +522,7 @@ class PushedTenderManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         userType = info['userType']
+        tenderTag = info['tenderTag']
 
         try:
             query = db.session.query(
@@ -535,22 +536,26 @@ class PushedTenderManager(Util):
             # 负责人查询
             if userType == USER_TAG_RESPONSIBLEPERSON:
                 query = query.filter(
-                    PushedTenderInfo.responsiblePersonPushedTime != None
+                    and_(PushedTenderInfo.responsiblePersonPushedTime != None,
+                         Tender.tenderTag == tenderTag)
                 ).order_by(desc(
                     PushedTenderInfo.responsiblePersonPushedTime
                 ))
                 countQuery = countQuery.filter(
-                    PushedTenderInfo.responsiblePersonPushedTime != None
+                    and_(PushedTenderInfo.responsiblePersonPushedTime != None,
+                         PushedTenderInfo.tag == tenderTag)
                 )
             #     审核人查询
             elif userType == USER_TAG_AUDITOR:
                 query = query.filter(
-                    PushedTenderInfo.auditorPushedTime != None
+                    and_(PushedTenderInfo.auditorPushedTime != None,
+                         Tender.tenderTag == tenderTag)
                 ).order_by(desc(
                     PushedTenderInfo.auditorPushedTime
                 ))
                 countQuery = countQuery.filter(
-                    PushedTenderInfo.auditorPushedTime != None
+                    and_(PushedTenderInfo.auditorPushedTime != None,
+                         PushedTenderInfo.tag == tenderTag)
                 )
             allResult = query.offset(startIndex).limit(pageCount).all()
             count = countQuery.first()

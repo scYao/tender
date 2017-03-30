@@ -123,7 +123,7 @@ class BossManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
 
@@ -150,7 +150,6 @@ class BossManager(Util):
             return (False, errorInfo)
         info['userID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
-        info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
     # 审定人获取待分配列表
