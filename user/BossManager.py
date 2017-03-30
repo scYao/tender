@@ -125,6 +125,8 @@ class BossManager(Util):
             return (False, errorInfo)
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
+        # 此方法同 负责人获取我的推送 所以此处伪装成负责人
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
         return pushedTenderManager.getPushedTenderListByUserType(info=info)
 
     # 审定人获取 审核人的推送列表
