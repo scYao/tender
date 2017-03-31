@@ -47,7 +47,7 @@ class ResponsiblePersonManager(Util):
     # 创建推送, 自定义标
     def createCustomizedTenderByResp(self, jsonInfo, imgFileList):
         info = json.loads(jsonInfo)
-        info['userType'] = USER_TAG_OPERATOR
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']

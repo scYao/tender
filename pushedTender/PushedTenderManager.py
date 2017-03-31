@@ -932,21 +932,24 @@ class PushedTenderManager(Util):
         res['quotedDescription'] = ''
 
 
-        result = db.session.query(PushedTenderInfo).filter(
+        result = db.session.query(PushedTenderInfo, Tender).outerjoin(
+            Tender, PushedTenderInfo.tenderID == Tender.tenderID
+        ).filter(
             PushedTenderInfo.tenderID == tenderID
         ).first()
         if result is not None:
-            res['projectManagerName'] = result.projectManagerName
-            res['openedDate'] = str(result.openedDate)
-            res['openedLocation'] = result.openedLocation
-            res['ceilPrice'] = result.ceilPrice
-            res['tenderInfoDescription'] = result.tenderInfoDescription
-            res['pushedID'] = result.pushedID
+            res['projectManagerName'] = result.PushedTenderInfo.projectManagerName
+            res['openedDate'] = str(result.PushedTenderInfo.openedDate)
+            res['openedLocation'] = result.PushedTenderInfo.openedLocation
+            res['ceilPrice'] = result.PushedTenderInfo.ceilPrice
+            res['tenderInfoDescription'] = result.PushedTenderInfo.tenderInfoDescription
+            res['pushedID'] = result.PushedTenderInfo.pushedID
+            res.update(Tender.generateBrief(tender=result.Tender))
             # 只有经办人能看到
             if info['userType'] == USER_TAG_OPERATOR:
-                res['quotedPrice'] = result.quotedPrice
-                res['quotedDate'] = str(result.quotedDate)
-                res['quotedDescription'] = result.quotedDescription
+                res['quotedPrice'] = result.PushedTenderInfo.quotedPrice
+                res['quotedDate'] = str(result.PushedTenderInfo.quotedDate)
+                res['quotedDescription'] = result.PushedTenderInfo.quotedDescription
             elif info['userType'] == USER_TAG_RESPONSIBLEPERSON:
                 (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
                 res['respQuotedPrice'] = respQuotedPrice
