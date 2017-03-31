@@ -117,8 +117,6 @@ class OperatorManager(Util):
 
     # 上传标书
     def createOperationBiddingBook(self, jsonInfo, imgFileList):
-        info = json.loads(jsonInfo)
-
         (status, operationID) = self.createOperation(jsonInfo=jsonInfo)
         if status is not True:
             return (False, operationID)
