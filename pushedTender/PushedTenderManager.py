@@ -949,8 +949,10 @@ class PushedTenderManager(Util):
             res.update(Tender.generateBrief(tender=result.Tender))
             # 只有经办人能看到
             if info['userType'] == USER_TAG_OPERATOR:
-                res['quotedPrice'] = result.PushedTenderInfo.quotedPrice
-                res['quotedDate'] = str(result.PushedTenderInfo.quotedDate)
+                if result.PushedTenderInfo.quotedPrice > 0:
+                    res['quotedPrice'] = result.PushedTenderInfo.quotedPrice
+                if result.PushedTenderInfo.quotedDate is not None:
+                    res['quotedDate'] = str(result.PushedTenderInfo.quotedDate)
                 res['quotedDescription'] = result.PushedTenderInfo.quotedDescription
             elif info['userType'] == USER_TAG_RESPONSIBLEPERSON:
                 (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
