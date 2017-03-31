@@ -118,11 +118,10 @@ class OperatorManager(Util):
     # 上传标书
     def createOperationBiddingBook(self, jsonInfo, imgFileList):
         info = json.loads(jsonInfo)
-        operatorID = info['operatorID']
-        info['createTime'] = datetime.now()
 
-        operationID = self.generateID(operatorID)
-        info['operationID'] = operationID
+        (status, operationID) = self.createOperation(jsonInfo=jsonInfo)
+        if status is not True:
+            return (False, operationID)
         ossInfo = {}
         ossInfo['bucket'] = 'sjtender'
         try:
