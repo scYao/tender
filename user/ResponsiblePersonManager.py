@@ -41,6 +41,7 @@ class ResponsiblePersonManager(Util):
         info['tag'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
+        info['userID'] = userID
         return pushedTenderManager.createPushedTender(info=info)
 
     # 创建推送, 自定义标
@@ -253,7 +254,7 @@ class ResponsiblePersonManager(Util):
      # 负责人获取 正在进行中的招标详情
     def getDoingDetailByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
-        info['userType'] = USER_TAG_BOSS
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']

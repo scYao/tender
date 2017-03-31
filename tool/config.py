@@ -187,6 +187,12 @@ ErrorInfo['TENDER_31'] = {
     'info' : 'upload file error!',
     'zhInfo' : '上传文件错误'
 }
+
+ErrorInfo['TENDER_32'] = {
+    'code' : 'TENDER_32',
+    'info' : 'get operator error!',
+    'zhInfo' : '获取经办人失败'
+}
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRA\n

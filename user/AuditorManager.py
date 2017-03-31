@@ -197,7 +197,7 @@ class AuditorManager(Util):
     # 审核人获取 正在进行中的招标详情
     def getDoingDetailByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
-        info['userType'] = USER_TAG_BOSS
+        info['userType'] = USER_TAG_AUDITOR
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']

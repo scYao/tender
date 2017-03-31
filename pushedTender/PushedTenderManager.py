@@ -233,6 +233,7 @@ class PushedTenderManager(Util):
     def createQuotedPrice(self, info):
         userID = info['userID']
         tenderID = info['tenderID']
+        userType = info['userType']
         createTime = datetime.now()
         quotedID = self.generateID(userID + tenderID)
         info['quotedID'] = quotedID
@@ -248,10 +249,20 @@ class PushedTenderManager(Util):
             if result is not None:
                 return (False, ErrorInfo['TENDER_29'])#已经填写了报价信息
             QuotedPrice.create(info=info)
+            if userType == USER_TAG_BOSS:
+                pushedQuery = db.session.query(PushedTenderInfo).filter(
+                    PushedTenderInfo.tenderID == tenderID
+                )
+                pushedQuery.update({
+                    PushedTenderInfo.quotedDescription : info['description'],
+                    PushedTenderInfo.quotedDate : createTime,
+                    PushedTenderInfo.quotedPrice : info['price']
+                }, synchronize_session=False)
             db.session.commit()
             return (True, None)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -380,7 +391,8 @@ class PushedTenderManager(Util):
                      Tender.tenderTag == tenderTag)
             )
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
-                PushedTenderInfo.userID == userID
+                and_(PushedTenderInfo.userID == userID,
+                     PushedTenderInfo.tag == tenderTag)
             )
             count = countQuery.first()
             count = count[0]
@@ -421,7 +433,9 @@ class PushedTenderManager(Util):
             ).filter(
                 and_(Operator.userID == userID,
                      PushedTenderInfo.step == step)
-            )
+            ).order_by(desc(
+                PushedTenderInfo.createTime
+            ))
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
                 and_(PushedTenderInfo.userID == userID,
                      PushedTenderInfo.step == step)
@@ -475,7 +489,11 @@ class PushedTenderManager(Util):
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).outerjoin(
                 Operator, PushedTenderInfo.tenderID == Operator.tenderID
-            ).filter(PushedTenderInfo.step == step)
+            ).filter(
+                PushedTenderInfo.step == step
+            ).order_by(desc(
+                PushedTenderInfo.createTime
+            ))
             countQuery = db.session.query(
                 func.count(PushedTenderInfo.pushedID)
             ).filter(PushedTenderInfo.step == step)
@@ -626,6 +644,8 @@ class PushedTenderManager(Util):
                 PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
                 or_(Operator.userID == '-1',
                     Operator.state == 2)
+            )).order_by(desc(
+                PushedTenderInfo.createTime
             ))
 
             pushedInfoResult = query.offset(startIndex).limit(pageCount).all()
@@ -763,6 +783,11 @@ class PushedTenderManager(Util):
         operatorID = info['operatorID']
 
         try:
+            OperatorResult = db.session.query(Operator).filter(
+                Operator.operatorID == operatorID
+            ).first()
+            tenderID = OperatorResult.tenderID
+            info['tenderID'] = tenderID
             query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
             allResult = query.all()
             bookQuery = db.session.query(Operation, ImgPath).outerjoin(
@@ -796,6 +821,8 @@ class PushedTenderManager(Util):
             (status, tenderComment) = self.__getTenderCommentInDoingDetail(info=info)
             resultDic['projectInfo'] = projectInfo
             resultDic['tenderComment'] = tenderComment
+            (status, quoteResult) = self.__getQuotedPriceByTenderID(info=info)
+            resultDic['quoteResult'] = quoteResult
             return (True, resultDic)
         except Exception as e:
             print e
@@ -805,8 +832,95 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-    def __getProjectInfoInDoingDetail(self, info):
+    def __getQuotedPriceByTenderID(self, info):
         operatorID = info['operatorID']
+        userType = info['userType']
+        # 获取该自己公司的负责人 审核人 审定人
+        operatorResult = db.session.query(Operator).filter(
+            Operator.operatorID == operatorID
+        ).first()
+
+        if operatorResult is None:
+            return (False, ErrorInfo['TENDER_32'])
+        userID = operatorResult.userID
+
+        # 获取公司ID, 以后公司多了后 防止出现同一个标被多个公司的人获取
+        userResult1 = db.session.query(UserInfo).filter(
+            UserInfo.userID == userID
+        ).first()
+        if userResult1 is None:
+            return (False, ErrorInfo['TENDER_23'])
+        companyID = userResult1.customizedCompanyID
+        info['companyID'] = companyID
+
+        result = {}
+        if userType == USER_TAG_RESPONSIBLEPERSON:
+            # 获取负责人
+            info['userType'] = USER_TAG_RESPONSIBLEPERSON
+            (status, respQuote) = self.__getQuoteItem(info=info)
+            result['respQuote'] = respQuote
+        elif userType == USER_TAG_AUDITOR:
+            info['userType'] = USER_TAG_RESPONSIBLEPERSON
+            (status, respQuote) = self.__getQuoteItem(info=info)
+            result['respQuote'] = respQuote
+            info['userType'] = USER_TAG_AUDITOR
+            (status, auditorQuote) = self.__getQuoteItem(info=info)
+            result['auditorQuote'] = auditorQuote
+        elif userType == USER_TAG_BOSS:
+            info['userType'] = USER_TAG_RESPONSIBLEPERSON
+            (status, respQuote) = self.__getQuoteItem(info=info)
+            result['respQuote'] = respQuote
+            info['userType'] = USER_TAG_AUDITOR
+            (status, auditorQuote) = self.__getQuoteItem(info=info)
+            result['auditorQuote'] = auditorQuote
+            info['userType'] = USER_TAG_BOSS
+            (status, bossQuote) = self.__getQuoteItem(info=info)
+            result['bossQuote'] = bossQuote
+        else:
+            pass
+        return (True, result)
+
+
+
+    def __getQuoteItem(self, info):
+        companyID = info['companyID']
+        tenderID = info['tenderID']
+        userType = info['userType']
+        respResult = db.session.query(UserInfo).filter(and_(
+                UserInfo.customizedCompanyID == companyID,
+                UserInfo.userType == userType
+            )).first()
+        leaderUserID = respResult.userID
+        # # 测试期间使用
+        # if userType == USER_TAG_BOSS:
+        #     print leaderUserID, 'respUserID'
+        #     leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f713213'
+        # elif userType == USER_TAG_RESPONSIBLEPERSON:
+        #     leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62d723213'
+        # elif userType == USER_TAG_AUDITOR:
+        #     leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f723213'
+        quote = {}
+        quote['quotedID'] = ''
+        quote['quotedPrice'] = ''
+        quote['price'] = ''
+        quote['costPrice'] = ''
+        quote['createTime'] = ''
+        quote['description'] = ''
+        respQResult = db.session.query(QuotedPrice).filter(and_(
+            QuotedPrice.tenderID == tenderID,
+            QuotedPrice.userID == leaderUserID
+        )).first()
+        if respQResult is not None:
+            quote['quotedID'] = respQResult.quotedID
+            quote['quotedPrice'] = respQResult.quotedPrice
+            quote['price'] = respQResult.price
+            quote['costPrice'] = respQResult.costPrice
+            quote['createTime'] = str(respQResult.createTime)[0:10]
+            quote['description'] = respQResult.description
+        return (True, quote)
+
+    def __getProjectInfoInDoingDetail(self, info):
+        tenderID = info['tenderID']
         res = {}
         res['projectManagerName'] = ''
         res['openedDate'] = ''
@@ -817,12 +931,6 @@ class PushedTenderManager(Util):
         res['quotedDate'] = ''
         res['quotedDescription'] = ''
 
-
-        OperatorResult = db.session.query(Operator).filter(
-            Operator.operatorID == operatorID
-        ).first()
-        tenderID = OperatorResult.tenderID
-        info['tenderID'] = tenderID
 
         result = db.session.query(PushedTenderInfo).filter(
             PushedTenderInfo.tenderID == tenderID
@@ -837,7 +945,7 @@ class PushedTenderManager(Util):
             # 只有经办人能看到
             if info['userType'] == USER_TAG_OPERATOR:
                 res['quotedPrice'] = result.quotedPrice
-                res['quotedDate'] = result.quotedDate
+                res['quotedDate'] = str(result.quotedDate)
                 res['quotedDescription'] = result.quotedDescription
             elif info['userType'] == USER_TAG_RESPONSIBLEPERSON:
                 (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
@@ -1040,7 +1148,6 @@ class PushedTenderManager(Util):
     # 经办人特殊, 获取自己参与的, 历史记录
     def getTenderHistoryList(self, jsonInfo):
         info = json.loads(jsonInfo)
-        print info
         userType = info['userType']
         (status, userID) = self.isTokenValidByUserType(info=info)
         if status is not True:
