@@ -939,9 +939,11 @@ class PushedTenderManager(Util):
         ).first()
         if result is not None:
             res['projectManagerName'] = result.PushedTenderInfo.projectManagerName
-            res['openedDate'] = str(result.PushedTenderInfo.openedDate)
+            if result.PushedTenderInfo.openedDate is not None:
+                res['openedDate'] = str(result.PushedTenderInfo.openedDate)
             res['openedLocation'] = result.PushedTenderInfo.openedLocation
-            res['ceilPrice'] = result.PushedTenderInfo.ceilPrice
+            if result.PushedTenderInfo.ceilPrice > 0:
+                res['ceilPrice'] = result.PushedTenderInfo.ceilPrice
             res['tenderInfoDescription'] = result.PushedTenderInfo.tenderInfoDescription
             res['pushedID'] = result.PushedTenderInfo.pushedID
             res.update(Tender.generateBrief(tender=result.Tender))
