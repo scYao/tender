@@ -204,7 +204,7 @@ class BossManager(Util):
     #账号管理，创建新员工
     def createUserInfoByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
-        info['OAUserType'] = info['userType']
+        info['OAUserType'] = info['userTypeID']
         info['userType'] = USER_TAG_BOSS
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:

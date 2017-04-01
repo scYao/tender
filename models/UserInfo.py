@@ -89,7 +89,8 @@ class UserInfo(db.Model):
         res = {}
         res['userID'] = userInfo.userID
         res['userName'] = userInfo.userName
-        res['userType'] = USER_TAG_DIC[userInfo.userType]
+        res['userType'] = userInfo.userType
+        res['userTypeName'] = USER_TAG_DIC[userInfo.userType]
         res['tel'] = userInfo.tel
         return res
 

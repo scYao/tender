@@ -9,6 +9,7 @@ sys.setdefaultencoding('utf-8')
 from datetime import datetime
 import hashlib
 from sqlalchemy import and_, text, func, desc
+import traceback
 from tool.tagconfig import CUSTOMIZEDCOMPANYID, DEFAULT_PWD
 
 from models.flask_app import db
@@ -458,6 +459,7 @@ class UserManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -467,12 +469,13 @@ class UserManager(Util):
     def createOAUserInfo(self, info):
         userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"')
         tel = info['tel'].replace('\'', '\\\'').replace('\"', '\\\"')
+        password = info['password']
         userID = self.generateID(userName)
         info['userID'] = userID
         info['customizedCompanyID'] = CUSTOMIZEDCOMPANYID
         info['tel'] = tel
-        info['password'] = hashlib.md5(DEFAULT_PWD).hexdigest()
-        info['userType'] = info['OAUserType']
+        info['password'] = self.getMD5String(password)
+        info['userType'] = info['userTypeID']
         try:
             #判断是否已经存在该员工
             query = db.session.query(UserInfo).filter(UserInfo.tel == tel)
