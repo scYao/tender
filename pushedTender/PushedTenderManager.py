@@ -7,8 +7,8 @@ import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
     PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_MAKE_BIDDING_BOOK, \
-    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY, PUSH_TENDER_INFO_TAG_TENDER, \
-    PUSH_TENDER_INFO_TAG_CUS
+    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY, \
+    CUS_TENDER_DOC_DIRECTORY
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -402,6 +402,34 @@ class PushedTenderManager(Util):
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
             return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+    # 获取自定义项目的详情
+    def getCustomizedTenderDetail(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tenderID = info['tenderID']
+
+        try:
+            tenderResult = db.session.query(Tender).filter(
+                Tender.tenderID == tenderID
+            ).first()
+            result = {}
+            result['tenderID'] = tenderID
+            result['title'] = tenderResult.title
+            result['url'] = tenderResult.url
+            imgResult = db.session.query(ImgPath).filter(
+                ImgPath.foreignID == tenderID
+            ).all()
+            ossInfo = {}
+            ossInfo['bucket'] = 'sjtender'
+            imgList = [ImgPath.generate(img=o, directory=CUS_TENDER_DOC_DIRECTORY, ossInfo=ossInfo,
+                                                hd=True, isFile=True) for o in imgResult]
+            result['imgList'] = imgList
+            return (True, result)
         except Exception as e:
             print e
             errorInfo = ErrorInfo['TENDER_02']

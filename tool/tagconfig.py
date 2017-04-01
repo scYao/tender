@@ -85,6 +85,7 @@ OPERATION_TAG_ATTEND = 4   # 现场开标
 
 #标书OSS目录
 BID_DOC_DIRECTORY = 'biddocument'
+CUS_TENDER_DOC_DIRECTORY = 'customizedtender'
 
 #公司ID
 CUSTOMIZEDCOMPANYID = '1'

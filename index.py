@@ -1542,8 +1542,7 @@ def update_done_pushed_tender():
         return json.dumps(data)
 
 
-#已经完成的项目信息详情
-
+# 已经完成的项目信息详情
 @app.route('/get_tender_done_detail/', methods=['POST', 'GET'])
 def get_tender_done_detail():
     pushedTenderManager = PushedTenderManager()
@@ -1553,6 +1552,21 @@ def get_tender_done_detail():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = pushedTenderManager.getTenderDoneDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取自定义项目的详情
+@app.route('/get_customized_tender_detail/', methods=['POST', 'GET'])
+def get_customized_tender_detail():
+    pushedTenderManager = PushedTenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = pushedTenderManager.getCustomizedTenderDetail(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
