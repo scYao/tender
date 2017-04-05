@@ -476,6 +476,8 @@ class UserManager(Util):
         info['tel'] = tel
         info['password'] = self.getMD5String(password)
         info['userType'] = info['userTypeID']
+        info['jobNumber'] = info['jobNumber']
+        info['createTime'] = datetime.now()
         try:
             #判断是否已经存在该员工
             query = db.session.query(UserInfo).filter(UserInfo.tel == tel)

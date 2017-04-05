@@ -28,6 +28,7 @@ class UserInfo(db.Model):
     provinceID = db.Column(db.String(100), db.ForeignKey('Province.provinceID'))
     customizedCompanyID = db.Column(db.String(100))
     userType = db.Column(db.Integer)
+    jobNumber = db.Column(db.String(100))
 
     userIp = db.relationship('UserIP', backref='UserInfo', lazy='dynamic')
 
@@ -36,7 +37,7 @@ class UserInfo(db.Model):
                  tel=None, email=None, gender=0,
                  createTime=None, deviceID=None, code=None,
                  cityID=63, provinceID=10, companyName=None, jobPosition=None,
-                 customizedCompanyID=None, userType=0):
+                 customizedCompanyID=None, userType=0, jobNumber=None):
         self.userID = userID
         self.userName = userName
         self.password = password
@@ -55,6 +56,7 @@ class UserInfo(db.Model):
         self.jobPosition = jobPosition
         self.customizedCompanyID = customizedCompanyID
         self.userType = userType
+        self.jobNumber = jobNumber
 
     def __repr__(self):
         return self.userID
@@ -75,6 +77,7 @@ class UserInfo(db.Model):
         res['tel'] = userInfo.tel
         res['customizedCompanyID'] = userInfo.customizedCompanyID
         res['userType'] = userInfo.userType
+        res['jobNumber'] = userInfo.jobNumber
         return res
 
     @staticmethod
@@ -82,6 +85,7 @@ class UserInfo(db.Model):
         res = {}
         res['userID'] = userInfo.userID
         res['userName'] = userInfo.userName
+        res['jobNumber'] = userInfo.jobNumber
         return res
 
     @staticmethod
@@ -92,6 +96,7 @@ class UserInfo(db.Model):
         res['userType'] = userInfo.userType
         res['userTypeName'] = USER_TAG_DIC[userInfo.userType]
         res['tel'] = userInfo.tel
+        res['jobNumber'] = userInfo.jobNumber
         return res
 
     @staticmethod
@@ -100,7 +105,8 @@ class UserInfo(db.Model):
             userID=createInfo['userID'], userName=createInfo['userName'],
             tel=createInfo['tel'], userType=createInfo['userType'],
             customizedCompanyID=createInfo['customizedCompanyID'],
-            password=createInfo['password']
+            password=createInfo['password'], createTime=createInfo['createTime'],
+            jobNumber=createInfo['jobNumber']
         )
         db.session.add(userInfo)
         return (True, None)
