@@ -794,6 +794,8 @@ class PushedTenderManager(Util):
             imgPath = result.ImgPath
             operationID = operation.operationID
             if not mDic.has_key(operationID):
+                if imgPath is None:
+                    return None
                 res = Operation.generate(c=operation)
                 imgList = []
                 imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo,
@@ -805,6 +807,7 @@ class PushedTenderManager(Util):
                 imgList = mDic[operationID]
                 imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
         bookDataList = [generateInfo(result=result) for result in bookResult]
+        bookDataList = filter(None, bookDataList)
         return bookDataList
 
     def getTenderDoingDetail(self, info):
@@ -816,33 +819,41 @@ class PushedTenderManager(Util):
             ).first()
             tenderID = OperatorResult.tenderID
             info['tenderID'] = tenderID
-            query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
-            allResult = query.all()
-            bookQuery = db.session.query(Operation, ImgPath).outerjoin(
-                ImgPath, Operation.operationID == ImgPath.foreignID
-            ).filter(
-                and_(
-                    Operation.tag == OPERATION_TAG_MAKE_BIDDING_BOOK,
-                    Operation.operatorID == operatorID
-                )
-            )
-            bookResult = bookQuery.all()
-            dataList = [Operation.generate(c=result) for result in allResult]
-            bookDataList = self.__generateBookInfo(bookResult=bookResult)
-            l1 = []
-            l2 = []
-            l4 = []
-            for o in dataList:
-                if o['tag'] == OPERATION_TAG_ENLIST:
-                    l1.append(o)
-                elif o['tag'] == OPERATION_TAG_DEPOSIT:
-                    l2.append(o)
-                elif o['tag'] == OPERATION_TAG_ATTEND:
-                    l4.append(o)
+            # query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
+            # allResult = query.all()
+            # dataList = [Operation.generate(c=result) for result in allResult]
+            # l1 = []
+            # l2 = []
+            # l4 = []
+            # for o in dataList:
+            #     if o['tag'] == OPERATION_TAG_ENLIST:
+            #         l1.append(o)
+            #     elif o['tag'] == OPERATION_TAG_DEPOSIT:
+            #         l2.append(o)
+            #     elif o['tag'] == OPERATION_TAG_ATTEND:
+            #         l4.append(o)
+
+
+            # 报名
+            info['operationTag'] = OPERATION_TAG_ENLIST
+            l1 = self.__getOperationList(info=info)
+
+            # 打保证金
+            info['operationTag'] = OPERATION_TAG_DEPOSIT
+            l2 = self.__getOperationList(info=info)
+
+            # 标书
+            info['operationTag'] = OPERATION_TAG_MAKE_BIDDING_BOOK
+            l3 = self.__getOperationList(info=info)
+
+            # 备案
+            info['operationTag'] = OPERATION_TAG_ATTEND
+            l4 = self.__getOperationList(info=info)
+
             resultDic = {}
             resultDic[OPERATION_TAG_ENLIST] = l1
             resultDic[OPERATION_TAG_DEPOSIT] = l2
-            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = bookDataList
+            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = l3
             resultDic[OPERATION_TAG_ATTEND] = l4
             # 获取项目信息模块
             (status, projectInfo) = self.__getProjectInfoInDoingDetail(info=info)
@@ -859,6 +870,22 @@ class PushedTenderManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+    def __getOperationList(self, info):
+        operatorID = info['operatorID']
+        operationTag = info['operationTag']
+        operationQuery = db.session.query(Operation, ImgPath).outerjoin(
+            ImgPath, Operation.operationID == ImgPath.foreignID
+        ).filter(
+            and_(
+                Operation.tag == operationTag,
+                Operation.operatorID == operatorID
+            )
+        )
+        operationResult = operationQuery.all()
+
+        operationDataList = self.__generateBookInfo(bookResult=operationResult)
+        return operationDataList
 
     def __getQuotedPriceByTenderID(self, info):
         operatorID = info['operatorID']
