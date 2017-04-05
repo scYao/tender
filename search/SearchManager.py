@@ -48,10 +48,10 @@ class SearchManager(Util):
         #     errorInfo = ErrorInfo['TENDER_01']
         #     return (False, errorInfo)
         # 管理员身份校验, 里面已经校验过token合法性
-        adminManager = AdminManager()
-        (status, reason) = adminManager.adminAuth(jsonInfo)
-        if status is not True:
-            return (False, reason)
+        # adminManager = AdminManager()
+        # (status, reason) = adminManager.adminAuth(jsonInfo)
+        # if status is not True:
+        #     return (False, reason)
         (status, foreignIDTuple) = self.__query(info)
         # allResult = query.offset(startIndex).limit(pageCount).all()
         params = {}

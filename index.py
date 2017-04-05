@@ -1040,7 +1040,7 @@ def search():
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = searchManager.search(paramsJson)
+        (status, result) = searchManager.searchBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
