@@ -213,3 +213,18 @@ class BossManager(Util):
         userManager = UserManager()
         return userManager.createOAUserInfo(info=info)
 
+    #账号管理，删除员工
+    def deleteUserInfoByBoss(self, jsonInfo):
+        print jsonInfo
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        userManager = UserManager()
+        info['selfUserID'] = userID
+        return userManager.deleteOAUserInfo(info=info)
+
+
+

@@ -193,6 +193,12 @@ ErrorInfo['TENDER_32'] = {
     'info' : 'get operator error!',
     'zhInfo' : '获取经办人失败'
 }
+
+ErrorInfo['TENDER_33'] = {
+    'code' : 'TENDER_33',
+    'info' : 'can not delete other company\'s user !',
+    'zhInfo' : '无法删除其他公司的用户!'
+}
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRA\n

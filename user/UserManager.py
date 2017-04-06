@@ -493,3 +493,40 @@ class UserManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+    def deleteOAUserInfo(self, info):
+        selfUserID = info['selfUserID']
+        userID = info['userID']
+
+        try:
+
+            # 1, 判空后 查询该用户是否时自己公司的
+            # 身份校验交给上层
+            selfResult = db.session.query(UserInfo).filter(
+                UserInfo.userID == selfUserID
+            ).first()
+            selfCompanyID = selfResult.customizedCompanyID
+
+            userQuery = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            )
+            userResult = userQuery.first()
+            if userResult is None:
+                return (False, ErrorInfo['TENDER_23'])
+            userCompanyID = userResult.customizedCompanyID
+            if selfCompanyID != userCompanyID:
+                return (False, ErrorInfo['TENDER_33'])
+            # 2, 删除用户
+            userQuery.delete()
+            db.session.commit()
+            return (True, userID)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def updateOAUserInfo(self, info):
+        pass

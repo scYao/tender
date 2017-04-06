@@ -2164,3 +2164,18 @@ def create_user_info_by_boss():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+#企业账号管理，删除成员
+@app.route('/delete_user_info_by_boss/', methods=['POST', 'GET'])
+def delete_user_info_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.deleteUserInfoByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
