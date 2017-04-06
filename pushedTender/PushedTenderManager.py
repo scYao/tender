@@ -948,7 +948,6 @@ class PushedTenderManager(Util):
         leaderUserID = respResult.userID
         # # 测试期间使用
         if userType == USER_TAG_BOSS:
-            print leaderUserID, 'respUserID'
             leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f713213'
         elif userType == USER_TAG_RESPONSIBLEPERSON:
             leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62d723213'
