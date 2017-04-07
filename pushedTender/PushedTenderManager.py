@@ -6,9 +6,9 @@ import poster
 import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
-    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_MAKE_BIDDING_BOOK, \
-    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_ATTEND, BID_DOC_DIRECTORY, \
-    CUS_TENDER_DOC_DIRECTORY
+    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_TENDER_PLAN, \
+    OPERATION_TAG_TENDER_PRICE, OPERATION_TAG_DEPOSIT, OPERATION_TAG_MAKE_BIDDING_BOOK, BID_DOC_DIRECTORY, \
+    CUS_TENDER_DOC_DIRECTORY, OPERATION_TAG_MANAGER_ARRANGEMENT
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -165,6 +165,12 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.openedLocation: info['openedLocation'],
                     PushedTenderInfo.ceilPrice: info['ceilPrice'],
                     PushedTenderInfo.tenderInfoDescription: info['tenderInfoDescription'],
+                    PushedTenderInfo.tenderCompanyName: info['tenderCompanyName'],
+                    PushedTenderInfo.projectType: info['projectType'],
+                    PushedTenderInfo.workContent: info['workContent'],
+                    PushedTenderInfo.deposit: info['deposit'],
+                    PushedTenderInfo.planScore: info['planScore'],
+                    PushedTenderInfo.tenderType: info['tenderType']
                 }
                 query.update(
                     updateInfo, synchronize_session=False
@@ -834,27 +840,32 @@ class PushedTenderManager(Util):
             #         l4.append(o)
 
 
-            # 报名
-            info['operationTag'] = OPERATION_TAG_ENLIST
+            # 确定投标价格
+            info['operationTag'] = OPERATION_TAG_TENDER_PRICE
             l1 = self.__getOperationList(info=info)
 
-            # 打保证金
+            # 保证金支付
             info['operationTag'] = OPERATION_TAG_DEPOSIT
             l2 = self.__getOperationList(info=info)
 
-            # 标书
-            info['operationTag'] = OPERATION_TAG_MAKE_BIDDING_BOOK
+            # 投标方案
+            info['operationTag'] = OPERATION_TAG_TENDER_PLAN
             l3 = self.__getOperationList(info=info)
 
-            # 备案
-            info['operationTag'] = OPERATION_TAG_ATTEND
+            # 标书制作
+            info['operationTag'] = OPERATION_TAG_MAKE_BIDDING_BOOK
             l4 = self.__getOperationList(info=info)
 
+            # 项目经理安排
+            info['operationTag'] = OPERATION_TAG_MANAGER_ARRANGEMENT
+            l5 = self.__getOperationList(info=info)
+
             resultDic = {}
-            resultDic[OPERATION_TAG_ENLIST] = l1
+            resultDic[OPERATION_TAG_TENDER_PRICE] = l1
             resultDic[OPERATION_TAG_DEPOSIT] = l2
-            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = l3
-            resultDic[OPERATION_TAG_ATTEND] = l4
+            resultDic[OPERATION_TAG_TENDER_PLAN] = l3
+            resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = l4
+            resultDic[OPERATION_TAG_MANAGER_ARRANGEMENT] = l5
             # 获取项目信息模块
             (status, projectInfo) = self.__getProjectInfoInDoingDetail(info=info)
             (status, tenderComment) = self.__getTenderCommentInDoingDetail(info=info)
@@ -984,7 +995,12 @@ class PushedTenderManager(Util):
         res['quotedPrice'] = ''
         res['quotedDate'] = ''
         res['quotedDescription'] = ''
-
+        res['tenderCompanyName'] = ''
+        res['projectType'] = ''
+        res['workContent'] = ''
+        res['deposit'] = ''
+        res['planScore'] = ''
+        res['tenderType'] = ''
 
         result = db.session.query(PushedTenderInfo, Tender).outerjoin(
             Tender, PushedTenderInfo.tenderID == Tender.tenderID
@@ -1000,6 +1016,12 @@ class PushedTenderManager(Util):
                 res['ceilPrice'] = result.PushedTenderInfo.ceilPrice
             res['tenderInfoDescription'] = result.PushedTenderInfo.tenderInfoDescription
             res['pushedID'] = result.PushedTenderInfo.pushedID
+            res['tenderCompanyName'] = result.PushedTenderInfo.tenderCompanyName
+            res['projectType'] = result.PushedTenderInfo.projectType
+            res['workContent'] = result.PushedTenderInfo.workContent
+            res['deposit'] = result.PushedTenderInfo.deposit
+            res['planScore'] = result.PushedTenderInfo.planScore
+            res['tenderType'] = result.PushedTenderInfo.tenderType
             res.update(Tender.generateBrief(tender=result.Tender))
             # 只有经办人能看到
             if info['userType'] == USER_TAG_OPERATOR:

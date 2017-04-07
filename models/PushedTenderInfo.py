@@ -43,6 +43,12 @@ class PushedTenderInfo(db.Model):
     candidatePrice2 = db.Column(db.Float)
     candidateName3 = db.Column(db.String(100))
     candidatePrice3 = db.Column(db.Float)
+    tenderCompanyName = db.Column(db.String(100))
+    projectType = db.Column(db.String(100))
+    workContent = db.Column(db.String(100))
+    deposit = db.Column(db.Float)
+    planScore = db.Column(db.Float)
+    tenderType = db.Column(db.String(100))
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
@@ -54,7 +60,8 @@ class PushedTenderInfo(db.Model):
                  Q2=0, deductedRate1=0, deductedRate2=0,
                  workerName='', candidateName1='', candidatePrice1=0,
                  candidateName2='', candidatePrice2=0, candidateName3='',
-                 candidatePrice3=0, tag=0):
+                 candidatePrice3=0, tag=0, tenderCompanyName=None, projectType=None,
+                 workContent=None, deposit=0, planScore=0, tenderType=None):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -87,6 +94,13 @@ class PushedTenderInfo(db.Model):
         self.candidateName3 = candidateName3
         self.candidatePrice3 = candidatePrice3
         self.tag = tag
+        self.tenderCompanyName = tenderCompanyName
+        self.projectType = projectType
+        self.workContent = workContent
+        self.deposit = deposit
+        self.planScore = planScore
+        self.tenderType = tenderType
+
 
     @staticmethod
     def create(info):
@@ -155,6 +169,12 @@ class PushedTenderInfo(db.Model):
         res['candidatePrice2'] = c.candidatePrice2
         res['candidateName3'] = c.candidateName3
         res['candidatePrice3'] = c.candidatePrice3
+        res['tenderCompanyName'] = c.tenderCompanyName
+        res['projectType'] = c.projectType
+        res['workContent'] = c.workContent
+        res['deposit'] = c.deposit
+        res['planScore'] = c.planScore
+        res['tenderType'] = c.tenderType
         return res
 
     def __repr__(self):

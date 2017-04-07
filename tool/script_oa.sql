@@ -40,6 +40,13 @@ create table pushedTenderInfo(
 	candidatePrice2 float comment '候选人2报价',
 	candidateName3 nvarchar(100) comment '候选人3',
 	candidatePrice3 float comment '候选人3报价'
+	-- 新增的进行中的详情
+	tenderCompanyName nvarchar(100) comment '投标单位',
+	projectType nvarchar(100) comment '项目类型',
+	workContent nvarchar(100) comment '工作内容',
+	deposit float comment '投标保证金',
+	planScore float comment '方案评分',
+	tenderType nvarchar(100) comment '评标方法'
 );
 
 create table quotedPrice(
