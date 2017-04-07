@@ -369,7 +369,6 @@ class UserManager(Util):
         if status is not True:
             return (False, reason)
         (status, reason) = self.__resetPassWord(tel=tel, pwd=password)
-        print status, reason
         if status is not True:
             return (False, reason)
 

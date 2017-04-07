@@ -236,10 +236,13 @@ class TenderManager(Util):
             query = query.filter(
                 Tender.cityID == info['cityID']
             )
-        if startDate != '-1' and endDate != '-1':
+        if startDate != '-1':
+            query = query.filter(Tender.publishDate > startDate)
+
+        if endDate != '-1':
             query = query.filter(
                 Tender.publishDate < endDate
-            ).filter(Tender.publishDate > startDate)
+            )
 
         query = query.filter(
             Tender.tenderTag == PUSH_TENDER_INFO_TAG_TENDER
