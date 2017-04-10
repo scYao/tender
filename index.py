@@ -1555,6 +1555,7 @@ def update_doing_pushed_tender():
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
+        print json.dumps(result)
         return json.dumps(data)
 
 # 已经完成，添加项目信息
