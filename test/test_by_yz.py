@@ -85,6 +85,23 @@ def getTenderList():
     result = resultManager.getResult(params, upload_url)
     print result
 
+# 获取招标公告列表
+def wechat_search():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/wechat_search/' % LOCALHOST
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['cityID'] = '-1'
+    info['searchKey'] = '南京'
+    info['startDate'] = '-1'
+    info['endDate'] = '-1'
+    info['tag'] = 2
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
 #获取招标公告列表，后台管理
 def get_tender_list_background():
     opener = poster.streaminghttp.register_openers()
@@ -693,7 +710,8 @@ def get_tender_done_detail():
 
 
 if __name__ == '__main__':
-    get_tender_done_detail()
+    wechat_search()
+    # get_tender_done_detail()
     # create_user_info_by_boss()
     # get_user_info_list_by_boss()
     # operate_pushed_tender_info()
