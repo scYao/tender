@@ -1,6 +1,8 @@
 # coding=utf8
 import sys
 import json
+import traceback
+
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -208,6 +210,7 @@ class OperatorManager(Util):
             return (True, userResult)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()

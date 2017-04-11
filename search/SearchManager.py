@@ -52,7 +52,8 @@ class SearchManager(Util):
         # (status, reason) = adminManager.adminAuth(jsonInfo)
         # if status is not True:
         #     return (False, reason)
-        (status, foreignIDTuple) = self.__query(info)
+        (status, foreignIDList) = self.__query(info)
+        foreignIDTuple = tuple(foreignIDList)
         # allResult = query.offset(startIndex).limit(pageCount).all()
         params = {}
         params['foreignIDTuple'] = foreignIDTuple
@@ -70,8 +71,8 @@ class SearchManager(Util):
             # tenderIDList = [result.foreignID for result in allResult]
             # tenderIDTuple = tuple(tenderIDList)
             tenderManager = TenderManager()
-            tenderList = tenderManager.getTenderListByIDTuple(info=params)
-            return (True, tenderList)
+            return tenderManager.getTenderListByIDTuple(info=params)
+
 
         if tag == 3:
             # bidIDList = [result.foreignID for result in allResult]
@@ -93,8 +94,8 @@ class SearchManager(Util):
                 searchKey).filter(
             SearchKey.tag == tag
         ).all()
-        foreignIDTuple = (s.foreignID for s in searchResult)
-        return (True, foreignIDTuple)
+        foreignIDList = [s.foreignID for s in searchResult]
+        return (True, foreignIDList)
 
         # if tag == 1:
         #     query = SearchKey.query.whoosh_search(

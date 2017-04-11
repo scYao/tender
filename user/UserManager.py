@@ -10,7 +10,7 @@ from datetime import datetime
 import hashlib
 from sqlalchemy import and_, text, func, desc
 import traceback
-from tool.tagconfig import CUSTOMIZEDCOMPANYID, DEFAULT_PWD
+from tool.tagconfig import CUSTOMIZEDCOMPANYID, DEFAULT_PWD, USER_TAG_BOSS, USER_TAG_OPERATOR
 
 from models.flask_app import db
 from models.UserInfo import UserInfo
@@ -410,6 +410,9 @@ class UserManager(Util):
             errorInfo = ErrorInfo['TENDER_05']
             return (False, errorInfo)
         userType = result.userType
+
+        if userType<USER_TAG_BOSS or userType>USER_TAG_OPERATOR:
+            return (False, ErrorInfo['TENDER_34'])
 
         # 生成新的Token记录
         userID = result.userID

@@ -207,6 +207,7 @@ class TenderManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -318,19 +319,15 @@ class TenderManager(Util):
             Tender.tenderID.in_(foreignIDTuple)
         ).order_by(desc(Tender.publishDate)).offset(startIndex).limit(pageCount)
         allResult = query.all()
-        # def generateTender(result):
-        #     res = {}
-        #     tender = result.Tender
-        #     city = result.City
-        #     res['tenderID'] = tender.tenderID
-        #     res['title'] = tender.title
-        #     res['location'] = tender.location
-        #     res['publishDate'] = str(tender.publishDate)
-        #     res['cityID'] = city.cityID
-        #     res['cityName'] = city.cityName
-        #     return res
+        count = db.session.query(func.count(Tender.tenderID)).filter(
+            Tender.tenderID.in_(foreignIDTuple)
+        ).first()
+        count = count[0]
         tenderList = [self.__generateBrief(o=result) for result in allResult]
-        return filter(None, tenderList)
+        result = {}
+        result['dataList'] = filter(None, tenderList)
+        result['count'] = count
+        return (True, result)
 
     def getTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
