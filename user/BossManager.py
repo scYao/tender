@@ -215,7 +215,6 @@ class BossManager(Util):
 
     #账号管理，删除员工
     def deleteUserInfoByBoss(self, jsonInfo):
-        print jsonInfo
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_BOSS
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)

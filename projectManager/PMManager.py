@@ -43,6 +43,12 @@ class PMManager(Util):
         safeFromDate = info['safeFromDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
+        if safeEndDate == '':
+            safeEndDate = None
+
+        if safeFromDate == '':
+            safeFromDate = None
+
         (status, reason) = self.doesProjectManagerExists(info=info)
         if status is True:
             errorInfo = ErrorInfo['TENDER_19']

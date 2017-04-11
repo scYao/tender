@@ -95,6 +95,12 @@ class CompanyManager(Util):
             errorInfo['detail'] = reason
             return (False, errorInfo)
 
+        if businessTermFrom == '':
+            businessTermFrom = None
+
+        if creditEndDate == '':
+            creditEndDate = None
+
         company = Company(companyID=companyID, companyName=companyName, newArchiveID=newArchiveID,
                           registerArea=registerArea, companyAreaType=companyAreaType,
                           certificateID=certificateID, certificationAuthority=certificationAuthority,
