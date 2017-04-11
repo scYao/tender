@@ -333,7 +333,8 @@ class TenderManager(Util):
         result = {}
         result['dataList'] = filter(None, tenderList)
         result['count'] = count
-        return (True, result)
+
+        return self.__tagTenderList(info=result)
 
     def getTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -440,24 +441,44 @@ class TenderManager(Util):
         res.update(City.generate(city=city))
         return res
 
+    # 给数据打上tag，是否推送了
+    def __tagTenderList(self, info):
+        dataList = info['dataList']
+        tenderIDTuple = (o['tenderID'] for o in dataList)
+        allResult = db.session.query(PushedTenderInfo).filter(
+            PushedTenderInfo.tenderID.in_(tenderIDTuple)
+        ).all()
+
+        pushedTenderList = []
+        for o in allResult:
+            pushedTenderList.append(o.tenderID)
+
+        for o in info['dataList']:
+            if o['tenderID'] in pushedTenderList:
+                o['pushed'] = True
+            else:
+                o['pushed'] = False
+        return (True, info)
+
     # 获取招标列表, 标志是否被push
     def getTenderListWithPushedTag(self, jsonInfo):
         (status, result) = self.getTenderList(jsonInfo=jsonInfo)
         if status is True:
-            dataList = result['dataList']
-            tenderIDTuple = (o['tenderID'] for o in dataList)
-            allResult = db.session.query(PushedTenderInfo).filter(
-                PushedTenderInfo.tenderID.in_(tenderIDTuple)
-            ).all()
+            # dataList = result['dataList']
+            # tenderIDTuple = (o['tenderID'] for o in dataList)
+            # allResult = db.session.query(PushedTenderInfo).filter(
+            #     PushedTenderInfo.tenderID.in_(tenderIDTuple)
+            # ).all()
+            #
+            # pushedTenderList = []
+            # for o in allResult:
+            #     pushedTenderList.append(o.tenderID)
+            #
+            # for o in result['dataList']:
+            #     if o['tenderID'] in pushedTenderList:
+            #         o['pushed'] = True
+            #     else:
+            #         o['pushed'] = False
 
-            pushedTenderList = []
-            for o in allResult:
-                pushedTenderList.append(o.tenderID)
-
-            for o in result['dataList']:
-                if o['tenderID'] in pushedTenderList:
-                    o['pushed'] = True
-                else:
-                    o['pushed'] = False
-            return (True, result)
+            return self.__tagTenderList(info=result)
         return (False, result)
