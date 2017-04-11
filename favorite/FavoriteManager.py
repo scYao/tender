@@ -115,7 +115,8 @@ class FavoriteManager(Util):
         try:
             info['userID'] = userID
             info['tag'] = FAVORITE_TAG_TENDER
-            (status, tenderIDTuple) = self.getFavoriteItemID(info=info)
+            (status, tenderIDList) = self.getFavoriteItemID(info=info)
+            tenderIDTuple = tuple(tenderIDList)
             query = db.session.query(Tender, City).outerjoin(
                 City, Tender.cityID == City.cityID
             ).filter(
@@ -185,7 +186,7 @@ class FavoriteManager(Util):
                  Favorite.tag == tag)
         ).all()
 
-        dataList = (o.tenderID for o in allResult)
+        dataList = [o.tenderID for o in allResult]
         return (True, dataList)
 
     # 判断招标或中标是否被收藏

@@ -37,6 +37,11 @@ class LicenseManager(Util):
 
         licenseID = self.generateID(licenseName)
 
+        if licenseEndDate == '':
+            licenseEndDate = None
+
+        if licenseDate == '':
+            licenseDate = None
         managerLicense = ManagerLicense(
             licenseID=licenseID, licenseName=licenseName, licenseNum=licenseNum,
             grade=grade, authority=authority, licenseDate=licenseDate,

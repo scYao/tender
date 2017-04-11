@@ -42,7 +42,10 @@ class WinBiddingPub(db.Model):
         bidInfo = {}
         bidInfo['biddingID'] = result.biddingID
         bidInfo['title'] = result.title
-        bidInfo['publishDate'] = str(result.publishDate)
+        if result.publishDate is None:
+            bidInfo['publishDate'] = ''
+        else:
+            bidInfo['publishDate'] = str(result.publishDate)
         bidInfo['biddingNum'] = result.biddingNum
         return bidInfo
 
