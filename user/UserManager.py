@@ -18,6 +18,7 @@ from models.Token import Token
 from models.SmsCode import SmsCode
 from models.UserIP import UserIP
 from models.AdminInfo import AdminInfo
+from models.PushedTenderInfo import PushedTenderInfo
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.StringConfig import STRING_INFO_SMS_REGISTER
@@ -516,7 +517,15 @@ class UserManager(Util):
             if selfCompanyID != userCompanyID:
                 return (False, ErrorInfo['TENDER_33'])
             # 2, 删除用户
-            userQuery.delete()
+            # 2.1 删除userIP信息
+            db.session.query(UserIP).filter(
+                UserIP.userID == userID
+            ).delete(synchronize_session=False)
+            # 2.2 删除pushedTenderInfo
+            db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.userID == userID
+            ).delete(synchronize_session=False)
+            userQuery.delete(synchronize_session=False)
             db.session.commit()
             return (True, userID)
         except Exception as e:
