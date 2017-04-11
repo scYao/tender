@@ -55,29 +55,25 @@ class SearchManager(Util):
         (status, foreignIDList) = self.__query(info)
         foreignIDTuple = tuple(foreignIDList)
         # allResult = query.offset(startIndex).limit(pageCount).all()
-        params = {}
-        params['foreignIDTuple'] = foreignIDTuple
-        params['startIndex'] = startIndex
-        params['pageCount'] = pageCount
-
+        info['foreignIDTuple'] = foreignIDTuple
 
         if tag == 1:
             # userIDList = [result.foreignID for result in allResult]
             # userIDTuple = tuple(userIDList)
-            userInfoList = UserManager.getUserInfoListByIDTuple(info=params)
+            userInfoList = UserManager.getUserInfoListByIDTuple(info=info)
             return (True, userInfoList)
 
         if tag == 2:
             # tenderIDList = [result.foreignID for result in allResult]
             # tenderIDTuple = tuple(tenderIDList)
             tenderManager = TenderManager()
-            return tenderManager.getTenderListByIDTuple(info=params)
+            return tenderManager.getTenderListByIDTuple(info=info)
 
 
         if tag == 3:
             # bidIDList = [result.foreignID for result in allResult]
             # bidIDTuple = tuple(bidIDList)
-            bidList = WinBiddingManager.getBiddingListByIDTuple(info=params)
+            bidList = WinBiddingManager.getBiddingListByIDTuple(info=info)
             return (True, bidList)
 
     def __query(self, info):

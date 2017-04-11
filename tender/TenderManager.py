@@ -238,11 +238,11 @@ class TenderManager(Util):
                 Tender.cityID == info['cityID']
             )
         if startDate != '-1':
-            query = query.filter(Tender.publishDate > startDate)
+            query = query.filter(Tender.publishDate >= startDate)
 
         if endDate != '-1':
             query = query.filter(
-                Tender.publishDate < endDate
+                Tender.publishDate <= endDate
             )
 
         query = query.filter(
@@ -315,13 +315,19 @@ class TenderManager(Util):
             Tender, City
         ).outerjoin(
             City, City.cityID == Tender.cityID
-        ).filter(
+        )
+        info['query'] = query
+        query = self.__getQueryResult(info=info)
+        query = query.filter(
             Tender.tenderID.in_(foreignIDTuple)
         ).order_by(desc(Tender.publishDate)).offset(startIndex).limit(pageCount)
         allResult = query.all()
-        count = db.session.query(func.count(Tender.tenderID)).filter(
+        countQuery = db.session.query(func.count(Tender.tenderID)).filter(
             Tender.tenderID.in_(foreignIDTuple)
-        ).first()
+        )
+        info['query'] = countQuery
+        countQuery = self.__getQueryResult(info=info)
+        count = countQuery.first()
         count = count[0]
         tenderList = [self.__generateBrief(o=result) for result in allResult]
         result = {}
