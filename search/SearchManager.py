@@ -79,6 +79,46 @@ class SearchManager(Util):
             bidList = WinBiddingManager.getBiddingListByIDTuple(info=params)
             return (True, bidList)
 
+
+    # 搜索，小程序，tag=1，表示用户，2,表示招标，３，表示中标
+
+    def wechatSearch(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tag = int(info['tag'])
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        (status, foreignIDTuple) = self.__wechatQuery(info)
+        info['foreignIDTuple'] = foreignIDTuple
+        if tag == 1:
+            userManager = UserManager()
+            userInfoList = userManager.getWechatUserInfoList(info=info)
+            return (True, userInfoList)
+
+        if tag == 2:
+            tenderManager = TenderManager()
+            tenderList = tenderManager.getWechatTenderList(info=info)
+            return (True, tenderList)
+
+        if tag == 3:
+            bidList = WinBiddingManager.getBiddingListByIDTuple(info=info)
+            return (True, bidList)
+
+    def __wechatQuery(self, info):
+        searchKey = info['searchKey']
+        tag = int(info['tag'])
+        fenciList = jieba.cut_for_search(searchKey)
+        searchKey = ' '.join(fenciList)
+
+        if len(searchKey) == 1:
+            searchKey = " ".join(lazy_pinyin(searchKey))
+
+        searchResult = SearchKey.query.whoosh_search(
+                searchKey).filter(
+            SearchKey.tag == tag
+        ).all()
+        foreignIDTuple = (s.foreignID for s in searchResult)
+        return (True, foreignIDTuple)
+
     def __query(self, info):
         searchKey = info['searchKey']
         tag = int(info['tag'])

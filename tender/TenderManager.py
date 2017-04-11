@@ -196,10 +196,43 @@ class TenderManager(Util):
             resultResult = query.order_by(
                 desc(Tender.publishDate)
             ).offset(startIndex).limit(pageCount).all()
-            # tenderIDList = [t.tenderID for t in tenderList]
-            # tenderIDTuple = tuple(tenderIDList)
-            # info['tenderIDTuple'] = tenderIDTuple
-            # resultList = self.__doGetTenderList(info)
+            dataList = [self.__generateBrief(o=o) for o in resultResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    # 获取投标信息列表, 小程序使用
+
+    @cache.memoize(timeout=60 * 2)
+    def getWechatTenderList(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        foreignIDTuple = info['foreignIDTuple']
+        # 获取tenderID列表
+        try:
+            query = db.session.query(Tender, City).outerjoin(
+                City, Tender.cityID == City.cityID
+            ).filter(
+                Tender.tenderID.in_(foreignIDTuple)
+            )
+            info['query'] = query
+            query = self.__getQueryResult(info)
+            # count
+            countQuery = db.session.query(func.count(Tender.tenderID))
+            info['query'] = countQuery
+            countQuery = self.__getQueryResult(info=info)
+            count = countQuery.first()
+            count = count[0]
+            resultResult = query.order_by(
+                desc(Tender.publishDate)
+            ).offset(startIndex).limit(pageCount).all()
             dataList = [self.__generateBrief(o=o) for o in resultResult]
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
