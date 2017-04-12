@@ -573,7 +573,6 @@ def login_with_wechat():
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        print paramsJson
         (status, result) = userManager.loginWithWechat(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
