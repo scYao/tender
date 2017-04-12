@@ -37,6 +37,7 @@ from user.AuditorManager import AuditorManager
 from user.BossManager import BossManager
 from pushedTender.PushedTenderManager import PushedTenderManager
 from tender.CustomizedTenderManager import CustomizedTenderManager
+from news.NewsManager import NewsManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -68,6 +69,26 @@ def create_tender():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = tenderManager.createTender(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 判断招标信息是否存在
+@app.route('/does_tender_exists/', methods=['POST', 'GET'])
+def does_tender_exists():
+    from datetime import datetime
+    t1 = datetime.now()
+    print 't1', t1
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        t2 = datetime.now()
+        print 't2 - t1', t2 - t1
+        (status, jsonlist) = tenderManager.doesTenderExists(info=json.loads(paramsJson))
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -2253,6 +2274,32 @@ def delete_user_info_by_boss():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.deleteUserInfoByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建招标资讯
+@app.route('/create_news/', methods=['POST', 'GET'])
+def create_news():
+    newsManager = NewsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        info = json.loads(paramsJson)
+        imgNameList = info['imgNameList']
+        imgList = []
+        for img in imgNameList:
+            _imgName = img['imgName']
+            f = request.files[_imgName]
+            imgName = f.filename
+            imgDic = {}
+            imgDic['imgName'] = imgName
+            imgDic['file'] = f
+            imgList.append(imgDic)
+        (status, result) = newsManager.createNews(jsonInfo=paramsJson, imgFileList=imgList)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

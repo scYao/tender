@@ -91,10 +91,10 @@ class TenderManager(Util):
 
     # 通过title判断改标段是否存在, 存在为True
     def doesTenderExists(self, info):
-        title = info['title']
+        biddingNum = info['biddingNum']
         try:
             result = db.session.query(Tender).filter(
-                Tender.title == title
+                Tender.biddingNum == biddingNum
             ).first()
             if result is not None:
                 return (True, result.tenderID)

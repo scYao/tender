@@ -153,14 +153,20 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''commentID nvarchar(100) primary key comment '领导批注ID',
-	userID nvarchar(100) comment '批注人ID',
-    createTime datetime comment '批注时间',
-    description text comment '批注内容' '''
-    # sql_to_model_members(sql)
-    # sql_to_model_init(sql)
-    # sql_to_model_generate(sql, 'c')
-    # create_tender(sql)
-    # sql_to_model_init_model_param(sql)
-    # sql_to_generate_info(sql)
+    sql = '''newID nvarchar(100) primary key comment '资讯ID',
+	title nvarchar(100) comment '标题',
+	content text comment '正文内容',
+	createTime datetime comment '创建时间' '''
+    sql_to_model_members(sql)
+    print '\n'
+    sql_to_model_init(sql)
+    print '\n'
+    sql_to_model_generate(sql, 'c')
+    print '\n'
+    create_tender(sql)
+    print '\n'
+    sql_to_model_init_model_param(sql)
+    print '\n'
+    sql_to_generate_info(sql)
+    print '\n'
     sql_to_create_info(sql)
