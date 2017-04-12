@@ -564,6 +564,22 @@ def oa_login():
         data['data'] = result
         return json.dumps(data)
 
+# 微信小程序使用微信登录
+@app.route('/login_with_wechat/', methods=['POST', 'GET'])
+def login_with_wechat():
+    userManager = UserManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        print paramsJson
+        (status, result) = userManager.loginWithWechat(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 获取用户详情
 @app.route('/get_user_info_detail/', methods=['POST', 'GET'])
 def get_user_info_detail():

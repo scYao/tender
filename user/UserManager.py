@@ -1,6 +1,12 @@
 # coding=utf8
+import base64
 import sys
 import json
+import urllib
+import urllib2
+
+from Crypto.Cipher import AES
+
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -27,7 +33,8 @@ from stoken.TokenManager import TokenManager
 
 class UserManager(Util):
     def __init__(self):
-        pass
+        self.appID = 'wxc9029ba1dcf6f2de'
+        self.appSecret = '7aba62050624812ba861146750e40de4'
 
     #重新生成所有招标检索
     def reGenerateUserSearchIndex(self, jsonInfo):
@@ -541,3 +548,69 @@ class UserManager(Util):
 
     def updateOAUserInfo(self, info):
         pass
+
+
+    # 使用微信账号登录
+    def loginWithWechat(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        #第一步：获取参数code, encryptedData, rawData, signature, iv
+        code = info['code']
+        encryptedData = info['encryptedData']
+        rawData = info['rawData']
+        rawData = str(rawData)
+        signature = info['signature']
+        iv = info['iv']
+        #第二步：　获取唯一的openid, session_key
+        url = 'https://api.weixin.qq.com/sns/jscode2session?appid=%s' \
+              '&secret=%s&js_code=%s&grant_type=authorization_code' % (self.appID, self.appSecret, code)
+        f = urllib.urlopen(url)
+        ret = json.loads(f.read())
+        #判断是否获取成功
+        if(len(ret['session_key']) > 1 and len(ret['openid']) > 1):
+            #第三步：根据openid, 生成tokenID, 将tokenID, session_key 存入到数据库中
+            openID = ret['openid']
+            sessionKey = ret['session_key']
+            sessionKey = str(sessionKey)
+            #第四步，　验证签名
+            newSignature = hashlib.sha1(rawData + sessionKey).hexdigest()
+            if(newSignature == signature):
+                encryptedData = encryptedData.encode('utf-8')
+                resultDict = self.decrypt(encryptedData, iv, sessionKey)
+                tokenManager = TokenManager()
+                tokenID = tokenManager.createToken(openID)
+                # db.session.query(Token).filter(
+                #     Token.tokenID == tokenID
+                # ).update({Token.sessionKey: sessionKey}, synchronize_session=False)
+                #查询是否存在已经创建的用户
+                allResult = db.session.query(UserInfo).filter(UserInfo.userID == openID).all()
+                if(len(allResult) < 1):
+                    now = datetime.now()
+                    uInfo = {}
+                    uInfo['url'] = resultDict['avatarUrl']
+                    uInfo['userName'] = resultDict['nickName']
+                    userInfo = UserInfo(userID=openID, userName=resultDict['nickName'],
+                                        gender=resultDict['gender'], createTime=now)
+                    db.session.add(userInfo)
+
+                db.session.commit()
+                resultDict['tokenID'] = tokenID
+                return (True, tokenID)
+        else:
+            return (False, None)
+
+
+    #微信登录时候，解密用户加密的数据信息
+    def decrypt(self, encryptedData, iv, sessionKey):
+        # base64 decode
+        sessionKey = base64.b64decode(sessionKey)
+        encryptedData = base64.b64decode(encryptedData)
+        iv = base64.b64decode(iv)
+        cipher = AES.new(sessionKey, AES.MODE_CBC, iv)
+        decrypted = json.loads(self._unpad(cipher.decrypt(encryptedData)))
+        if decrypted['watermark']['appid'] != self.appID:
+            raise Exception('Invalid Buffer')
+        return decrypted
+
+    def _unpad(self, s):
+        return s[:-ord(s[len(s) - 1:])]
+
