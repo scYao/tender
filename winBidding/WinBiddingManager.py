@@ -143,6 +143,12 @@ class WinBiddingManager(Util):
         endDate = info['endDate']
         cityID = info['cityID']
         # 公告分类
+
+        if cityID != '-1':
+            query = query.filter(
+                WinBiddingPub.cityID == cityID
+            )
+
         if startDate != '-1':
             query = query.filter(WinBiddingPub.publishDate >= startDate)
 
@@ -151,10 +157,6 @@ class WinBiddingManager(Util):
                 WinBiddingPub.publishDate <= endDate
             )
 
-        if cityID != '-1':
-            query = query.filter(
-                WinBiddingPub.cityID == cityID
-            )
         info['query'] = query
         return query
 
@@ -235,25 +237,32 @@ class WinBiddingManager(Util):
         db.session.commit()
         return (True, '111')
 
-    @staticmethod
-    def getBiddingListByIDTuple(info):
+    def getBiddingListByIDTuple(self, info):
         foreignIDTuple = info['foreignIDTuple']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         query = db.session.query(
-            WinBiddingPub).filter(
+            WinBiddingPub, City).outerjoin(
+            City, WinBiddingPub.cityID == City.cityID
+        ).filter(
             WinBiddingPub.biddingID.in_(foreignIDTuple)
-        ).order_by(desc(WinBiddingPub.publishDate)).offset(startIndex).limit(pageCount)
+        )
+        info['query'] = query
+        query = self.__getQueryResult(info)
+        query = query.order_by(desc(WinBiddingPub.publishDate)).offset(startIndex).limit(pageCount)
         allResult = query.all()
-        def generateBid(result):
-            res = {}
-            res['biddingID'] = result.biddingID
-            res['title'] = result.title
-            res['publishDate'] = result.publishDate
-            res['biddingNum'] = result.biddingNum
-            return res
-        tenderList = [generateBid(result) for result in allResult]
-        return filter(None, tenderList)
+        biddingList = [self.__generateBrief(result) for result in allResult]
+        countQuery = db.session.query(func.count(WinBiddingPub.biddingID)).filter(
+            WinBiddingPub.biddingID.in_(foreignIDTuple)
+        )
+        info['query'] = countQuery
+        countQuery = self.__getQueryResult(info)
+        count = countQuery.first()
+        count = count[0]
+        result = {}
+        result['dataList'] = biddingList
+        result['count'] = count
+        return (True, result)
 
 
     # 编辑信息，后台

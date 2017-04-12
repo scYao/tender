@@ -73,8 +73,8 @@ class SearchManager(Util):
         if tag == 3:
             # bidIDList = [result.foreignID for result in allResult]
             # bidIDTuple = tuple(bidIDList)
-            bidList = WinBiddingManager.getBiddingListByIDTuple(info=info)
-            return (True, bidList)
+            winBiddingManager = WinBiddingManager()
+            return winBiddingManager.getBiddingListByIDTuple(info=info)
 
 
     # 搜索，小程序，tag=1，表示用户，2,表示招标，３，表示中标

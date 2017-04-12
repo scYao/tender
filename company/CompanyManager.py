@@ -231,7 +231,7 @@ class CompanyManager(Util):
         (status, reason) = adminManager.adminAuth(jsonInfo)
         if status is not True:
             return (False, reason)
-        self.getCompanyImg(jsonInfo=jsonInfo)
+        return self.getCompanyImg(jsonInfo=jsonInfo)
 
     #获取企业图片，根据不同的tag
     def getCompanyImg(self, jsonInfo):
