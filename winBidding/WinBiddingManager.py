@@ -73,10 +73,10 @@ class WinBiddingManager(Util):
 
     # 通过title判断改标段是否存在, 存在为True
     def doesBiddingExists(self, info):
-        title = info['title']
+        biddingNum = info['biddingNum']
         try:
             result = db.session.query(WinBiddingPub).filter(
-                WinBiddingPub.title == title
+                WinBiddingPub.biddingNum == biddingNum
             ).first()
             if result is not None:
                 return (True, result.biddingID)
