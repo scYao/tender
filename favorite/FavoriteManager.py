@@ -140,7 +140,6 @@ class FavoriteManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-
     def getFavoriteWinBiddingList(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
@@ -211,3 +210,92 @@ class FavoriteManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+    #小程序使用，获取我关注的列表
+    def getWechatFavoriteList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        tag = info['tag']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        try:
+            (status, ForeignIDList) = self.getFavoriteItemID(info=info)
+            info['foreignIDTuple'] = tuple(ForeignIDList)
+            if tag == FAVORITE_TAG_TENDER:
+                (status, callBackInfo) = self.getWechatFavoriteTenderList(info)
+                if status is True:
+                    return (status, callBackInfo)
+            else:
+                (status, callBackInfo) = self.getWechatFavoriteBidList(info)
+                if status is True:
+                    return (status, callBackInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+
+    #获取小程序关注的招标公告
+    def getWechatFavoriteTenderList(self, info):
+        cityID = info['cityID']
+        startDate = info['startDate']
+        endDate = info['endDate']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tenderIDTuple = info['foreignIDTuple']
+        query = db.session.query(Tender, City).outerjoin(
+            City, Tender.cityID == City.cityID
+        ).filter(
+            Tender.tenderID.in_(tenderIDTuple)
+        )
+        if cityID != '-1':
+            query = query.filter(Tender.cityID == cityID)
+        if startDate != '-1':
+            query.filter(Tender.publishDate >= startDate)
+        if endDate != '-1':
+            query = query.filter(
+                Tender.publishDate <= endDate
+            )
+        allResult = query.offset(startIndex).limit(pageCount).all()
+        tenderList = [self.__generateTender(t=t) for t in allResult]
+        count = len(tenderList)
+        callBackInfo = {}
+        callBackInfo['dataList'] = tenderList
+        callBackInfo['count'] = count
+        return (True, callBackInfo)
+
+
+    #获取小程序关注的招标公告
+    def getWechatFavoriteBidList(self, info):
+        cityID = info['cityID']
+        startDate = info['startDate']
+        endDate = info['endDate']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        bidTuple = info['foreignIDTuple']
+        query = db.session.query(WinBiddingPub, City).outerjoin(
+            City, WinBiddingPub.cityID == City.cityID
+        ).filter(
+            WinBiddingPub.biddingID.in_(bidTuple)
+        )
+        if cityID != '-1':
+            query = query.filter(WinBiddingPub.cityID == cityID)
+        if startDate != '-1':
+            query.filter(WinBiddingPub.publishDate >= startDate)
+        if endDate != '-1':
+            query = query.filter(
+                WinBiddingPub.publishDate <= endDate
+            )
+        allResult = query.offset(startIndex).limit(pageCount).all()
+        biddingList = [self.__generateBidding(b=b) for b in allResult]
+        count = len(biddingList)
+        callBackInfo = {}
+        callBackInfo['dataList'] = biddingList
+        callBackInfo['count'] = count
+        return (True, callBackInfo)
+

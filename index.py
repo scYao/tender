@@ -680,6 +680,22 @@ def create_admin_manager():
         data['data'] = userID
     return json.dumps(data)
 
+#小程序使用，获取我的关注列表
+@app.route('/get_wechat_favorite_list/', methods=['POST', 'GET'])
+def get_wechat_favorite_list():
+    favoriteManager = FavoriteManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = favoriteManager.getWechatFavoriteList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
 # 获取收藏列表, 招标
 @app.route('/get_favorite_tender_list/', methods=['POST', 'GET'])
 def get_favorite_tender_list():
