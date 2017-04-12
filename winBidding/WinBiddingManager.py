@@ -143,10 +143,13 @@ class WinBiddingManager(Util):
         endDate = info['endDate']
         cityID = info['cityID']
         # 公告分类
-        if startDate != '-1' and endDate != '-1':
+        if startDate != '-1':
+            query = query.filter(WinBiddingPub.publishDate >= startDate)
+
+        if endDate != '-1':
             query = query.filter(
-                WinBiddingPub.publishDate < endDate
-            ).filter(WinBiddingPub.publishDate > startDate)
+                WinBiddingPub.publishDate <= endDate
+            )
 
         if cityID != '-1':
             query = query.filter(
