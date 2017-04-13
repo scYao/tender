@@ -2294,6 +2294,21 @@ def get_news_list():
         data['data'] = result
         return json.dumps(data)
 
+# 获取资讯列表, 后台管理
+@app.route('/get_news_list_background/', methods=['POST', 'GET'])
+def get_news_list_background():
+    newsManager = NewsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = newsManager.getNewsList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 获取资讯列表
 @app.route('/get_news_detail/', methods=['POST', 'GET'])
 def get_news_detail():
@@ -2304,6 +2319,36 @@ def get_news_detail():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = newsManager.getNewsDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取资讯列表, 后台管理
+@app.route('/get_news_detail_background/', methods=['POST', 'GET'])
+def get_news_detail_background():
+    newsManager = NewsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = newsManager.getNewsDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 删除资讯, 后台管理
+@app.route('/delete_news_background/', methods=['POST', 'GET'])
+def delete_news_background():
+    newsManager = NewsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = newsManager.deleteNewsBackground(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
