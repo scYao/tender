@@ -30,7 +30,7 @@ class NewsManager(Util):
 
     def createNews(self, jsonInfo, imgFileList):
         info = json.loads(jsonInfo)
-        title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"')
+        title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"').strip()
         content = info['content'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         newsID = self.generateID(title)
@@ -92,6 +92,7 @@ class NewsManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -101,16 +102,15 @@ class NewsManager(Util):
         foreignID = o.foreignID
         img = ImgPath.generate(img=o, directory=TENDER_NEWS, ossInfo=ossInfo,
                                                 hd=True, isFile=False)
+
         if not dic.has_key(foreignID):
             imgList = [img]
             dic[foreignID] = imgList
+            print dic
         else:
             imgList = dic[foreignID]
             imgList.append(img)
         return (True, None)
-
-
-
 
     def addImageListToNews(self, info):
         newsIDList = info['newsIDList']
@@ -125,10 +125,10 @@ class NewsManager(Util):
         ossInfo['bucket'] = 'sjtender'
         _ = [self.__generateImg(o=o, dic=dic, ossInfo=ossInfo) for o in allResult]
         for o in dataList:
-            newsID = o.newsID
+            newsID = o['newsID']
             o['imgList'] = dic[newsID]
         def __addImgList(o):
-            o['imgList'] = dic[o.newsID]
+            o['imgList'] = dic[o['newsID']]
         _ = [__addImgList(o=o) for o in dataList]
         return (True, None)
 
@@ -142,6 +142,32 @@ class NewsManager(Util):
                 News.newsID == newsID
             ).first()
 
+            newsResult = {}
+            newsResult.update(News.generate(o=result))
+            imgResult = db.session.query(ImgPath).filter(
+                ImgPath.foreignID == newsResult['newsID']
+            ).all()
+            ossInfo = {}
+            ossInfo['bucket'] = 'sjtender'
+            newsResult['imgList'] = [ImgPath.generate(img=o, directory=TENDER_NEWS, ossInfo=ossInfo,
+                                                hd=True, isFile=False) for o in imgResult]
+            return (True, newsResult)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def deleteNewsBackground(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        newsID = info['newsID']
+
+        try:
+            db.session.query(News).filter(
+                News.newsID == newsID
+            ).delete(synchronize_session=False)
         except Exception as e:
             print e
             traceback.print_exc()
