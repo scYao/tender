@@ -1129,6 +1129,22 @@ def search():
         data['data'] = result
         return json.dumps(data)
 
+
+#获取热门搜索关键词，小程序使用
+@app.route('/get_hot_searchkey_list/', methods=['POST', 'GET'])
+def get_hot_searchkey_list():
+    searchManager = SearchManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = searchManager.getHotSearchkeyList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 #微信小程序，搜索
 @app.route('/wechat_search/', methods=['POST', 'GET'])
 def wechat_search():

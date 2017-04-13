@@ -395,6 +395,7 @@ class TenderManager(Util):
             ).first()
             if favoriteResult is not None:
                 tenderDetail['favorite'] = True
+                tenderDetail['favoriteID'] = favoriteResult.favoriteID
         return (True, tenderDetail)
 
     def getTenderDetailBackground(self, jsonInfo):
