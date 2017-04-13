@@ -57,6 +57,28 @@ class TenderCommentManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+
+    #删除批注
+    def deleteTenderComment(self, info):
+        userID = info['userID']
+        tenderID = info['tenderID']
+        try:
+            query = db.session.query(TenderComment).filter(
+                and_(
+                    TenderComment.userID == userID,
+                    TenderComment.tenderID == tenderID
+                )
+            )
+            query.delete(synchronize_session=False)
+            db.session.commit()
+            return (True, None)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
     def getCommentList(self, info):
         pushedID = info['pushedID']
 

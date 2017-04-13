@@ -740,11 +740,27 @@ def get_hot_searchkey_list():
     print result
 
 
+def delete_pushed_tender_by_operator():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/delete_pushed_tender_by_operator/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2017-04-13153628c6a0f09a06d78462fce33ea791a9effc'
+    info['pushedID'] = '2017-04-131536114dc06f390d62bad133d45f82c1eb0d30'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
 
 
 
 if __name__ == '__main__':
-    get_hot_searchkey_list()
+    delete_pushed_tender_by_operator()
+    # t1 = datetime.datetime.now()
+    # t2 = None
+    # print t1 > t2
+    # get_hot_searchkey_list()
     # get_wechat_favorite_list()
     # wechat_search()
     # get_tender_done_detail()

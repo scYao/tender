@@ -45,6 +45,18 @@ class BossManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
 
+    # 审定人取消推送
+    def deletePushedTenderByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.deletePushedTender(info=info)
+
     # 创建推送, 自定义标
     def createCustomizedTenderByBoss(self, jsonInfo, imgFileList):
         info = json.loads(jsonInfo)
@@ -82,9 +94,21 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         info['userID'] = userID
-        info['userID'] = userID
         tenderCommentManager = TenderCommentManager()
         return tenderCommentManager.createTenderComment(info=info)
+
+
+    # 审定人删除批注
+    def deleteTenderCommentByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        tenderCommentManager = TenderCommentManager()
+        return tenderCommentManager.deleteTenderComment(info=info)
 
     # 决定是否投标
     def operatePushedTenderInfo(self, jsonInfo):
@@ -200,6 +224,17 @@ class BossManager(Util):
             return (False, errorInfo)
         userManager = UserManager()
         return userManager.getOAUserInfoList(info=info)
+
+    # 审定人获取推送人员列表
+    def getTenderUserInfoListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        userManager = UserManager()
+        return userManager.getTenderUserInfoList(info=info)
 
     #账号管理，创建新员工
     def createUserInfoByBoss(self, jsonInfo):

@@ -142,6 +142,65 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    # 经办人 负责人 审核人 审定人撤销推送
+    def deletePushedTender(self, info):
+        pushedID = info['pushedID']
+        userType = info['userType']
+        userID = info['userID']
+        try:
+            query = db.session.query(PushedTenderInfo).filter(
+                and_(
+                    PushedTenderInfo.pushedID == pushedID,
+                    PushedTenderInfo.userID == userID
+                )
+            )
+            result = query.first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_28'])#推送消息不存在
+            createTime = result.createTime
+            responsiblePersonPushedTime = result.responsiblePersonPushedTime
+            auditorPushedTime = result.auditorPushedTime
+            state = result.state
+
+            #(1)判断取消人身份，（２）判断是否可以取消，（３）根据不同身份返回到推送前状态
+            if userType == USER_TAG_OPERATOR:
+                if responsiblePersonPushedTime is not None:
+                    return (False, ErrorInfo['TENDER_35'])
+                query.delete(synchronize_session=False)
+
+            if userType == USER_TAG_RESPONSIBLEPERSON:
+                if auditorPushedTime is not None:
+                    return (False, ErrorInfo['TENDER_35'])
+                else:
+                    if createTime is not None:
+                        query.update(
+                            {PushedTenderInfo.responsiblePersonPushedTime: None},
+                            synchronize_session=False
+                        )
+                    else:
+                        query.delete(synchronize_session=False)
+
+            if userType == USER_TAG_AUDITOR:
+                if state == 0:
+                    return (False, ErrorInfo['TENDER_35'])
+                else:
+                    if responsiblePersonPushedTime is not None:
+                        query.update(
+                            {PushedTenderInfo.auditorPushedTime: None},
+                            synchronize_session=False
+                        )
+                    else:
+                        query.delete(synchronize_session=False)
+            db.session.commit()
+            return (True, None)
+        except Exception as e:
+            print e
+            traceback.print_stack()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
 
     # 添加项目信息，正在进行中
     def updateDoingPushedTender(self, info):

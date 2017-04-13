@@ -51,6 +51,21 @@ class OperatorManager(Util):
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.createPushedTender(info)
 
+    # 经办人取消自己的推送
+    def deletePushedTenderByOperator(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.deletePushedTender(info)
+
+
+
+
     # 创建推送, 自定义标
     def createCustomizedTenderByOperator(self, jsonInfo, imgFileList):
         info = json.loads(jsonInfo)

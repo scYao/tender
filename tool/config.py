@@ -206,6 +206,12 @@ ErrorInfo['TENDER_34'] = {
     'zhInfo' : '用户不是OA用户!'
 }
 
+ErrorInfo['TENDER_35'] = {
+    'code' : 'TENDER_35',
+    'info' : 'can not delete this pushedTenderInfo!',
+    'zhInfo' : '无法删除该推送!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

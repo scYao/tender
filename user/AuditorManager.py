@@ -3,6 +3,8 @@ import sys
 import json
 import traceback
 
+from user.UserManager import UserManager
+
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -28,7 +30,7 @@ class AuditorManager(Util):
     def __init__(self):
         pass
 
-    # 负责人推送, 创建推送
+    # 审核人推送, 创建推送
     def createPushedTenderByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_AUDITOR
@@ -36,10 +38,20 @@ class AuditorManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['tag'] = USER_TAG_BOSS
         pushedTenderManager = PushedTenderManager()
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.createPushedTender(info=info)
+
+    # 审核人取消推送
+    def deletePushedTenderByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.deletePushedTender(info=info)
 
     # 创建推送, 自定义标
     def createCustomizedTenderByAuditor(self, jsonInfo, imgFileList):
@@ -190,9 +202,21 @@ class AuditorManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         info['userID'] = userID
-        info['userID'] = userID
         tenderCommentManager = TenderCommentManager()
         return tenderCommentManager.createTenderComment(info=info)
+
+
+    #审核人删除批注
+    def deleteTenderCommentByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        tenderCommentManager = TenderCommentManager()
+        return tenderCommentManager.deleteTenderComment(info=info)
 
     # 审核人获取 正在进行中的招标详情
     def getDoingDetailByAuditor(self, jsonInfo):
@@ -205,3 +229,14 @@ class AuditorManager(Util):
         pushedTenderManager = PushedTenderManager()
         info['userID'] = userID
         return pushedTenderManager.getTenderDoingDetail(info=info)
+
+    # 审核人获取推送人员列表
+    def getTenderUserInfoListByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        userManager = UserManager()
+        return userManager.getTenderUserInfoList(info=info)
