@@ -17,7 +17,7 @@ import hashlib
 from sqlalchemy import and_, text, func, desc
 import traceback
 from tool.tagconfig import CUSTOMIZEDCOMPANYID, DEFAULT_PWD, USER_TAG_BOSS, USER_TAG_OPERATOR
-
+from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from models.flask_app import db
 from models.UserInfo import UserInfo
 from models.Token import Token
@@ -446,7 +446,8 @@ class UserManager(Util):
         resultDic['userType'] = userType
         return (True, resultDic)
 
-    #获取OA用户列表
+
+    # 获取OA用户列表
     def getOAUserInfoList(self, info):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
@@ -460,6 +461,40 @@ class UserManager(Util):
                 func.count(UserInfo.userID)
             ).filter(
                 UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID
+            )
+            count = countQuery.first()
+            count = count[0]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count
+            return (True, callBackInfo)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    # 获取推送人员列表
+    def getTenderUserInfoList(self, info):
+        userType = info['userType']
+        try:
+            query = db.session.query(UserInfo).filter(
+                and_(
+                    UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID,
+                    UserInfo.userType >= userType
+                )
+            )
+            allResult = query.all()
+            dataList = [UserInfo.generateOAInfo(result) for result in allResult]
+            countQuery = db.session.query(
+                func.count(UserInfo.userID)
+            ).filter(
+                and_(
+                    UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID,
+                    UserInfo.userType >= userType
+                )
             )
             count = countQuery.first()
             count = count[0]

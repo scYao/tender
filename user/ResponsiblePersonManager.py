@@ -3,6 +3,8 @@ import sys
 import json
 import traceback
 
+from user.UserManager import UserManager
+
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -43,6 +45,19 @@ class ResponsiblePersonManager(Util):
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         info['userID'] = userID
         return pushedTenderManager.createPushedTender(info=info)
+
+    # 负责人取消推送
+    def deletePushedTenderByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['tag'] = USER_TAG_AUDITOR
+        pushedTenderManager = PushedTenderManager()
+        info['userID'] = userID
+        return pushedTenderManager.deletePushedTender(info=info)
 
     # 创建推送, 自定义标
     def createCustomizedTenderByResp(self, jsonInfo, imgFileList):
@@ -251,6 +266,18 @@ class ResponsiblePersonManager(Util):
         tenderCommentManager = TenderCommentManager()
         return tenderCommentManager.createTenderComment(info=info)
 
+    # 负责人, 删除批注
+    def deleteTenderCommentByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        tenderCommentManager = TenderCommentManager()
+        return tenderCommentManager.deleteTenderComment(info=info)
+
      # 负责人获取 正在进行中的招标详情
     def getDoingDetailByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -262,3 +289,14 @@ class ResponsiblePersonManager(Util):
         pushedTenderManager = PushedTenderManager()
         info['userID'] = userID
         return pushedTenderManager.getTenderDoingDetail(info=info)
+
+    # 负责人获取推送人员列表
+    def getTenderUserInfoListByRes(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        userManager = UserManager()
+        return userManager.getTenderUserInfoList(info=info)

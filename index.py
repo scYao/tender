@@ -1479,6 +1479,21 @@ def create_tender_comment_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人, 删除批注
+@app.route('/delete_tender_comment_by_resp/', methods=['POST', 'GET'])
+def delete_tender_comment_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.deleteTenderCommentByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 负责人获取待分配列表
 @app.route('/get_undistributed_tender_list_by_resp/', methods=['POST', 'GET'])
 def get_undistributed_tender_list_by_resp():
@@ -1598,6 +1613,22 @@ def create_pushed_tender_by_operator():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+# 取消推送，经办人
+@app.route('/delete_pushed_tender_by_operator/', methods=['POST', 'GET'])
+def delete_pushed_tender_by_operator():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.deletePushedTenderByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 创建推送, 自定义标
 @app.route('/create_customized_tender_by_operator/', methods=['POST', 'GET'])
@@ -1912,6 +1943,21 @@ def create_pushed_tender_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人取消推送
+@app.route('/delete_pushed_tender_by_resp/', methods=['POST', 'GET'])
+def delete_pushed_tender_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.deletePushedTenderByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 创建推送, 自定义标, 负责人
 @app.route('/create_customized_tender_by_resp/', methods=['POST', 'GET'])
@@ -1949,6 +1995,21 @@ def create_pushed_tender_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = auditorManager.createPushedTenderByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审核人撤销推送
+@app.route('/delete_pushed_tender_by_auditor/', methods=['POST', 'GET'])
+def delete_pushed_tender_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.deletePushedTenderByAuditor(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1995,6 +2056,21 @@ def create_pushed_tender_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人撤销推送
+@app.route('/delete_pushed_tender_by_boss/', methods=['POST', 'GET'])
+def delete_pushed_tender_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.deletePushedTenderByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 审定人创建推送, 自定义标段
 @app.route('/create_customized_tender_by_boss/', methods=['POST', 'GET'])
 def create_customized_tender_by_boss():
@@ -2032,6 +2108,21 @@ def create_tender_comment_by_boss():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.createTenderCommentByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人删除批注
+@app.route('/delete_tender_comment_by_boss/', methods=['POST', 'GET'])
+def delete_tender_comment_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.deleteTenderCommentByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -2169,6 +2260,21 @@ def create_tender_comment_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = auditorManager.createTenderCommentByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审核人 删除批注
+@app.route('/delete_tender_comment_by_auditor/', methods=['POST', 'GET'])
+def delete_tender_comment_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.deleteTenderCommentByAuditor(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -2391,6 +2497,52 @@ def create_news():
             imgDic['file'] = f
             imgList.append(imgDic)
         (status, result) = newsManager.createNews(jsonInfo=paramsJson, imgFileList=imgList)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+#审定人获取推送人员列表
+@app.route('/get_tender_user_info_list_by_boss/', methods=['POST', 'GET'])
+def get_tender_user_info_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getTenderUserInfoListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+#审核人获取推送人员列表
+@app.route('/get_tender_user_info_list_by_auditor/', methods=['POST', 'GET'])
+def get_tender_user_info_list_by_auditor():
+    aauditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = aauditorManager.getTenderUserInfoListByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+#负责人获取推送人员列表
+@app.route('/get_tender_user_info_list_by_res/', methods=['POST', 'GET'])
+def get_tender_user_info_list_by_res():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getTenderUserInfoListByRes(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
