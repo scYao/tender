@@ -126,7 +126,7 @@ create table message(
 
 -- 招标资讯
 create table news(
-	newID nvarchar(100) primary key comment '资讯ID',
+	newsID nvarchar(100) primary key comment '资讯ID',
 	title nvarchar(100) comment '标题',
 	content text comment '正文内容',
 	createTime datetime comment '创建时间'
