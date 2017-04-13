@@ -88,6 +88,7 @@ OPERATION_TAG_MANAGER_ARRANGEMENT = 5   # 项目经理安排
 #标书OSS目录
 BID_DOC_DIRECTORY = 'biddocument'
 CUS_TENDER_DOC_DIRECTORY = 'customizedtender'
+TENDER_NEWS = 'tendernews'
 
 #公司ID
 CUSTOMIZEDCOMPANYID = '1'

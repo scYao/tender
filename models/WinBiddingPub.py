@@ -16,7 +16,7 @@ class WinBiddingPub(db.Model):
     detail = db.Column(db.Text)
     cityID = db.Column(db.String(100), db.ForeignKey('City.cityID'))
 
-    delinquenentConduct = db.relationship('Candidate', backref='WinBiddingPub', lazy='dynamic')
+    candidate = db.relationship('Candidate', backref='WinBiddingPub', lazy='dynamic')
 
     def __init__(self, biddingID=None, title=None, publishDate=None,
                  biddingNum=None, detail=None, cityID=None):

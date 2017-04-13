@@ -2295,6 +2295,36 @@ def delete_user_info_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 获取资讯列表
+@app.route('/get_news_list/', methods=['POST', 'GET'])
+def get_news_list():
+    newsManager = NewsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = newsManager.getNewsList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取资讯列表
+@app.route('/get_news_detail/', methods=['POST', 'GET'])
+def get_news_detail():
+    newsManager = NewsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = newsManager.getNewsDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 创建招标资讯
 @app.route('/create_news/', methods=['POST', 'GET'])
 def create_news():
