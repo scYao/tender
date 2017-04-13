@@ -106,7 +106,6 @@ class NewsManager(Util):
         if not dic.has_key(foreignID):
             imgList = [img]
             dic[foreignID] = imgList
-            print dic
         else:
             imgList = dic[foreignID]
             imgList.append(img)

@@ -49,6 +49,7 @@ class PushedTenderInfo(db.Model):
     deposit = db.Column(db.Float)
     planScore = db.Column(db.Float)
     tenderType = db.Column(db.String(100))
+    deadline = db.Column(db.Date)
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
@@ -61,7 +62,8 @@ class PushedTenderInfo(db.Model):
                  workerName='', candidateName1='', candidatePrice1=0,
                  candidateName2='', candidatePrice2=0, candidateName3='',
                  candidatePrice3=0, tag=0, tenderCompanyName=None, projectType=None,
-                 workContent=None, deposit=0, planScore=0, tenderType=None):
+                 workContent=None, deposit=0, planScore=0, tenderType=None,
+                 deadline=None):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -100,6 +102,7 @@ class PushedTenderInfo(db.Model):
         self.deposit = deposit
         self.planScore = planScore
         self.tenderType = tenderType
+        self.deadline = deadline
 
 
     @staticmethod
@@ -133,6 +136,10 @@ class PushedTenderInfo(db.Model):
         res['createTime'] = str(c.createTime)
         res['tenderID'] = c.tenderID
         res['state'] = c.state
+        if c.deadline is None:
+            res['deadline'] = ''
+        else:
+            res['deadline'] = str(c.deadline)
         return res
 
     @staticmethod
@@ -175,6 +182,10 @@ class PushedTenderInfo(db.Model):
         res['deposit'] = c.deposit
         res['planScore'] = c.planScore
         res['tenderType'] = c.tenderType
+        if c.deadline is None:
+            res['deadline'] = ''
+        else:
+            res['deadline'] = str(c.deadline)
         return res
 
     def __repr__(self):

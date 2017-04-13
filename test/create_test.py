@@ -326,6 +326,22 @@ def get_news_list_background():
     print result
     return result
 
+# 获取资讯, 后台管理
+def get_news_detail_background():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_news_detail_background/' % (LOCALHOST, PORT)
+    info = {}
+    info['newsID'] = '2017-04-1314541536221cf14e33334b0699cf3bac95d0af'
+    info['tokenID'] = '2017-04-11150528a339713a3be89c472aa052fb380cad87'
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    print result
+    return result
+
 
 def test_get_provinces_citys():
     result = get_province_list()
@@ -460,7 +476,8 @@ def test_get_tender_list_time():
     print dt2 - dt1
 
 if __name__ == '__main__':
-    get_news_list_background()
+    get_news_detail_background()
+    # get_news_list_background()
     # get_favorite_tender_list()
     # get_province_city_info()
     # batck_create_tender()
