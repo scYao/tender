@@ -707,10 +707,46 @@ def get_tender_done_detail():
 
 
 
+def get_wechat_favorite_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_wechat_favorite_list/' % LOCALHOST
+    info = {}
+    info['endDate'] = '-1'
+    info['startDate'] = '-1'
+    info['cityID'] = '-1'
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = ''
+    info['tag'] = '1'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+def get_hot_searchkey_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_hot_searchkey_list/' % LOCALHOST
+    info = {}
+    info['endDate'] = '-1'
+    info['startDate'] = '-1'
+    info['cityID'] = '-1'
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = ''
+    info['tag'] = '1'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
 
 
 if __name__ == '__main__':
-    wechat_search()
+    get_hot_searchkey_list()
+    # get_wechat_favorite_list()
+    # wechat_search()
     # get_tender_done_detail()
     # create_user_info_by_boss()
     # get_user_info_list_by_boss()

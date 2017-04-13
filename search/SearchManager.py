@@ -36,6 +36,12 @@ class SearchManager(Util):
     def __init__(self):
         pass
 
+    # 获取热门搜索关键词，小程序使用
+    def getHotSearchkeyList(self, jsonInfo):
+
+        callBackInfo = '设计，市政，施工，绿化，总承包，桩基'.split('，')
+        return (True, callBackInfo)
+
     # 搜索，后台，tag=1，表示用户，2,表示招标，３，表示中标
     def searchBackground(self, jsonInfo):
         info = json.loads(jsonInfo)
