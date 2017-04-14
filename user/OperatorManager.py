@@ -173,7 +173,7 @@ class OperatorManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userID'] = userID
+        info['staffUserID'] = userID
         pushedTenderManager = PushedTenderManager()
         info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
@@ -186,7 +186,7 @@ class OperatorManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userID'] = userID
+        info['staffUserID'] = userID
         pushedTenderManager = PushedTenderManager()
         info['tenderTag'] = PUSH_TENDER_INFO_TAG_CUS
         return pushedTenderManager.getPushedTenderListByUserID(info=info)

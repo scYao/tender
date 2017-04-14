@@ -176,7 +176,7 @@ class BossManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userID'] = operatorUserID
+        info['staffUserID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
@@ -189,20 +189,10 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
 
-        staffUserID = None
-        if info['userID'] != '-1':
-            staffUserID = info['userID']
-        userManager = UserManager()
-        info['userID'] = userID
-        (status, userInfo) = userManager.getUserInfo(info=info)
-        info['customizedCompanyID'] = userInfo['customizedCompanyID']
-        info['selfUserType'] = userInfo['userType']
+        info['selfUserID'] = userID
+        info['staffUserID'] = info['userID']
         pushedTenderManager = PushedTenderManager()
-        info['tenderTag'] = '-1'
-        info['userID'] = '-1'
-        if staffUserID is not None:
-            info['userID'] = staffUserID
-        return pushedTenderManager.getPushedTenderListByUserID(info=info)
+        return pushedTenderManager.getAllPushedList(info=info)
 
     # 审定人获取待分配列表
     def getUndistributedTenderListByBoss(self, jsonInfo):

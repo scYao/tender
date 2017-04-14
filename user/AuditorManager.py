@@ -115,7 +115,7 @@ class AuditorManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userID'] = operatorUserID
+        info['staffUserID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
         (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
         if status is True:
@@ -241,3 +241,17 @@ class AuditorManager(Util):
             return (False, errorInfo)
         userManager = UserManager()
         return userManager.getTenderUserInfoList(info=info)
+
+    # 审核人  获取所有人的推送列表
+    def getAllPushedListByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['selfUserID'] = userID
+        info['staffUserID'] = info['userID']
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getAllPushedList(info=info)

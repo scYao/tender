@@ -350,6 +350,7 @@ def get_all_pushed_list_by_boss():
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['tokenID'] = '2017-04-141343271cc0fa1ac77f7969d3edfe436b4f46e4'
+    info['userID'] = '-1'
 
     params = {'data': json.dumps(info)}
     datagen, headers = poster.encode.multipart_encode(params)

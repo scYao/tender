@@ -478,12 +478,21 @@ class PushedTenderManager(Util):
         res.update(CustomizedTender.generate(c=result.CustomizedTender))
         return res
 
+    def getAllPushedList(self, info):
+        userID = info['selfUserID']
+        userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
+        info['selfUserType'] = userInfo['userType']
+        info['tenderTag'] = '-1'
+        return self.getPushedTenderListByUserID(info=info)
 
     # 经办人 获取我的推送列表, 其他人获取经办人推送列表
     def getPushedTenderListByUserID(self, info):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        userID = info['userID']
+        userID = info['staffUserID']
         tenderTag = info['tenderTag']
 
         try:

@@ -191,7 +191,7 @@ class ResponsiblePersonManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         operatorUserID = info['userID']
-        info['userID'] = operatorUserID
+        info['staffUserID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
         # info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
@@ -300,3 +300,17 @@ class ResponsiblePersonManager(Util):
             return (False, errorInfo)
         userManager = UserManager()
         return userManager.getTenderUserInfoList(info=info)
+
+    # 审核人  获取所有人的推送列表
+    def getAllPushedListByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['selfUserID'] = userID
+        info['staffUserID'] = info['userID']
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getAllPushedList(info=info)
