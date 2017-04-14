@@ -752,11 +752,34 @@ def delete_pushed_tender_by_operator():
     print result
 
 
+def get_tender_user_info_list_by_boss():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_tender_user_info_list_by_boss/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2017-04-13155228ba95dd5fd2d8665f3274fbd9dcf538b6'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+def create_pushed_tender_by_boss():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/create_pushed_tender_by_boss/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2017-04-13155228ba95dd5fd2d8665f3274fbd9dcf538b6'
+    info['tenderID'] = '2017-04-11163821ac645cd78c34f7fe4b42c30f2a8e91ac'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
 
 
 
 if __name__ == '__main__':
-    delete_pushed_tender_by_operator()
+    create_pushed_tender_by_boss()
+    # get_tender_user_info_list_by_boss()
+    # delete_pushed_tender_by_operator()
     # t1 = datetime.datetime.now()
     # t2 = None
     # print t1 > t2

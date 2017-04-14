@@ -108,7 +108,8 @@ class PushedTenderManager(Util):
     # 经办人 负责人 审核人 创建推送
     def createPushedTender(self, info):
         userID = info['userID']
-        pushedID = self.generateID(userID + info['tenderID'])
+        tenderID = info['tenderID']
+        pushedID = self.generateID(userID + tenderID)
         info['pushedID'] = pushedID
         info['userID'] = userID
         info['createTime'] = None
@@ -125,16 +126,27 @@ class PushedTenderManager(Util):
             info['auditorPushedTime'] = datetime.now()
         if userType == USER_TAG_RESPONSIBLEPERSON:
             info['responsiblePersonPushedTime'] = datetime.now()
+        #推送人是审定人，直接视为推送到审定人且审定人决定投标,分配一个默认的经办人
+        if userType == USER_TAG_BOSS:
+            info['state'] = 1
         try:
             #判断是否已经创建过推送消息
             result = db.session.query(PushedTenderInfo).filter(
-                PushedTenderInfo.tenderID == info['tenderID']
+                PushedTenderInfo.tenderID == tenderID
             ).first()
             if result:
                 return (False, ErrorInfo['TENDER_25'])
             (status, result) = PushedTenderInfo.create(info)
-            # self.createPushMessage(info=info)
             db.session.commit()
+            if status is True and userType == USER_TAG_BOSS:
+                operatorInfo = {}
+                operatorInfo['operatorID'] = self.generateID(tenderID)
+                operatorInfo['tenderID'] = tenderID
+                operatorInfo['userID'] = -1
+                operatorInfo['state'] = 0
+                Operator.create(info=operatorInfo)
+                self.createAssignMessage(info=info)
+                db.session.commit()
             return (True, pushedID)
         except Exception as e:
             print e

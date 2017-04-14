@@ -107,6 +107,7 @@ class PushedTenderInfo(db.Model):
 
     @staticmethod
     def create(info):
+        print '3333', info
         pushedTenderInfo = PushedTenderInfo(
             pushedID=info['pushedID'],
             userID=info['userID'],
