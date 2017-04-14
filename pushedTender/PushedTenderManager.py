@@ -162,13 +162,9 @@ class PushedTenderManager(Util):
     def deletePushedTender(self, info):
         pushedID = info['pushedID']
         userType = info['userType']
-        userID = info['userID']
         try:
             query = db.session.query(PushedTenderInfo).filter(
-                and_(
-                    PushedTenderInfo.pushedID == pushedID,
-                    PushedTenderInfo.userID == userID
-                )
+                    PushedTenderInfo.pushedID == pushedID
             )
             result = query.first()
             if result is None:

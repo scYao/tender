@@ -28,6 +28,8 @@ from user.AdminManager import AdminManager
 from winBidding.WinBiddingManager import WinBiddingManager
 from tool.Util import Util
 from tool.config import ErrorInfo
+from tool.tagconfig import SEARCH_KEY_TAG_USER, SEARCH_KEY_TAG_WIN_BIDDING
+from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
 from sqlalchemy import func
 
 
@@ -63,20 +65,20 @@ class SearchManager(Util):
         # allResult = query.offset(startIndex).limit(pageCount).all()
         info['foreignIDTuple'] = foreignIDTuple
 
-        if tag == 1:
+        if tag == SEARCH_KEY_TAG_USER:
             # userIDList = [result.foreignID for result in allResult]
             # userIDTuple = tuple(userIDList)
             userInfoList = UserManager.getUserInfoListByIDTuple(info=info)
             return (True, userInfoList)
 
-        if tag == 2:
+        if tag == SEARCH_KEY_TAG_TENDRE:
             # tenderIDList = [result.foreignID for result in allResult]
             # tenderIDTuple = tuple(tenderIDList)
             tenderManager = TenderManager()
             return tenderManager.getTenderListByIDTuple(info=info)
 
 
-        if tag == 3:
+        if tag == SEARCH_KEY_TAG_WIN_BIDDING:
             # bidIDList = [result.foreignID for result in allResult]
             # bidIDTuple = tuple(bidIDList)
             winBiddingManager = WinBiddingManager()
