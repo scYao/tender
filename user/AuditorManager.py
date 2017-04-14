@@ -40,6 +40,7 @@ class AuditorManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
+        info['userID'] = userID
         return pushedTenderManager.createPushedTender(info=info)
 
     # 审核人取消推送

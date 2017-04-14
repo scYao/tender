@@ -116,7 +116,8 @@ class PushedTenderInfo(db.Model):
             state=info['state'],
             step=info['step'],
             tenderID=info['tenderID'],
-            tag=info['pushedTenderInfoTag']
+            tag=info['pushedTenderInfoTag'],
+            deadline=info['deadline']
             # projectManagerName=info['projectManagerName'],
             # openedDate=info['openedDate'],
             # openedLocation=info['openedLocation'],

@@ -116,6 +116,8 @@ class PushedTenderManager(Util):
         info['auditorPushedTime'] = None
         info['state'] = 0
         info['step'] = 0
+        if not info.has_key('deadline'):
+            info['deadline'] = None
         userType = info['userType']
         if userType == USER_TAG_OPERATOR:
             info['createTime'] = datetime.now()
