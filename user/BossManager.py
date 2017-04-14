@@ -42,6 +42,8 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         info['tag'] = USER_TAG_BOSS
+        info['userID'] = userID
+        info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.createPushedTender(info=info)
 
