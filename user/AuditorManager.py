@@ -242,6 +242,17 @@ class AuditorManager(Util):
         userManager = UserManager()
         return userManager.getTenderUserInfoList(info=info)
 
+
+    # 给数据打上tag，是否推送了
+    def __tagTenderList(self, info):
+        dataList = info['dataList']
+        for o in dataList:
+            if o['auditorPushedTime'] != '':
+                o['pushed'] = True
+            else:
+                o['pushed'] = False
+        return (True, info)
+
     # 审核人  获取所有人的推送列表
     def getAllPushedListByAuditor(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -254,4 +265,7 @@ class AuditorManager(Util):
         info['selfUserID'] = userID
         info['staffUserID'] = info['userID']
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getAllPushedList(info=info)
+        (status, result) = pushedTenderManager.getAllPushedList(info=info)
+        if status is True:
+            self.__tagTenderList(info=result)
+        return (status, result)

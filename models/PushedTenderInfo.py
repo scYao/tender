@@ -138,6 +138,16 @@ class PushedTenderInfo(db.Model):
             res['createTime'] = ''
         else:
             res['createTime'] = str(c.createTime)
+
+        if c.responsiblePersonPushedTime is None:
+            res['responsiblePersonPushedTime'] = ''
+        else:
+            res['responsiblePersonPushedTime'] = str(c.responsiblePersonPushedTime)
+
+        if c.auditorPushedTime is None:
+            res['auditorPushedTime'] = ''
+        else:
+            res['auditorPushedTime'] = str(c.auditorPushedTime)
         res['tenderID'] = c.tenderID
         res['state'] = c.state
         if c.deadline is None:

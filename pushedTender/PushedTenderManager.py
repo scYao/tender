@@ -43,7 +43,7 @@ from user.UserManager import UserManager
 class PushedTenderManager(Util):
 
     def __init__(self):
-        pass
+        self.resp = None
 
     @staticmethod
     def isTokenValidByUserType(info):
@@ -548,6 +548,7 @@ class PushedTenderManager(Util):
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()

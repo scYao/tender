@@ -175,7 +175,8 @@ class OperatorManager(Util):
             return (False, errorInfo)
         info['staffUserID'] = userID
         pushedTenderManager = PushedTenderManager()
-        info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
+        # info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
+        info['tenderTag'] = '-1'
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
     # 获取经办人的推送列表,其他途经
