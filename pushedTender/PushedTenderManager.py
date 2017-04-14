@@ -37,6 +37,7 @@ from models.ImgPath import ImgPath
 from models.TenderComment import TenderComment
 
 from message.MessageManager import MessageManager
+from user.UserManager import UserManager
 
 class PushedTenderManager(Util):
 
@@ -444,6 +445,31 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
+        # 获取推送人员列表
+        if self.resp is not None:
+            pushedUserList = []
+            # 经办人推送了
+            if result.PushedTenderInfo.createTime is not None:
+                u = {}
+                u['userID'] = result.UserInfo.userID
+                u['userName'] = result.UserInfo.userName
+                u['userType'] = result.UserInfo.userType
+                pushedUserList.append(u)
+            if result.PushedTenderInfo.responsiblePersonPushedTime \
+                    is not None and self.selfUserType <= USER_TAG_RESPONSIBLEPERSON:
+                u = {}
+                u['userID'] = self.resp['userID']
+                u['userName'] = self.resp['userName']
+                u['userType'] = self.resp['userType']
+                pushedUserList.append(u)
+            if result.PushedTenderInfo.auditorPushedTime \
+                    is not None and self.selfUserType <= USER_TAG_AUDITOR:
+                u = {}
+                u['userID'] = self.auditor['userID']
+                u['userName'] = self.auditor['userName']
+                u['userType'] = self.auditor['userType']
+                pushedUserList.append(u)
+            res['pushedUserList'] = pushedUserList
         return res
 
     def __generateCustomizedPushedBrief(self, result):
@@ -462,21 +488,46 @@ class PushedTenderManager(Util):
 
         try:
             query = db.session.query(
-                PushedTenderInfo, Tender
+                PushedTenderInfo, Tender, UserInfo
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
-            ).filter(
-                and_(PushedTenderInfo.userID == userID,
-                     Tender.tenderTag == tenderTag)
+            ).outerjoin(
+                UserInfo, PushedTenderInfo.userID == UserInfo.userID
             )
-            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
-                and_(PushedTenderInfo.userID == userID,
-                     PushedTenderInfo.tag == tenderTag)
-            )
+
+            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID))
+
+            if tenderTag != '-1':
+                query = query.filter(Tender.tenderTag == tenderTag)
+                countQuery = countQuery.filter(Tender.tenderTag == tenderTag)
+
+
+            if userID != '-1':
+                query = query.filter(PushedTenderInfo.userID == userID)
+                countQuery = countQuery.filter(PushedTenderInfo.userID == userID)
+
             count = countQuery.first()
             count = count[0]
             allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(pageCount).all()
+
+            if info.has_key('customizedCompanyID'):
+                userManager = UserManager()
+                info['userType'] = USER_TAG_RESPONSIBLEPERSON
+                (status, resp) = userManager.getStaffInfo(info=info)
+                if status is True:
+                    self.resp = resp
+
+                info['userType'] = USER_TAG_AUDITOR
+                (status, auditor) = userManager.getStaffInfo(info=info)
+                if status is True:
+                    self.auditor = auditor
+
+                self.selfUserType = info['selfUserType']
+
             dataList = [self.__generatePushedBrief(result=result) for result in allResult]
+
+            pushedIDList = [o['pushedID'] for o in dataList]
+            info['pushedIDList'] = pushedIDList
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
@@ -487,6 +538,7 @@ class PushedTenderManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
     # 获取自定义项目的详情
     def getCustomizedTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)

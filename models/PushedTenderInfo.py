@@ -107,7 +107,6 @@ class PushedTenderInfo(db.Model):
 
     @staticmethod
     def create(info):
-        print '3333', info
         pushedTenderInfo = PushedTenderInfo(
             pushedID=info['pushedID'],
             userID=info['userID'],
@@ -135,7 +134,10 @@ class PushedTenderInfo(db.Model):
     def generateBrief(c):
         res = {}
         res['pushedID'] = c.pushedID
-        res['createTime'] = str(c.createTime)
+        if c.createTime is None:
+            res['createTime'] = ''
+        else:
+            res['createTime'] = str(c.createTime)
         res['tenderID'] = c.tenderID
         res['state'] = c.state
         if c.deadline is None:

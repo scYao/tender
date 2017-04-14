@@ -180,6 +180,30 @@ class BossManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
+    # 审定人  获取所有人的推送列表
+    def getAllPushedListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        staffUserID = None
+        if info['userID'] != '-1':
+            staffUserID = info['userID']
+        userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
+        info['selfUserType'] = userInfo['userType']
+        pushedTenderManager = PushedTenderManager()
+        info['tenderTag'] = '-1'
+        info['userID'] = '-1'
+        if staffUserID is not None:
+            info['userID'] = staffUserID
+        return pushedTenderManager.getPushedTenderListByUserID(info=info)
+
     # 审定人获取待分配列表
     def getUndistributedTenderListByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)

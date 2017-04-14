@@ -342,6 +342,23 @@ def get_news_detail_background():
     print result
     return result
 
+# 审定人  获取所有人的推送列表
+def get_all_pushed_list_by_boss():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:%s/get_all_pushed_list_by_boss/' % (LOCALHOST, PORT)
+    info = {}
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['tokenID'] = '2017-04-141343271cc0fa1ac77f7969d3edfe436b4f46e4'
+
+    params = {'data': json.dumps(info)}
+    datagen, headers = poster.encode.multipart_encode(params)
+    request = urllib2.Request(upload_url, datagen, headers)
+    data = urllib2.urlopen(request)
+    result = data.read()
+    print result
+    return result
+
 
 def test_get_provinces_citys():
     result = get_province_list()
@@ -476,7 +493,8 @@ def test_get_tender_list_time():
     print dt2 - dt1
 
 if __name__ == '__main__':
-    get_news_detail_background()
+    get_all_pushed_list_by_boss()
+    # get_news_detail_background()
     # get_news_list_background()
     # get_favorite_tender_list()
     # get_province_city_info()

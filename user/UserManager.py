@@ -80,7 +80,6 @@ class UserManager(Util):
         return (True, biddingResult)
 
 
-
     def login(self, jsonInfo):
         info = json.loads(jsonInfo)
         tel = info['tel']
@@ -455,7 +454,8 @@ class UserManager(Util):
             query = db.session.query(UserInfo).filter(
                 UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID
             )
-            allResult = query.offset(startIndex).limit(pageCount).all()
+            allResult = query.order_by(desc(UserInfo.createTime)
+                                       ).offset(startIndex).limit(pageCount).all()
             dataList = [UserInfo.generateOAInfo(result) for result in allResult]
             countQuery = db.session.query(
                 func.count(UserInfo.userID)
@@ -649,3 +649,45 @@ class UserManager(Util):
     def _unpad(self, s):
         return s[:-ord(s[len(s) - 1:])]
 
+
+    # 获取经办人 审核人 审定人 信息
+    def getStaffInfo(self, info):
+        customizedCompanyID = info['customizedCompanyID']
+        userType = info['userType']
+        try:
+            result = db.session.query(UserInfo).filter(
+                and_(
+                    UserInfo.userType == userType,
+                    UserInfo.customizedCompanyID == customizedCompanyID
+                )
+            ).first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_23'])
+            resp = {}
+            resp['userID'] = result.userID
+            resp['userName'] = result.userName
+            resp['userType'] = result.userType
+            return (True, resp)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def getUserInfo(self, info):
+        userID = info['userID']
+
+        try:
+            result = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_23'])
+            return (True, UserInfo.generate(userInfo=result))
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
