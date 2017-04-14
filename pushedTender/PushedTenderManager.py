@@ -8,7 +8,8 @@ from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
     PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_TENDER_PLAN, \
     OPERATION_TAG_TENDER_PRICE, OPERATION_TAG_DEPOSIT, OPERATION_TAG_MAKE_BIDDING_BOOK, BID_DOC_DIRECTORY, \
-    CUS_TENDER_DOC_DIRECTORY, OPERATION_TAG_MANAGER_ARRANGEMENT
+    CUS_TENDER_DOC_DIRECTORY, OPERATION_TAG_MANAGER_ARRANGEMENT, PUSH_TENDER_INFO_TAG_STATE_DISCARD, \
+    PUSH_TENDER_INFO_TAG_STATE_UNREAD
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -502,9 +503,13 @@ class PushedTenderManager(Util):
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).outerjoin(
                 UserInfo, PushedTenderInfo.userID == UserInfo.userID
+            ).filter(
+                PushedTenderInfo.state != PUSH_TENDER_INFO_TAG_STATE_DISCARD
             )
 
-            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID))
+            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
+                PushedTenderInfo.state != PUSH_TENDER_INFO_TAG_STATE_DISCARD
+            )
 
             if tenderTag != '-1':
                 query = query.filter(Tender.tenderTag == tenderTag)
@@ -1378,6 +1383,68 @@ class PushedTenderManager(Util):
 
     def getTenderHistoryDetail(self, jsonInfo):
         pass
+
+
+    def getDiscardPushedList(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            query = db.session.query(
+                PushedTenderInfo, Tender
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).filter(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
+            )
+            countQuery = db.session.query(
+                func.count(PushedTenderInfo.pushedID)
+            ).filter(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
+            )
+
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            count = countQuery.first()
+            dataList = [self.__generatePushedBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count[0]
+            return (True, callBackInfo)
+        except Exception as e:
+            traceback.print_exc()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def recoverPushedTenderInfo(self, info):
+        tenderID = info['tenderID']
+
+
+        try:
+            query = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == tenderID
+            )
+            result = query.first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_28'])
+
+            state = result.state
+            if state != PUSH_TENDER_INFO_TAG_STATE_DISCARD:
+                return (False, ErrorInfo['TENDER_36'])
+
+            query.update({
+                PushedTenderInfo.state : PUSH_TENDER_INFO_TAG_STATE_UNREAD
+            }, synchronize_session=False)
+            db.session.commit()
+        except Exception as e:
+            traceback.print_exc()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
 
 if __name__ == '__main__':
     l = [i for i in xrange(0, 10)]

@@ -276,5 +276,26 @@ class BossManager(Util):
         info['selfUserID'] = userID
         return userManager.deleteOAUserInfo(info=info)
 
+    # 审定人获取回收站列表
+    def getDiscardPushedListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
 
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDiscardPushedList(info=info)
 
+    # 从回收站回收
+    def recoverPushedTenderByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.recoverPushedTenderInfo(info=info)

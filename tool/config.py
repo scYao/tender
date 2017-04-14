@@ -212,6 +212,12 @@ ErrorInfo['TENDER_35'] = {
     'zhInfo' : '无法删除该推送!'
 }
 
+ErrorInfo['TENDER_36'] = {
+    'code' : 'TENDER_36',
+    'info' : 'can not recover pushed tender info!',
+    'zhInfo' : '不是已放弃状态!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

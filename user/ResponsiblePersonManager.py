@@ -291,7 +291,7 @@ class ResponsiblePersonManager(Util):
         return pushedTenderManager.getTenderDoingDetail(info=info)
 
     # 负责人获取推送人员列表
-    def getTenderUserInfoListByRes(self, jsonInfo):
+    def getTenderUserInfoListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)

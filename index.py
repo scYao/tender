@@ -2234,6 +2234,36 @@ def get_operator_pushed_list_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人 回收站列表
+@app.route('/get_discard_pushed_list_by_boss/', methods=['POST', 'GET'])
+def get_discard_pushed_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getDiscardPushedListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 从回收站回收
+@app.route('/recover_pushed_tender_by_boss/', methods=['POST', 'GET'])
+def recover_pushed_tender_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.recoverPushedTenderByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 审定人 获取所以推送列表
 @app.route('/get_all_pushed_list_by_boss/', methods=['POST', 'GET'])
 def get_all_pushed_list_by_boss():
@@ -2579,15 +2609,15 @@ def get_tender_user_info_list_by_auditor():
         return json.dumps(data)
 
 #负责人获取推送人员列表
-@app.route('/get_tender_user_info_list_by_res/', methods=['POST', 'GET'])
-def get_tender_user_info_list_by_res():
+@app.route('/get_tender_user_info_list_by_resp/', methods=['POST', 'GET'])
+def get_tender_user_info_list_by_resp():
     responsiblePersonManager = ResponsiblePersonManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        (status, result) = responsiblePersonManager.getTenderUserInfoListByRes(paramsJson)
+        (status, result) = responsiblePersonManager.getTenderUserInfoListByResp(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
