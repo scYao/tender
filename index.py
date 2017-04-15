@@ -2400,6 +2400,21 @@ def delete_tender_comment_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+# 审核人 删除批注
+@app.route('/get_all_data_info_by_auditor/', methods=['POST', 'GET'])
+def get_all_data_info_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getAllDataInfoByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 获取operation信息列表
 @app.route('/get_operation_list_by_operator_id/', methods=['POST', 'GET'])
 def get_operation_list_by_operator_id():

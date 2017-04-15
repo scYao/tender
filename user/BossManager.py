@@ -1,9 +1,7 @@
 # coding=utf8
 import sys
 import json
-from tender.CustomizedTenderManager import CustomizedTenderManager
 
-from user.UserManager import UserManager
 
 sys.path.append("..")
 import os, random, requests
@@ -26,9 +24,12 @@ from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_T
 from pushedTender.TenderCommentManager import TenderCommentManager
 
 from pushedTender.PushedTenderManager import PushedTenderManager
+from user.UserBaseManager import UserBaseManager
+from user.UserManager import UserManager
+from tender.CustomizedTenderManager import CustomizedTenderManager
 
 
-class BossManager(Util):
+class BossManager(UserBaseManager):
 
     def __init__(self):
         pass
@@ -304,13 +305,6 @@ class BossManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.recoverPushedTenderInfo(info=info)
 
-    def __addPushedDataInfoToUser(self, o, pushedTenderManager, info):
-        info['userID'] = o['userID']
-        info['userType'] = o['userType']
-        (status, dataInfo) = pushedTenderManager.getDataInfoByUserID(info=info)
-        o.update(dataInfo)
-        return None
-
     # 获取所有员工的推送信息
     def getAllDataInfoByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -318,5 +312,5 @@ class BossManager(Util):
         dataList = dataInfo['dataList']
 
         pushedTenderManager = PushedTenderManager()
-        _ = [self.__addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
+        _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
         return (True, dataInfo)
