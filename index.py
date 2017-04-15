@@ -2003,6 +2003,21 @@ def delete_pushed_tender_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人获取我的推送数据分析
+@app.route('/get_data_info_by_resp/', methods=['POST', 'GET'])
+def get_data_info_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getDataInfoByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 创建推送, 自定义标, 负责人
 @app.route('/create_customized_tender_by_resp/', methods=['POST', 'GET'])

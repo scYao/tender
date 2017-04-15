@@ -312,7 +312,7 @@ class ResponsiblePersonManager(Util):
 
         return (True, info)
 
-    # 审核人  获取所有人的推送列表
+    # 负责人  获取所有人的推送列表
     def getAllPushedListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
@@ -328,3 +328,16 @@ class ResponsiblePersonManager(Util):
         if status is True:
             self.__tagTenderList(info=result)
         return (status, result)
+
+    # 负责人获取我的推送数据分析
+    def getDataInfoByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDataInfoByUserID(info=info)
