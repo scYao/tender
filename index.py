@@ -2045,6 +2045,36 @@ def create_customized_tender_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+#负责人获取推送人员列表
+@app.route('/get_tender_user_info_list_by_resp/', methods=['POST', 'GET'])
+def get_tender_user_info_list_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getTenderUserInfoListByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取所有员工的推送信息 负责人
+@app.route('/get_all_data_info_by_resp/', methods=['POST', 'GET'])
+def get_all_data_info_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getAllDataInfoByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 #审核人创建推送
 @app.route('/create_pushed_tender_by_auditor/', methods=['POST', 'GET'])
 def create_pushed_tender_by_auditor():
@@ -2678,21 +2708,6 @@ def get_tender_user_info_list_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = aauditorManager.getTenderUserInfoListByAuditor(paramsJson)
-        if status is not False:
-            data['status'] = 'SUCCESS'
-        data['data'] = result
-        return json.dumps(data)
-
-#负责人获取推送人员列表
-@app.route('/get_tender_user_info_list_by_resp/', methods=['POST', 'GET'])
-def get_tender_user_info_list_by_resp():
-    responsiblePersonManager = ResponsiblePersonManager()
-    data = {}
-    data['status'] = 'FAILED'
-    data['data'] = 'NULL'
-    if request.method == 'POST':
-        paramsJson = request.form['data']
-        (status, result) = responsiblePersonManager.getTenderUserInfoListByResp(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

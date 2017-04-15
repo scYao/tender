@@ -3,8 +3,6 @@ import sys
 import json
 import traceback
 
-from user.UserManager import UserManager
-
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -27,8 +25,10 @@ from models.Token import Token
 from tender.CustomizedTenderManager import CustomizedTenderManager
 from pushedTender.PushedTenderManager import PushedTenderManager
 from pushedTender.TenderCommentManager import TenderCommentManager
+from user.UserBaseManager import UserBaseManager
+from user.UserManager import UserManager
 
-class ResponsiblePersonManager(Util):
+class ResponsiblePersonManager(UserBaseManager):
     def __init__(self):
         pass
 
@@ -344,3 +344,13 @@ class ResponsiblePersonManager(Util):
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getDataInfoByUserID(info=info)
+
+    # 获取所有员工的推送信息
+    def getAllDataInfoByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        (status, dataInfo) = self.getTenderUserInfoListByResp(jsonInfo=jsonInfo)
+        dataList = dataInfo['dataList']
+
+        pushedTenderManager = PushedTenderManager()
+        _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
+        return (True, dataInfo)
