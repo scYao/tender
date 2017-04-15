@@ -262,6 +262,7 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         userManager = UserManager()
+        info['bossUserID'] = userID
         return userManager.createOAUserInfo(info=info)
 
     #账号管理，删除员工

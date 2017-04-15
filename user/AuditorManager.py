@@ -269,3 +269,16 @@ class AuditorManager(Util):
         if status is True:
             self.__tagTenderList(info=result)
         return (status, result)
+
+    # 审核人获取我的推送数据分析
+    def getDataInfoByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDataInfoByUserID(info=info)

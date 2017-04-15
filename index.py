@@ -1957,6 +1957,21 @@ def get_all_pushed_list_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+# 审核人获取我的推送数据分析
+@app.route('/get_data_info_by_auditor/', methods=['POST', 'GET'])
+def get_data_info_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getDataInfoByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 #负责人创建推送
 @app.route('/create_pushed_tender_by_resp/', methods=['POST', 'GET'])

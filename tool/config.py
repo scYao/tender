@@ -218,6 +218,12 @@ ErrorInfo['TENDER_36'] = {
     'zhInfo' : '不是已放弃状态!'
 }
 
+ErrorInfo['TENDER_37'] = {
+    'code' : 'TENDER_37',
+    'info' : 'can not create OA user!',
+    'zhInfo' : '用户可能已经存在账户, 或者已经是其他公司的员工!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

@@ -517,19 +517,36 @@ class UserManager(Util):
         password = info['password']
         userID = self.generateID(userName)
         info['userID'] = userID
-        info['customizedCompanyID'] = CUSTOMIZEDCOMPANYID
+        # info['customizedCompanyID'] = CUSTOMIZEDCOMPANYID
         info['tel'] = tel
         info['password'] = self.getMD5String(password)
         info['userType'] = info['userTypeID']
         info['jobNumber'] = info['jobNumber']
         info['createTime'] = datetime.now()
         try:
+            # 获取boss的公司ID
+            bossUserID = info['bossUserID']
+            bossResult = db.session.query(UserInfo).filter(
+                UserInfo.userID == bossUserID
+            ).first()
+            if bossResult is None:
+                return (False, ErrorInfo['TENDER_07'])
+            customizedCompanyID = bossResult.customizedCompanyID
+            info['customizedCompanyID'] = customizedCompanyID
             #判断是否已经存在该员工
             query = db.session.query(UserInfo).filter(UserInfo.tel == tel)
             result = query.first()
             if result is not None:
-                return (False, ErrorInfo['TENDER_07'])
-            UserInfo.create(createInfo=info)
+                # 如果用户已存在 判断用户的公司是否是0
+                customizedCompanyID = result.customizedCompanyID
+                if customizedCompanyID != 0:
+                    return (False, ErrorInfo['TENDER_37'])
+                query.update({
+                    UserInfo.customizedCompanyID : customizedCompanyID
+                }, synchronize_session=False)
+                # return (False, ErrorInfo['TENDER_07'])
+            else:
+                UserInfo.create(createInfo=info)
             db.session.commit()
             return (True, userID)
         except Exception as e:

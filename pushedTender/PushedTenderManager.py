@@ -1447,6 +1447,66 @@ class PushedTenderManager(Util):
             return (False, errorInfo)
 
 
+    def __generateDataInfo(self, o, res):
+        res['pushedCount'] = res['pushedCount'] + 1
+        if o.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE:
+            res['usedCount'] = res['usedCount'] + 1
+        if o.winbidding is True:
+            res['wonCount'] = res['wonCount'] + 1
+        return (True, None)
+
+
+    # 根据用户ID获取用户的推送，采纳及中标各项数据信息
+    def getDataInfoByUserID(self, info):
+        userID = info['userID']
+        userType = info['userType']
+        startDate = info['startDate']
+        endDate = info['endDate']
+
+        res = {}
+        res['pushedCount'] = 0
+        res['usedCount'] = 0
+        res['wonCount'] = 0
+        res['startDate'] = startDate
+        res['endDate'] = endDate
+
+        query = db.session.query(PushedTenderInfo).filter(
+            PushedTenderInfo.userID == userID
+        )
+        if userType == USER_TAG_OPERATOR:
+            if startDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.createTime >= startDate
+                )
+            if endDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.createTime <= endDate
+                )
+        elif userType == USER_TAG_RESPONSIBLEPERSON:
+            if startDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.responsiblePersonPushedTime >= startDate
+                )
+            if endDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.responsiblePersonPushedTime <= endDate
+                )
+        elif userType == USER_TAG_AUDITOR:
+            if startDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.auditorPushedTime >= startDate
+                )
+            if endDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.auditorPushedTime <= endDate
+                )
+        allResult = query.all()
+        _ = [self.__generateDataInfo(o=o, res=res) for o in allResult]
+        return (True, res)
+
+
+
+
 if __name__ == '__main__':
     l = [i for i in xrange(0, 10)]
 

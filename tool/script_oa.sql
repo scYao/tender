@@ -48,7 +48,8 @@ create table pushedTenderInfo(
 	planScore float comment '方案评分',
 	tenderType nvarchar(100) comment '评标方法',
 	-- 新增报名截止时间
-	deadline date comment '报名截止日期'
+	deadline date comment '报名截止日期',
+	winbidding boolean default 0 comment '是否中标'
 );
 
 create table quotedPrice(

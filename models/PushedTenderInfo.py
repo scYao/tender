@@ -50,6 +50,7 @@ class PushedTenderInfo(db.Model):
     planScore = db.Column(db.Float)
     tenderType = db.Column(db.String(100))
     deadline = db.Column(db.Date)
+    winbidding = db.Column(db.Boolean)
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
@@ -63,7 +64,7 @@ class PushedTenderInfo(db.Model):
                  candidateName2='', candidatePrice2=0, candidateName3='',
                  candidatePrice3=0, tag=0, tenderCompanyName=None, projectType=None,
                  workContent=None, deposit=0, planScore=0, tenderType=None,
-                 deadline=None):
+                 deadline=None, winbidding=False):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -103,6 +104,7 @@ class PushedTenderInfo(db.Model):
         self.planScore = planScore
         self.tenderType = tenderType
         self.deadline = deadline
+        self.winbidding = winbidding
 
 
     @staticmethod
