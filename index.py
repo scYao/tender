@@ -2430,6 +2430,21 @@ def update_to_history():
         data['data'] = result
         return json.dumps(data)
 
+# 经办人获取我的推送数据分析
+@app.route('/get_data_info_by_operator/', methods=['POST', 'GET'])
+def get_data_info_by_operator():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.getDataInfoByOperator(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 决定是否采用该经办人
 @app.route('/validate_operator/', methods=['POST', 'GET'])

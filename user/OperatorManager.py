@@ -295,3 +295,16 @@ class OperatorManager(Util):
 
         info['step'] = PUSH_TENDER_INFO_TAG_STEP_HISTORY
         return self.__updatePushedTenderInfoStep(info=info)
+
+    # 经办人获取我的推送数据分析
+    def getDataInfoByOperator(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDataInfoByUserID(info=info)
