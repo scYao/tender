@@ -176,12 +176,15 @@ class PushedTenderManager(Util):
 
             #(1)判断取消人身份，（２）判断是否可以取消，（３）根据不同身份返回到推送前状态
             if userType == USER_TAG_OPERATOR:
-                if responsiblePersonPushedTime is not None:
+                if state != PUSH_TENDER_INFO_TAG_STATE_UNREAD or \
+                                responsiblePersonPushedTime is not None or \
+                                auditorPushedTime is not None:
                     return (False, ErrorInfo['TENDER_35'])
                 query.delete(synchronize_session=False)
 
             if userType == USER_TAG_RESPONSIBLEPERSON:
-                if auditorPushedTime is not None:
+                if state != PUSH_TENDER_INFO_TAG_STATE_UNREAD or \
+                             auditorPushedTime is not None:
                     return (False, ErrorInfo['TENDER_35'])
                 else:
                     if createTime is not None:
@@ -193,7 +196,7 @@ class PushedTenderManager(Util):
                         query.delete(synchronize_session=False)
 
             if userType == USER_TAG_AUDITOR:
-                if state == 0:
+                if state != PUSH_TENDER_INFO_TAG_STATE_UNREAD:
                     return (False, ErrorInfo['TENDER_35'])
                 else:
                     if responsiblePersonPushedTime is not None:
@@ -1434,6 +1437,7 @@ class PushedTenderManager(Util):
                 PushedTenderInfo.state : PUSH_TENDER_INFO_TAG_STATE_UNREAD
             }, synchronize_session=False)
             db.session.commit()
+            return (True, None)
         except Exception as e:
             traceback.print_exc()
             print e
