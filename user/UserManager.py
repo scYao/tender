@@ -482,10 +482,16 @@ class UserManager(Util):
         try:
             query = db.session.query(UserInfo).filter(
                 and_(
-                    UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID,
+                    UserInfo.customizedCompanyID == info['customizedCompanyID'],
                     UserInfo.userType >= userType
                 )
             )
+            if info.has_key('startIndex'):
+                startIndex = info['startIndex']
+                pageCount = info['pageCount']
+                query = query.order_by(
+                    desc(UserInfo.createTime)
+                ).offset(startIndex).limit(pageCount)
             allResult = query.all()
             dataList = [UserInfo.generateOAInfo(result) for result in allResult]
             countQuery = db.session.query(

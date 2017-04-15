@@ -2340,6 +2340,21 @@ def operate_pushed_tender_info():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人 决定是否要投标
+@app.route('/get_all_data_info_by_boss/', methods=['POST', 'GET'])
+def get_all_data_info_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getAllDataInfoByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 #审核人推送消息
 @app.route('/update_pushed_tender_by_auditor/', methods=['POST', 'GET'])
 def update_pushed_tender_by_auditor():

@@ -240,6 +240,9 @@ class AuditorManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
         return userManager.getTenderUserInfoList(info=info)
 
 

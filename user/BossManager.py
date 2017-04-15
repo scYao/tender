@@ -250,6 +250,9 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
         return userManager.getTenderUserInfoList(info=info)
 
     #账号管理，创建新员工
@@ -300,3 +303,20 @@ class BossManager(Util):
 
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.recoverPushedTenderInfo(info=info)
+
+    def __addPushedDataInfoToUser(self, o, pushedTenderManager, info):
+        info['userID'] = o['userID']
+        info['userType'] = o['userType']
+        (status, dataInfo) = pushedTenderManager.getDataInfoByUserID(info=info)
+        o.update(dataInfo)
+        return None
+
+    # 获取所有员工的推送信息
+    def getAllDataInfoByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        (status, dataInfo) = self.getTenderUserInfoListByBoss(jsonInfo=jsonInfo)
+        dataList = dataInfo['dataList']
+
+        pushedTenderManager = PushedTenderManager()
+        _ = [self.__addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
+        return (True, dataInfo)
