@@ -156,6 +156,7 @@ class PushedTenderInfo(db.Model):
             res['deadline'] = ''
         else:
             res['deadline'] = str(c.deadline)
+        res['tenderTag'] = c.tag
         return res
 
     @staticmethod

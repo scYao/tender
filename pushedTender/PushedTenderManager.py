@@ -244,7 +244,8 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.workContent: info['workContent'],
                     PushedTenderInfo.deposit: info['deposit'],
                     PushedTenderInfo.planScore: info['planScore'],
-                    PushedTenderInfo.tenderType: info['tenderType']
+                    PushedTenderInfo.tenderType: info['tenderType'],
+                    PushedTenderInfo.winbidding: info['winbidding']
                 }
                 query.update(
                     updateInfo, synchronize_session=False

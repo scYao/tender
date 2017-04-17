@@ -1569,7 +1569,7 @@ def get_pushed_list_by_resp():
         data['data'] = result
         return json.dumps(data)
 
-# 负责人获取我的推送列表
+# 负责人从经办人推送列表推送
 @app.route('/update_pushed_tender_by_resp/', methods=['POST', 'GET'])
 def update_pushed_tender_by_resp():
     responsiblePersonManager = ResponsiblePersonManager()
