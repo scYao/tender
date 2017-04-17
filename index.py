@@ -1569,7 +1569,7 @@ def get_pushed_list_by_resp():
         data['data'] = result
         return json.dumps(data)
 
-# 负责人获取我的推送列表
+# 负责人从经办人推送列表推送
 @app.route('/update_pushed_tender_by_resp/', methods=['POST', 'GET'])
 def update_pushed_tender_by_resp():
     responsiblePersonManager = ResponsiblePersonManager()
@@ -1594,6 +1594,21 @@ def get_operator_pushed_list_by_resp():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = responsiblePersonManager.getOperatorPushedListByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 负责人 获取所有推送列表
+@app.route('/get_all_pushed_list_by_resp/', methods=['POST', 'GET'])
+def get_all_pushed_list_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getAllPushedListByResp(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -1927,6 +1942,36 @@ def get_operator_pushed_list_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+# 审核人 获取所以推送列表
+@app.route('/get_all_pushed_list_by_auditor/', methods=['POST', 'GET'])
+def get_all_pushed_list_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getAllPushedListByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审核人获取我的推送数据分析
+@app.route('/get_data_info_by_auditor/', methods=['POST', 'GET'])
+def get_data_info_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getDataInfoByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 #负责人创建推送
 @app.route('/create_pushed_tender_by_resp/', methods=['POST', 'GET'])
@@ -1958,6 +2003,21 @@ def delete_pushed_tender_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人获取我的推送数据分析
+@app.route('/get_data_info_by_resp/', methods=['POST', 'GET'])
+def get_data_info_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getDataInfoByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 创建推送, 自定义标, 负责人
 @app.route('/create_customized_tender_by_resp/', methods=['POST', 'GET'])
@@ -1980,6 +2040,36 @@ def create_customized_tender_by_resp():
             imgDic['file'] = f
             imgList.append(imgDic)
         (status, result) = responsiblePersonManager.createCustomizedTenderByResp(jsonInfo=paramsJson, imgFileList=imgList)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+#负责人获取推送人员列表
+@app.route('/get_tender_user_info_list_by_resp/', methods=['POST', 'GET'])
+def get_tender_user_info_list_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getTenderUserInfoListByResp(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取所有员工的推送信息 负责人
+@app.route('/get_all_data_info_by_resp/', methods=['POST', 'GET'])
+def get_all_data_info_by_resp():
+    responsiblePersonManager = ResponsiblePersonManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = responsiblePersonManager.getAllDataInfoByResp(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -2204,6 +2294,51 @@ def get_operator_pushed_list_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人 回收站列表
+@app.route('/get_discard_pushed_list_by_boss/', methods=['POST', 'GET'])
+def get_discard_pushed_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getDiscardPushedListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 从回收站回收
+@app.route('/recover_pushed_tender_by_boss/', methods=['POST', 'GET'])
+def recover_pushed_tender_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.recoverPushedTenderByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 获取所以推送列表
+@app.route('/get_all_pushed_list_by_boss/', methods=['POST', 'GET'])
+def get_all_pushed_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getAllPushedListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 
 # 审定人获取 审核人的推送列表
 @app.route('/get_auditor_pushed_list_by_boss/', methods=['POST', 'GET'])
@@ -2230,6 +2365,21 @@ def operate_pushed_tender_info():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.operatePushedTenderInfo(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 决定是否要投标
+@app.route('/get_all_data_info_by_boss/', methods=['POST', 'GET'])
+def get_all_data_info_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getAllDataInfoByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -2280,6 +2430,21 @@ def delete_tender_comment_by_auditor():
         data['data'] = result
         return json.dumps(data)
 
+# 审核人 删除批注
+@app.route('/get_all_data_info_by_auditor/', methods=['POST', 'GET'])
+def get_all_data_info_by_auditor():
+    auditorManager = AuditorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = auditorManager.getAllDataInfoByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 获取operation信息列表
 @app.route('/get_operation_list_by_operator_id/', methods=['POST', 'GET'])
 def get_operation_list_by_operator_id():
@@ -2320,6 +2485,21 @@ def update_to_history():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = operatorManager.updateToHistory(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 经办人获取我的推送数据分析
+@app.route('/get_data_info_by_operator/', methods=['POST', 'GET'])
+def get_data_info_by_operator():
+    operatorManager = OperatorManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = operatorManager.getDataInfoByOperator(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -2528,21 +2708,6 @@ def get_tender_user_info_list_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = aauditorManager.getTenderUserInfoListByAuditor(paramsJson)
-        if status is not False:
-            data['status'] = 'SUCCESS'
-        data['data'] = result
-        return json.dumps(data)
-
-#负责人获取推送人员列表
-@app.route('/get_tender_user_info_list_by_res/', methods=['POST', 'GET'])
-def get_tender_user_info_list_by_res():
-    responsiblePersonManager = ResponsiblePersonManager()
-    data = {}
-    data['status'] = 'FAILED'
-    data['data'] = 'NULL'
-    if request.method == 'POST':
-        paramsJson = request.form['data']
-        (status, result) = responsiblePersonManager.getTenderUserInfoListByRes(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

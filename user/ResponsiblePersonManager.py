@@ -3,8 +3,6 @@ import sys
 import json
 import traceback
 
-from user.UserManager import UserManager
-
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -27,8 +25,10 @@ from models.Token import Token
 from tender.CustomizedTenderManager import CustomizedTenderManager
 from pushedTender.PushedTenderManager import PushedTenderManager
 from pushedTender.TenderCommentManager import TenderCommentManager
+from user.UserBaseManager import UserBaseManager
+from user.UserManager import UserManager
 
-class ResponsiblePersonManager(Util):
+class ResponsiblePersonManager(UserBaseManager):
     def __init__(self):
         pass
 
@@ -191,7 +191,7 @@ class ResponsiblePersonManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         operatorUserID = info['userID']
-        info['userID'] = operatorUserID
+        info['staffUserID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
         # info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
@@ -291,7 +291,7 @@ class ResponsiblePersonManager(Util):
         return pushedTenderManager.getTenderDoingDetail(info=info)
 
     # 负责人获取推送人员列表
-    def getTenderUserInfoListByRes(self, jsonInfo):
+    def getTenderUserInfoListByResp(self, jsonInfo):
         info = json.loads(jsonInfo)
         info['userType'] = USER_TAG_RESPONSIBLEPERSON
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
@@ -299,4 +299,58 @@ class ResponsiblePersonManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
         return userManager.getTenderUserInfoList(info=info)
+
+    # 给数据打上tag，是否推送了
+    def __tagTenderList(self, info):
+        dataList = info['dataList']
+        for o in dataList:
+            if o['responsiblePersonPushedTime'] != '':
+                o['pushed'] = True
+            else:
+                o['pushed'] = False
+
+        return (True, info)
+
+    # 负责人  获取所有人的推送列表
+    def getAllPushedListByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['selfUserID'] = userID
+        info['staffUserID'] = info['userID']
+        pushedTenderManager = PushedTenderManager()
+        (status, result) = pushedTenderManager.getAllPushedList(info=info)
+        if status is True:
+            self.__tagTenderList(info=result)
+        return (status, result)
+
+    # 负责人获取我的推送数据分析
+    def getDataInfoByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDataInfoByUserID(info=info)
+
+    # 获取所有员工的推送信息
+    def getAllDataInfoByResp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        (status, dataInfo) = self.getTenderUserInfoListByResp(jsonInfo=jsonInfo)
+        dataList = dataInfo['dataList']
+
+        pushedTenderManager = PushedTenderManager()
+        _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
+        return (True, dataInfo)

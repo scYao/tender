@@ -49,6 +49,8 @@ class PushedTenderInfo(db.Model):
     deposit = db.Column(db.Float)
     planScore = db.Column(db.Float)
     tenderType = db.Column(db.String(100))
+    deadline = db.Column(db.Date)
+    winbidding = db.Column(db.Boolean)
 
     def __init__(self, pushedID=None, userID=None, createTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
@@ -61,7 +63,8 @@ class PushedTenderInfo(db.Model):
                  workerName='', candidateName1='', candidatePrice1=0,
                  candidateName2='', candidatePrice2=0, candidateName3='',
                  candidatePrice3=0, tag=0, tenderCompanyName=None, projectType=None,
-                 workContent=None, deposit=0, planScore=0, tenderType=None):
+                 workContent=None, deposit=0, planScore=0, tenderType=None,
+                 deadline=None, winbidding=False):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -100,11 +103,12 @@ class PushedTenderInfo(db.Model):
         self.deposit = deposit
         self.planScore = planScore
         self.tenderType = tenderType
+        self.deadline = deadline
+        self.winbidding = winbidding
 
 
     @staticmethod
     def create(info):
-        print '3333', info
         pushedTenderInfo = PushedTenderInfo(
             pushedID=info['pushedID'],
             userID=info['userID'],
@@ -114,7 +118,8 @@ class PushedTenderInfo(db.Model):
             state=info['state'],
             step=info['step'],
             tenderID=info['tenderID'],
-            tag=info['pushedTenderInfoTag']
+            tag=info['pushedTenderInfoTag'],
+            deadline=info['deadline']
             # projectManagerName=info['projectManagerName'],
             # openedDate=info['openedDate'],
             # openedLocation=info['openedLocation'],
@@ -131,9 +136,27 @@ class PushedTenderInfo(db.Model):
     def generateBrief(c):
         res = {}
         res['pushedID'] = c.pushedID
-        res['createTime'] = str(c.createTime)
+        if c.createTime is None:
+            res['createTime'] = ''
+        else:
+            res['createTime'] = str(c.createTime)
+
+        if c.responsiblePersonPushedTime is None:
+            res['responsiblePersonPushedTime'] = ''
+        else:
+            res['responsiblePersonPushedTime'] = str(c.responsiblePersonPushedTime)
+
+        if c.auditorPushedTime is None:
+            res['auditorPushedTime'] = ''
+        else:
+            res['auditorPushedTime'] = str(c.auditorPushedTime)
         res['tenderID'] = c.tenderID
         res['state'] = c.state
+        if c.deadline is None:
+            res['deadline'] = ''
+        else:
+            res['deadline'] = str(c.deadline)
+        res['tenderTag'] = c.tag
         return res
 
     @staticmethod
@@ -176,6 +199,10 @@ class PushedTenderInfo(db.Model):
         res['deposit'] = c.deposit
         res['planScore'] = c.planScore
         res['tenderType'] = c.tenderType
+        if c.deadline is None:
+            res['deadline'] = ''
+        else:
+            res['deadline'] = str(c.deadline)
         return res
 
     def __repr__(self):

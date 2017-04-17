@@ -106,7 +106,6 @@ class NewsManager(Util):
         if not dic.has_key(foreignID):
             imgList = [img]
             dic[foreignID] = imgList
-            print dic
         else:
             imgList = dic[foreignID]
             imgList.append(img)
@@ -126,10 +125,8 @@ class NewsManager(Util):
         _ = [self.__generateImg(o=o, dic=dic, ossInfo=ossInfo) for o in allResult]
         for o in dataList:
             newsID = o['newsID']
-            o['imgList'] = dic[newsID]
-        def __addImgList(o):
-            o['imgList'] = dic[o['newsID']]
-        _ = [__addImgList(o=o) for o in dataList]
+            if dic.has_key(newsID):
+                o['imgList'] = dic[newsID]
         return (True, None)
 
 
@@ -168,6 +165,8 @@ class NewsManager(Util):
             db.session.query(News).filter(
                 News.newsID == newsID
             ).delete(synchronize_session=False)
+            db.session.commit()
+            return (True, None)
         except Exception as e:
             print e
             traceback.print_exc()

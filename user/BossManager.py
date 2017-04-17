@@ -1,9 +1,7 @@
 # coding=utf8
 import sys
 import json
-from tender.CustomizedTenderManager import CustomizedTenderManager
 
-from user.UserManager import UserManager
 
 sys.path.append("..")
 import os, random, requests
@@ -26,9 +24,12 @@ from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_T
 from pushedTender.TenderCommentManager import TenderCommentManager
 
 from pushedTender.PushedTenderManager import PushedTenderManager
+from user.UserBaseManager import UserBaseManager
+from user.UserManager import UserManager
+from tender.CustomizedTenderManager import CustomizedTenderManager
 
 
-class BossManager(Util):
+class BossManager(UserBaseManager):
 
     def __init__(self):
         pass
@@ -176,9 +177,23 @@ class BossManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userID'] = operatorUserID
+        info['staffUserID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
+
+    # 审定人  获取所有人的推送列表
+    def getAllPushedListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['selfUserID'] = userID
+        info['staffUserID'] = info['userID']
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getAllPushedList(info=info)
 
     # 审定人获取待分配列表
     def getUndistributedTenderListByBoss(self, jsonInfo):
@@ -236,6 +251,9 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
         return userManager.getTenderUserInfoList(info=info)
 
     #账号管理，创建新员工
@@ -248,6 +266,7 @@ class BossManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         userManager = UserManager()
+        info['bossUserID'] = userID
         return userManager.createOAUserInfo(info=info)
 
     #账号管理，删除员工
@@ -262,5 +281,36 @@ class BossManager(Util):
         info['selfUserID'] = userID
         return userManager.deleteOAUserInfo(info=info)
 
+    # 审定人获取回收站列表
+    def getDiscardPushedListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
 
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDiscardPushedList(info=info)
 
+    # 从回收站回收
+    def recoverPushedTenderByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.recoverPushedTenderInfo(info=info)
+
+    # 获取所有员工的推送信息
+    def getAllDataInfoByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        (status, dataInfo) = self.getTenderUserInfoListByBoss(jsonInfo=jsonInfo)
+        dataList = dataInfo['dataList']
+
+        pushedTenderManager = PushedTenderManager()
+        _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
+        return (True, dataInfo)

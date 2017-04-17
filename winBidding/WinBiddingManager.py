@@ -35,16 +35,21 @@ class WinBiddingManager(Util):
     # 创建中标公示
     def createWinBidding(self, jsonInfo):
         info = json.loads(jsonInfo)
-        title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"')
+        title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"').strip()
         publishDate = info['publishDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         biddingNum = info['biddingNum'].replace('\'', '\\\'').replace('\"', '\\\"')
         detail = info['detail']
         cityID = info['cityID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         biddingID = self.generateID(biddingNum)
+
+        biddingNum = self.getMD5String(biddingNum.strip())
         (status, reason) = self.doesBiddingExists(info=info)
         if status is True:
             return (False, ErrorInfo['TENDER_17'])
+        if len(title) > 90:
+            title = title[0:90]
+
         winBidding = WinBiddingPub(biddingID=biddingID, title=title,
                                    publishDate=publishDate, biddingNum=biddingNum,
                                    detail=detail, cityID=cityID)

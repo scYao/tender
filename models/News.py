@@ -26,7 +26,7 @@ class News(db.Model):
         res['newsID'] = o.newsID
         res['title'] = o.title
         res['content'] = o.content
-        res['createTime'] = str(o.createTime)
+        res['createTime'] = str(o.createTime)[0:10]
         return res
 
     @staticmethod
@@ -34,5 +34,6 @@ class News(db.Model):
         res = {}
         res['newsID'] = o.newsID
         res['title'] = o.title
-        res['createTime'] = str(o.createTime)
+        res['content'] = o.content
+        res['createTime'] = str(o.createTime)[0:10]
         return res

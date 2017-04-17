@@ -8,7 +8,8 @@ from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
     PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_TENDER_PLAN, \
     OPERATION_TAG_TENDER_PRICE, OPERATION_TAG_DEPOSIT, OPERATION_TAG_MAKE_BIDDING_BOOK, BID_DOC_DIRECTORY, \
-    CUS_TENDER_DOC_DIRECTORY, OPERATION_TAG_MANAGER_ARRANGEMENT
+    CUS_TENDER_DOC_DIRECTORY, OPERATION_TAG_MANAGER_ARRANGEMENT, PUSH_TENDER_INFO_TAG_STATE_DISCARD, \
+    PUSH_TENDER_INFO_TAG_STATE_UNREAD
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -37,11 +38,12 @@ from models.ImgPath import ImgPath
 from models.TenderComment import TenderComment
 
 from message.MessageManager import MessageManager
+from user.UserManager import UserManager
 
 class PushedTenderManager(Util):
 
     def __init__(self):
-        pass
+        self.resp = None
 
     @staticmethod
     def isTokenValidByUserType(info):
@@ -117,6 +119,8 @@ class PushedTenderManager(Util):
         info['auditorPushedTime'] = None
         info['state'] = 0
         info['step'] = 0
+        if not info.has_key('deadline'):
+            info['deadline'] = None
         userType = info['userType']
         if userType == USER_TAG_OPERATOR:
             info['createTime'] = datetime.now()
@@ -158,13 +162,9 @@ class PushedTenderManager(Util):
     def deletePushedTender(self, info):
         pushedID = info['pushedID']
         userType = info['userType']
-        userID = info['userID']
         try:
             query = db.session.query(PushedTenderInfo).filter(
-                and_(
-                    PushedTenderInfo.pushedID == pushedID,
-                    PushedTenderInfo.userID == userID
-                )
+                    PushedTenderInfo.pushedID == pushedID
             )
             result = query.first()
             if result is None:
@@ -176,12 +176,15 @@ class PushedTenderManager(Util):
 
             #(1)判断取消人身份，（２）判断是否可以取消，（３）根据不同身份返回到推送前状态
             if userType == USER_TAG_OPERATOR:
-                if responsiblePersonPushedTime is not None:
+                if state != PUSH_TENDER_INFO_TAG_STATE_UNREAD or \
+                                responsiblePersonPushedTime is not None or \
+                                auditorPushedTime is not None:
                     return (False, ErrorInfo['TENDER_35'])
                 query.delete(synchronize_session=False)
 
             if userType == USER_TAG_RESPONSIBLEPERSON:
-                if auditorPushedTime is not None:
+                if state != PUSH_TENDER_INFO_TAG_STATE_UNREAD or \
+                             auditorPushedTime is not None:
                     return (False, ErrorInfo['TENDER_35'])
                 else:
                     if createTime is not None:
@@ -193,7 +196,7 @@ class PushedTenderManager(Util):
                         query.delete(synchronize_session=False)
 
             if userType == USER_TAG_AUDITOR:
-                if state == 0:
+                if state != PUSH_TENDER_INFO_TAG_STATE_UNREAD:
                     return (False, ErrorInfo['TENDER_35'])
                 else:
                     if responsiblePersonPushedTime is not None:
@@ -241,7 +244,8 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.workContent: info['workContent'],
                     PushedTenderInfo.deposit: info['deposit'],
                     PushedTenderInfo.planScore: info['planScore'],
-                    PushedTenderInfo.tenderType: info['tenderType']
+                    PushedTenderInfo.tenderType: info['tenderType'],
+                    PushedTenderInfo.winbidding: info['winbidding']
                 }
                 query.update(
                     updateInfo, synchronize_session=False
@@ -442,6 +446,31 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
+        # 获取推送人员列表
+        if self.resp is not None:
+            pushedUserList = []
+            # 经办人推送了
+            if result.PushedTenderInfo.createTime is not None:
+                u = {}
+                u['userID'] = result.UserInfo.userID
+                u['userName'] = result.UserInfo.userName
+                u['userType'] = result.UserInfo.userType
+                pushedUserList.append(u)
+            if result.PushedTenderInfo.responsiblePersonPushedTime \
+                    is not None and self.selfUserType <= USER_TAG_RESPONSIBLEPERSON:
+                u = {}
+                u['userID'] = self.resp['userID']
+                u['userName'] = self.resp['userName']
+                u['userType'] = self.resp['userType']
+                pushedUserList.append(u)
+            if result.PushedTenderInfo.auditorPushedTime \
+                    is not None and self.selfUserType <= USER_TAG_AUDITOR:
+                u = {}
+                u['userID'] = self.auditor['userID']
+                u['userName'] = self.auditor['userName']
+                u['userType'] = self.auditor['userType']
+                pushedUserList.append(u)
+            res['pushedUserList'] = pushedUserList
         return res
 
     def __generateCustomizedPushedBrief(self, result):
@@ -450,41 +479,81 @@ class PushedTenderManager(Util):
         res.update(CustomizedTender.generate(c=result.CustomizedTender))
         return res
 
+    def getAllPushedList(self, info):
+        userID = info['selfUserID']
+        userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
+        info['selfUserType'] = userInfo['userType']
+        info['tenderTag'] = '-1'
+        return self.getPushedTenderListByUserID(info=info)
 
     # 经办人 获取我的推送列表, 其他人获取经办人推送列表
     def getPushedTenderListByUserID(self, info):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
-        userID = info['userID']
+        userID = info['staffUserID']
         tenderTag = info['tenderTag']
 
         try:
             query = db.session.query(
-                PushedTenderInfo, Tender
+                PushedTenderInfo, Tender, UserInfo
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).outerjoin(
+                UserInfo, PushedTenderInfo.userID == UserInfo.userID
             ).filter(
-                and_(PushedTenderInfo.userID == userID,
-                     Tender.tenderTag == tenderTag)
+                PushedTenderInfo.state != PUSH_TENDER_INFO_TAG_STATE_DISCARD
             )
+
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
-                and_(PushedTenderInfo.userID == userID,
-                     PushedTenderInfo.tag == tenderTag)
+                PushedTenderInfo.state != PUSH_TENDER_INFO_TAG_STATE_DISCARD
             )
+
+            if tenderTag != '-1':
+                query = query.filter(Tender.tenderTag == tenderTag)
+                countQuery = countQuery.filter(Tender.tenderTag == tenderTag)
+
+
+            if userID != '-1':
+                query = query.filter(PushedTenderInfo.userID == userID)
+                countQuery = countQuery.filter(PushedTenderInfo.userID == userID)
+
             count = countQuery.first()
             count = count[0]
             allResult = query.order_by(desc(PushedTenderInfo.createTime)).offset(startIndex).limit(pageCount).all()
+
+            if info.has_key('customizedCompanyID'):
+                userManager = UserManager()
+                info['userType'] = USER_TAG_RESPONSIBLEPERSON
+                (status, resp) = userManager.getStaffInfo(info=info)
+                if status is True:
+                    self.resp = resp
+
+                info['userType'] = USER_TAG_AUDITOR
+                (status, auditor) = userManager.getStaffInfo(info=info)
+                if status is True:
+                    self.auditor = auditor
+
+                self.selfUserType = info['selfUserType']
+
             dataList = [self.__generatePushedBrief(result=result) for result in allResult]
+
+            pushedIDList = [o['pushedID'] for o in dataList]
+            info['pushedIDList'] = pushedIDList
             callBackInfo = {}
             callBackInfo['dataList'] = dataList
             callBackInfo['count'] = count
             return (True, callBackInfo)
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
     # 获取自定义项目的详情
     def getCustomizedTenderDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -1315,6 +1384,129 @@ class PushedTenderManager(Util):
 
     def getTenderHistoryDetail(self, jsonInfo):
         pass
+
+
+    def getDiscardPushedList(self, info):
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            query = db.session.query(
+                PushedTenderInfo, Tender
+            ).outerjoin(
+                Tender, PushedTenderInfo.tenderID == Tender.tenderID
+            ).filter(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
+            )
+            countQuery = db.session.query(
+                func.count(PushedTenderInfo.pushedID)
+            ).filter(
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
+            )
+
+            allResult = query.offset(startIndex).limit(pageCount).all()
+            count = countQuery.first()
+            dataList = [self.__generatePushedBrief(result=result) for result in allResult]
+            callBackInfo = {}
+            callBackInfo['dataList'] = dataList
+            callBackInfo['count'] = count[0]
+            return (True, callBackInfo)
+        except Exception as e:
+            traceback.print_exc()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def recoverPushedTenderInfo(self, info):
+        tenderID = info['tenderID']
+
+
+        try:
+            query = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == tenderID
+            )
+            result = query.first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_28'])
+
+            state = result.state
+            if state != PUSH_TENDER_INFO_TAG_STATE_DISCARD:
+                return (False, ErrorInfo['TENDER_36'])
+
+            query.update({
+                PushedTenderInfo.state : PUSH_TENDER_INFO_TAG_STATE_UNREAD
+            }, synchronize_session=False)
+            db.session.commit()
+            return (True, None)
+        except Exception as e:
+            traceback.print_exc()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+
+    def __generateDataInfo(self, o, res):
+        res['pushedCount'] = res['pushedCount'] + 1
+        if o.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE:
+            res['usedCount'] = res['usedCount'] + 1
+        if o.winbidding is True:
+            res['wonCount'] = res['wonCount'] + 1
+        return (True, None)
+
+
+    # 根据用户ID获取用户的推送，采纳及中标各项数据信息
+    def getDataInfoByUserID(self, info):
+        userID = info['userID']
+        userType = info['userType']
+        startDate = info['startDate']
+        endDate = info['endDate']
+
+        res = {}
+        res['pushedCount'] = 0
+        res['usedCount'] = 0
+        res['wonCount'] = 0
+        res['startDate'] = startDate
+        res['endDate'] = endDate
+
+        query = db.session.query(PushedTenderInfo).filter(
+            PushedTenderInfo.userID == userID
+        )
+        if userType == USER_TAG_OPERATOR:
+            if startDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.createTime >= startDate
+                )
+            if endDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.createTime <= endDate
+                )
+        elif userType == USER_TAG_RESPONSIBLEPERSON:
+            if startDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.responsiblePersonPushedTime >= startDate
+                )
+            if endDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.responsiblePersonPushedTime <= endDate
+                )
+        elif userType == USER_TAG_AUDITOR:
+            if startDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.auditorPushedTime >= startDate
+                )
+            if endDate != '-1':
+                query = query.filter(
+                    PushedTenderInfo.auditorPushedTime <= endDate
+                )
+        allResult = query.all()
+        _ = [self.__generateDataInfo(o=o, res=res) for o in allResult]
+        return (True, res)
+
+
+
 
 if __name__ == '__main__':
     l = [i for i in xrange(0, 10)]

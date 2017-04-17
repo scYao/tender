@@ -80,7 +80,6 @@ class UserManager(Util):
         return (True, biddingResult)
 
 
-
     def login(self, jsonInfo):
         info = json.loads(jsonInfo)
         tel = info['tel']
@@ -455,7 +454,8 @@ class UserManager(Util):
             query = db.session.query(UserInfo).filter(
                 UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID
             )
-            allResult = query.offset(startIndex).limit(pageCount).all()
+            allResult = query.order_by(desc(UserInfo.createTime)
+                                       ).offset(startIndex).limit(pageCount).all()
             dataList = [UserInfo.generateOAInfo(result) for result in allResult]
             countQuery = db.session.query(
                 func.count(UserInfo.userID)
@@ -482,10 +482,16 @@ class UserManager(Util):
         try:
             query = db.session.query(UserInfo).filter(
                 and_(
-                    UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID,
+                    UserInfo.customizedCompanyID == info['customizedCompanyID'],
                     UserInfo.userType >= userType
                 )
             )
+            if info.has_key('startIndex'):
+                startIndex = info['startIndex']
+                pageCount = info['pageCount']
+                query = query.order_by(
+                    desc(UserInfo.createTime)
+                ).offset(startIndex).limit(pageCount)
             allResult = query.all()
             dataList = [UserInfo.generateOAInfo(result) for result in allResult]
             countQuery = db.session.query(
@@ -517,19 +523,36 @@ class UserManager(Util):
         password = info['password']
         userID = self.generateID(userName)
         info['userID'] = userID
-        info['customizedCompanyID'] = CUSTOMIZEDCOMPANYID
+        # info['customizedCompanyID'] = CUSTOMIZEDCOMPANYID
         info['tel'] = tel
         info['password'] = self.getMD5String(password)
         info['userType'] = info['userTypeID']
         info['jobNumber'] = info['jobNumber']
         info['createTime'] = datetime.now()
         try:
+            # 获取boss的公司ID
+            bossUserID = info['bossUserID']
+            bossResult = db.session.query(UserInfo).filter(
+                UserInfo.userID == bossUserID
+            ).first()
+            if bossResult is None:
+                return (False, ErrorInfo['TENDER_07'])
+            customizedCompanyID = bossResult.customizedCompanyID
+            info['customizedCompanyID'] = customizedCompanyID
             #判断是否已经存在该员工
             query = db.session.query(UserInfo).filter(UserInfo.tel == tel)
             result = query.first()
             if result is not None:
-                return (False, ErrorInfo['TENDER_07'])
-            UserInfo.create(createInfo=info)
+                # 如果用户已存在 判断用户的公司是否是0
+                customizedCompanyID = result.customizedCompanyID
+                if customizedCompanyID != 0:
+                    return (False, ErrorInfo['TENDER_37'])
+                query.update({
+                    UserInfo.customizedCompanyID : customizedCompanyID
+                }, synchronize_session=False)
+                # return (False, ErrorInfo['TENDER_07'])
+            else:
+                UserInfo.create(createInfo=info)
             db.session.commit()
             return (True, userID)
         except Exception as e:
@@ -649,3 +672,45 @@ class UserManager(Util):
     def _unpad(self, s):
         return s[:-ord(s[len(s) - 1:])]
 
+
+    # 获取经办人 审核人 审定人 信息
+    def getStaffInfo(self, info):
+        customizedCompanyID = info['customizedCompanyID']
+        userType = info['userType']
+        try:
+            result = db.session.query(UserInfo).filter(
+                and_(
+                    UserInfo.userType == userType,
+                    UserInfo.customizedCompanyID == customizedCompanyID
+                )
+            ).first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_23'])
+            resp = {}
+            resp['userID'] = result.userID
+            resp['userName'] = result.userName
+            resp['userType'] = result.userType
+            return (True, resp)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def getUserInfo(self, info):
+        userID = info['userID']
+
+        try:
+            result = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_23'])
+            return (True, UserInfo.generate(userInfo=result))
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

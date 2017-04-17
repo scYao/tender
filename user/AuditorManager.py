@@ -3,8 +3,6 @@ import sys
 import json
 import traceback
 
-from user.UserManager import UserManager
-
 sys.path.append("..")
 import os, random, requests
 reload(sys)
@@ -24,8 +22,10 @@ from models.PushedTenderInfo import PushedTenderInfo
 from pushedTender.PushedTenderManager import PushedTenderManager
 from pushedTender.TenderCommentManager import TenderCommentManager
 from tender.CustomizedTenderManager import CustomizedTenderManager
+from user.UserBaseManager import UserBaseManager
+from user.UserManager import UserManager
 
-class AuditorManager(Util):
+class AuditorManager(UserBaseManager):
 
     def __init__(self):
         pass
@@ -40,6 +40,7 @@ class AuditorManager(Util):
             return (False, errorInfo)
         pushedTenderManager = PushedTenderManager()
         info['pushedTenderInfoTag'] = PUSH_TENDER_INFO_TAG_TENDER
+        info['userID'] = userID
         return pushedTenderManager.createPushedTender(info=info)
 
     # 审核人取消推送
@@ -114,7 +115,7 @@ class AuditorManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userID'] = operatorUserID
+        info['staffUserID'] = operatorUserID
         pushedTenderManager = PushedTenderManager()
         (status, tenderResult) = pushedTenderManager.getPushedTenderListByUserID(info=info)
         if status is True:
@@ -239,4 +240,58 @@ class AuditorManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
         userManager = UserManager()
+        info['userID'] = userID
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
         return userManager.getTenderUserInfoList(info=info)
+
+
+    # 给数据打上tag，是否推送了
+    def __tagTenderList(self, info):
+        dataList = info['dataList']
+        for o in dataList:
+            if o['auditorPushedTime'] != '':
+                o['pushed'] = True
+            else:
+                o['pushed'] = False
+        return (True, info)
+
+    # 审核人  获取所有人的推送列表
+    def getAllPushedListByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['selfUserID'] = userID
+        info['staffUserID'] = info['userID']
+        pushedTenderManager = PushedTenderManager()
+        (status, result) = pushedTenderManager.getAllPushedList(info=info)
+        if status is True:
+            self.__tagTenderList(info=result)
+        return (status, result)
+
+    # 审核人获取我的推送数据分析
+    def getDataInfoByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        info['userID'] = userID
+        pushedTenderManager = PushedTenderManager()
+        return pushedTenderManager.getDataInfoByUserID(info=info)
+
+    # 获取所有员工的推送信息
+    def getAllDataInfoByAuditor(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        (status, dataInfo) = self.getTenderUserInfoListByAuditor(jsonInfo=jsonInfo)
+        dataList = dataInfo['dataList']
+
+        pushedTenderManager = PushedTenderManager()
+        _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
+        return (True, dataInfo)
