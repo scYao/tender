@@ -14,10 +14,7 @@ from datetime import datetime
 from sqlalchemy import and_, text, func, desc
 
 from models.flask_app import db
-from models.Operator import Operator
-from models.Message import Message
-from models.PushedTenderInfo import PushedTenderInfo
-from models.TenderComment import TenderComment
+from models.UserInfo import UserInfo
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS, \
@@ -25,7 +22,7 @@ from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from pushedTender.TenderCommentManager import TenderCommentManager
 
-from pushedTender.PushedTenderManager import PushedTenderManager
+from UserManager import UserManager
 
 
 class UserBaseManager(Util):
@@ -39,3 +36,17 @@ class UserBaseManager(Util):
         (status, dataInfo) = pushedTenderManager.getDataInfoByUserID(info=info)
         o.update(dataInfo)
         return None
+
+    def getUserInfoByUserID(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        return self.getUserInfo(info=info)
+
+    def getUserInfo(self, info):
+        userManager = UserManager()
+        return userManager.getUserInfo(info=info)

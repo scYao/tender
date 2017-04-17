@@ -244,8 +244,7 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.workContent: info['workContent'],
                     PushedTenderInfo.deposit: info['deposit'],
                     PushedTenderInfo.planScore: info['planScore'],
-                    PushedTenderInfo.tenderType: info['tenderType'],
-                    PushedTenderInfo.winbidding: info['winbidding']
+                    PushedTenderInfo.tenderType: info['tenderType']
                 }
                 query.update(
                     updateInfo, synchronize_session=False
@@ -256,6 +255,7 @@ class PushedTenderManager(Util):
                 return (False, ErrorInfo['TENDER_28'])#推送消息不存在
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
@@ -293,7 +293,8 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.candidatePrice2: info['candidatePrice2'],
                     PushedTenderInfo.candidateName3: info['candidateName3'],
                     PushedTenderInfo.candidatePrice3: info['candidatePrice3'],
-                    PushedTenderInfo.ceilPrice: info['ceilPrice']
+                    PushedTenderInfo.ceilPrice: info['ceilPrice'],
+                    PushedTenderInfo.winbidding: info['winbidding']
                 }
                 query.update(
                     updateInfo, synchronize_session=False
