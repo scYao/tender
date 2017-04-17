@@ -325,6 +325,7 @@ class ResponsiblePersonManager(UserBaseManager):
             return (False, errorInfo)
 
         info['selfUserID'] = userID
+        info['selfUserType'] = USER_TAG_RESPONSIBLEPERSON
         info['staffUserID'] = info['userID']
         pushedTenderManager = PushedTenderManager()
         (status, result) = pushedTenderManager.getAllPushedList(info=info)

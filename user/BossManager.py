@@ -192,6 +192,7 @@ class BossManager(UserBaseManager):
 
         info['selfUserID'] = userID
         info['staffUserID'] = info['userID']
+        info['selfUserType'] = USER_TAG_BOSS
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getAllPushedList(info=info)
 

@@ -267,6 +267,7 @@ class AuditorManager(UserBaseManager):
 
         info['selfUserID'] = userID
         info['staffUserID'] = info['userID']
+        info['selfUserType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
         (status, result) = pushedTenderManager.getAllPushedList(info=info)
         if status is True:

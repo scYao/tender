@@ -45,6 +45,7 @@ class UserBaseManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
 
+        info['userID'] = userID
         return self.getUserInfo(info=info)
 
     def getUserInfo(self, info):

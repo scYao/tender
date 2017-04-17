@@ -484,10 +484,18 @@ class PushedTenderManager(Util):
         userID = info['selfUserID']
         userManager = UserManager()
         info['userID'] = userID
+        # 获取自己的信息
         (status, userInfo) = userManager.getUserInfo(info=info)
         info['customizedCompanyID'] = userInfo['customizedCompanyID']
         info['selfUserType'] = userInfo['userType']
         info['tenderTag'] = '-1'
+
+        info['staffUserType'] = '-1'
+        # 获取用户的信息
+        if info['staffUserID'] != '-1':
+            info['userID'] = info['staffUserID']
+            (status, userInfo) = userManager.getUserInfo(info=info)
+            info['staffUserType'] = userInfo['userType']
         return self.getPushedTenderListByUserID(info=info)
 
     # 经办人 获取我的推送列表, 其他人获取经办人推送列表
@@ -496,6 +504,7 @@ class PushedTenderManager(Util):
         pageCount = info['pageCount']
         userID = info['staffUserID']
         tenderTag = info['tenderTag']
+        staffUserType = info['staffUserType']
 
         try:
             query = db.session.query(
@@ -518,8 +527,28 @@ class PushedTenderManager(Util):
 
 
             if userID != '-1':
-                query = query.filter(PushedTenderInfo.userID == userID)
-                countQuery = countQuery.filter(PushedTenderInfo.userID == userID)
+                # 获取本人的, 或者获取某个人的
+                # 如果非经办人 不能看userID字段
+                if staffUserType == USER_TAG_OPERATOR:
+                    query = query.filter(PushedTenderInfo.userID == userID)
+                    countQuery = countQuery.filter(PushedTenderInfo.userID == userID)
+                elif staffUserType == USER_TAG_RESPONSIBLEPERSON:
+                    query = query.filter(PushedTenderInfo.responsiblePersonPushedTime != None)
+                    countQuery = countQuery.filter(PushedTenderInfo.responsiblePersonPushedTime != None)
+                elif staffUserType == USER_TAG_AUDITOR:
+                    query = query.filter(PushedTenderInfo.auditorPushedTime != None)
+                    countQuery = countQuery.filter(PushedTenderInfo.auditorPushedTime != None)
+
+            else:
+                # 不是 -1 就是获取该用户角色下能获取的
+                selfUserType = info['selfUserType']
+                userResult = db.session.query(UserInfo).filter(
+                    UserInfo.userType <= selfUserType
+                ).all()
+                staffUserIDTuple = (o.userID for o in userResult)
+                query = query.filter(
+                    PushedTenderInfo.userID.in_(staffUserIDTuple)
+                )
 
             count = countQuery.first()
             count = count[0]
