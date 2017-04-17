@@ -777,7 +777,7 @@ def create_pushed_tender_by_boss():
 
 
 if __name__ == '__main__':
-    create_pushed_tender_by_boss()
+    # create_pushed_tender_by_boss()
     # get_tender_user_info_list_by_boss()
     # delete_pushed_tender_by_operator()
     # t1 = datetime.datetime.now()
@@ -862,3 +862,34 @@ if __name__ == '__main__':
     # info['startIndex'] = 0
     # info['pageCount'] = 10
     # formatDic(info)
+    file_object = '''
+<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E7%8B%90.png" alt="">
+
+<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E4%B9%8C.png" alt="">
+
+<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E7%8B%90%E7%8B%B8.png" alt="">
+
+<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E4%B9%8C%E9%B8%A6.png" alt="">
+
+
+
+    '''
+
+    listInfo = file_object.splitlines()
+    if "<img" in listInfo[1]:
+        listInfo = filter(lambda x: x.strip() != '', listInfo)
+        for item in listInfo:
+            startIndex = item.index('http')
+            endIndex = item.index('" alt')
+            print "'" + item[startIndex: endIndex] + "'" + ","
+
+    else:
+        listInfo = filter(lambda x:x.strip() != '', listInfo)
+        # listInfo = filter(lambda x:print x, listInfo)
+        for item in listInfo:
+            print "'" + item.replace('<br>', '').strip() + "'" + ","
+
+
+
+
+
