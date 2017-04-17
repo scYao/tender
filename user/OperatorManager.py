@@ -177,6 +177,7 @@ class OperatorManager(Util):
         pushedTenderManager = PushedTenderManager()
         # info['tenderTag'] = PUSH_TENDER_INFO_TAG_TENDER
         info['tenderTag'] = '-1'
+        info['staffUserType'] = USER_TAG_OPERATOR
         return pushedTenderManager.getPushedTenderListByUserID(info=info)
 
     # 获取经办人的推送列表,其他途经

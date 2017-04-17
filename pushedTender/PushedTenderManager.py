@@ -539,16 +539,17 @@ class PushedTenderManager(Util):
                     query = query.filter(PushedTenderInfo.auditorPushedTime != None)
                     countQuery = countQuery.filter(PushedTenderInfo.auditorPushedTime != None)
 
-            else:
-                # 不是 -1 就是获取该用户角色下能获取的
-                selfUserType = info['selfUserType']
-                userResult = db.session.query(UserInfo).filter(
-                    UserInfo.userType <= selfUserType
-                ).all()
-                staffUserIDTuple = (o.userID for o in userResult)
-                query = query.filter(
-                    PushedTenderInfo.userID.in_(staffUserIDTuple)
-                )
+            # else:
+            #     print 'hhhhhh'
+            #     #  -1 就是获取该用户角色下能获取的
+            #     selfUserType = info['selfUserType']
+            #     userResult = db.session.query(UserInfo).filter(
+            #         UserInfo.userType <= selfUserType
+            #     ).all()
+            #     staffUserIDTuple = (o.userID for o in userResult)
+            #     query = query.filter(
+            #         PushedTenderInfo.userID.in_(staffUserIDTuple)
+            #     )
 
             count = countQuery.first()
             count = count[0]
