@@ -971,9 +971,9 @@ class PushedTenderManager(Util):
             imgPath = result.ImgPath
             operationID = operation.operationID
             if not mDic.has_key(operationID):
-                if imgPath is None:
-                    return None
                 res = Operation.generate(c=operation)
+                if imgPath is None:
+                    return res
                 imgList = []
                 imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo,
                                                 hd=True, isFile=True))
