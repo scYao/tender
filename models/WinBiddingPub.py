@@ -71,4 +71,7 @@ class WinBiddingPub(db.Model):
         )
         return (True, None)
 
+    def __repr__(self):
+        return self.biddingID
+
 
