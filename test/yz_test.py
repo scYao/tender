@@ -784,17 +784,19 @@ def get_tender_detail_text():
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
     print result
+    print json.loads(result)['data']['detail']
 
 def get_bidding_detail_text():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/get_bidding_detail_text/' % LOCALHOST
     info = {}
-    info['biddingID'] = '2017-04-18145202b84ff4d8d78e8a3a6d5a5dc68cfc4ee3'
+    info['tenderID'] = '2017-04-18145202b84ff4d8d78e8a3a6d5a5dc68cfc4ee3'
     info['tokenID'] = ''
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
     print result
+    print json.loads(result)['data']['detail']
 
 
 
@@ -807,7 +809,7 @@ def get_bidding_detail_text():
 
 
 if __name__ == '__main__':
-    get_bidding_detail_text()
+    # get_bidding_detail_text()
     # get_tender_detail_text()
     # create_pushed_tender_by_boss()
 #     # get_tender_user_info_list_by_boss()
@@ -860,7 +862,7 @@ if __name__ == '__main__':
 #     # update_tender_background()
 #     # re_generate_bid_search_index()
 #     # search_background()
-#     # get_bidding_list()
+    get_bidding_list()
 #     # get_bidding_list_background()
 #
 #     # print datetime.date.today()

@@ -406,7 +406,9 @@ class TenderManager(Util):
     def getTenderDetailText(self, jsonInfo):
         (status, callBackInfo) = self.getTenderDetail(jsonInfo=jsonInfo)
         if status:
-            callBackInfo['detail'] = BeautifulSoup(callBackInfo['detail'], 'lxml').get_text()
+            soup = BeautifulSoup(callBackInfo['detail'], 'lxml')
+            result =  soup.get_text().encode("utf-8")
+            callBackInfo['detail'] = result.strip()
             return (True, callBackInfo)
         else:
             return (False, None)
