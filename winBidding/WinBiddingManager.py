@@ -26,6 +26,7 @@ from sqlalchemy import func
 from favorite.FavoriteManager import FavoriteManager
 from user.AdminManager import AdminManager
 from sqlalchemy import desc, and_
+from bs4 import BeautifulSoup
 
 
 class WinBiddingManager(Util):
@@ -225,6 +226,16 @@ class WinBiddingManager(Util):
         #     else:
         #         biddingDetail['favorite'] = False
         return (True, biddingDetail)
+
+    #获取中标信息详情
+    def getBiddingDetailText(self, jsonInfo):
+        (status, callBackInfo) = self.getBiddingDetail(jsonInfo=jsonInfo)
+        if status:
+            callBackInfo['detail'] = BeautifulSoup(callBackInfo['detail'], 'lxml').get_text()
+            return (True, callBackInfo)
+        else:
+            return (False, None)
+
 
     #重新生成所有中标检索
     def reGenerateBiddingSearchIndex(self, jsonInfo):
