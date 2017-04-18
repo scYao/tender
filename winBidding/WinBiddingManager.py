@@ -187,7 +187,10 @@ class WinBiddingManager(Util):
     #获取中标信息详情
     def getBiddingDetail(self, jsonInfo):
         info = json.loads(jsonInfo)
-        biddingID = info['biddingID']
+        if info.has_key('biddingID'):
+            biddingID = info['biddingID']
+        else:
+            biddingID = info['tenderID']
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
         login = False
@@ -231,7 +234,9 @@ class WinBiddingManager(Util):
     def getBiddingDetailText(self, jsonInfo):
         (status, callBackInfo) = self.getBiddingDetail(jsonInfo=jsonInfo)
         if status:
-            callBackInfo['detail'] = BeautifulSoup(callBackInfo['detail'], 'lxml').get_text()
+            soup = BeautifulSoup(callBackInfo['detail'], 'lxml')
+            result =  soup.get_text().encode("utf-8")
+            callBackInfo['detail'] = result.strip()
             return (True, callBackInfo)
         else:
             return (False, None)

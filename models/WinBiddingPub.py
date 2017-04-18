@@ -41,6 +41,7 @@ class WinBiddingPub(db.Model):
     def generateBrief(result):
         bidInfo = {}
         bidInfo['biddingID'] = result.biddingID
+        bidInfo['tenderID'] = result.biddingID
         bidInfo['title'] = result.title
         if result.publishDate is None:
             bidInfo['publishDate'] = ''
