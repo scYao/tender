@@ -276,6 +276,21 @@ def get_tender_detail():
         data['data'] = jsonlist
         return json.dumps(data)
 
+# 获取投标信息详情
+@app.route('/get_tender_detail_text/', methods=['POST', 'GET'])
+def get_tender_detail_text():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.getTenderDetailText(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
 # 获取投标信息详情,后台
 @app.route('/get_tender_detail_background/', methods=['POST', 'GET'])
 def get_tender_detail_background():

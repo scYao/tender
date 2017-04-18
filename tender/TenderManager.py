@@ -24,6 +24,7 @@ from models.PushedTenderInfo import PushedTenderInfo
 from tool.tagconfig import SEARCH_KEY_TAG_TENDRE, PUSH_TENDER_INFO_TAG_TENDER
 from sqlalchemy import desc, and_, func
 from user.AdminManager import AdminManager
+from bs4 import BeautifulSoup
 
 class TenderManager(Util):
     def __init__(self):
@@ -397,6 +398,16 @@ class TenderManager(Util):
                 tenderDetail['favorite'] = True
                 tenderDetail['favoriteID'] = favoriteResult.favoriteID
         return (True, tenderDetail)
+
+
+    def getTenderDetailText(self, jsonInfo):
+        (status, callBackInfo) = self.getTenderDetail(jsonInfo=jsonInfo)
+        if status:
+            callBackInfo['detail'] = BeautifulSoup(callBackInfo['detail'], 'lxml').get_text()
+            return (True, callBackInfo)
+        else:
+            return (False, None)
+
 
     def getTenderDetailBackground(self, jsonInfo):
         info = json.loads(jsonInfo)

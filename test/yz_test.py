@@ -1,9 +1,8 @@
 # coding=utf8
-
+#
 import sys
 import urllib
 import types
-import xmltodict
 import datetime
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -11,6 +10,7 @@ import json
 import urllib2
 import poster as poster
 from test_by_yz_config import ResultManager
+from bs4 import BeautifulSoup
 
 LOCALHOST = '127.0.0.1'
 REMOTE = '121.41.56.218'
@@ -774,122 +774,135 @@ def create_pushed_tender_by_boss():
     print result
 
 
+def get_tender_detail_text():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_tender_detail_text/' % LOCALHOST
+    info = {}
+    info['tenderID'] = '2017-04-171436577a688be6450e13821ab1edf4f5f19530'
+    info['tokenID'] = ''
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
+    get_tender_detail_text()
     # create_pushed_tender_by_boss()
-    # get_tender_user_info_list_by_boss()
-    # delete_pushed_tender_by_operator()
-    # t1 = datetime.datetime.now()
-    # t2 = None
-    # print t1 > t2
-    # get_hot_searchkey_list()
-    # get_wechat_favorite_list()
-    # wechat_search()
-    # get_tender_done_detail()
-    # create_user_info_by_boss()
-    # get_user_info_list_by_boss()
-    # operate_pushed_tender_info()
-    # get_resp_pushed_list_by_boss()
-    # get_undistributed_tender_list_by_resp()
-    # get_tender_doing_list()
-    # get_operator_list()
-    # get_pushed_list_by_operator()
-    # create_pushed_tender_by_operator()
-    # create_pushed_tender_by_operator()
-    # find_password()
-    # get_grade_1_list_background()
-    # get_grade_2_list_background()
-    # get_grade_3_list_background()
-    # get_grade_4_list_background()
-    # get_company_assistant_list_background()
-    # get_company_achievement_list_background()
-    # get_manager_achievement_list_background()
-    # get_project_manager_info_background()
-    # create_tender()
-    # get_company_img_background()
-    # common()
-    # pythonic()
-
-
-    # get_company_detail_background()
-    # get_company_list_background()
-    # get_company_list()
-
-
-
-
-
-    # get_bid_detail_background()
-    # update_bid_background()
-    # delete_bid_background()
-    # get_tender_detail_background()
-    # delete_tender_background()
-    # update_tender_background()
-    # re_generate_bid_search_index()
-    # search_background()
-    # get_bidding_list()
-    # get_bidding_list_background()
-
-    # print datetime.date.today()
-
-
-
-
-
-    # get_user_info_detail_background()
-    # get_user_list_background()
-    # get_tender_list_background()
-    # administrator_login_background()
-    # create_admin_manager()
-
-    # register()
-    # sendSmsCode()
-    # logIn()
-    # findPassword()
-    # getTenderList()
-    # re_generate_search_index()
-    # re_generate_user_search_index()
-    # getCityList()
-    # getTenderDetail()
-    # createFavorite()
-    # deleteFavorite()
-    # getFavoriteList()
-    # # getUserInfoDetail()
-    # info = {}
-    # info['tokenID'] = YZTOKENID
-    # info['companyID'] = '2017-03-1817570920a745ba3dc69398c16b14fd72b09826'
-    # info['startIndex'] = 0
-    # info['pageCount'] = 10
-    # formatDic(info)
-    file_object = '''
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E7%8B%90.png" alt="">
-
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E4%B9%8C.png" alt="">
-
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E7%8B%90%E7%8B%B8.png" alt="">
-
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E4%B9%8C%E9%B8%A6.png" alt="">
-
-
-
-    '''
-
-    listInfo = file_object.splitlines()
-    if "<img" in listInfo[1]:
-        listInfo = filter(lambda x: x.strip() != '', listInfo)
-        for item in listInfo:
-            startIndex = item.index('http')
-            endIndex = item.index('" alt')
-            print "'" + item[startIndex: endIndex] + "'" + ","
-
-    else:
-        listInfo = filter(lambda x:x.strip() != '', listInfo)
-        # listInfo = filter(lambda x:print x, listInfo)
-        for item in listInfo:
-            print "'" + item.replace('<br>', '').strip() + "'" + ","
-
-
-
-
-
+#     # get_tender_user_info_list_by_boss()
+#     # delete_pushed_tender_by_operator()
+#     # t1 = datetime.datetime.now()
+#     # t2 = None
+#     # print t1 > t2
+#     # get_hot_searchkey_list()
+#     # get_wechat_favorite_list()
+#     # wechat_search()
+#     # get_tender_done_detail()
+#     # create_user_info_by_boss()
+#     # get_user_info_list_by_boss()
+#     # operate_pushed_tender_info()
+#     # get_resp_pushed_list_by_boss()
+#     # get_undistributed_tender_list_by_resp()
+#     # get_tender_doing_list()
+#     # get_operator_list()
+#     # get_pushed_list_by_operator()
+#     # create_pushed_tender_by_operator()
+#     # create_pushed_tender_by_operator()
+#     # find_password()
+#     # get_grade_1_list_background()
+#     # get_grade_2_list_background()
+#     # get_grade_3_list_background()
+#     # get_grade_4_list_background()
+#     # get_company_assistant_list_background()
+#     # get_company_achievement_list_background()
+#     # get_manager_achievement_list_background()
+#     # get_project_manager_info_background()
+#     # create_tender()
+#     # get_company_img_background()
+#     # common()
+#     # pythonic()
+#
+#
+#     # get_company_detail_background()
+#     # get_company_list_background()
+#     # get_company_list()
+#
+#
+#
+#
+#
+#     # get_bid_detail_background()
+#     # update_bid_background()
+#     # delete_bid_background()
+#     # get_tender_detail_background()
+#     # delete_tender_background()
+#     # update_tender_background()
+#     # re_generate_bid_search_index()
+#     # search_background()
+#     # get_bidding_list()
+#     # get_bidding_list_background()
+#
+#     # print datetime.date.today()
+#
+#
+#
+#
+#
+#     # get_user_info_detail_background()
+#     # get_user_list_background()
+#     # get_tender_list_background()
+#     # administrator_login_background()
+#     # create_admin_manager()
+#
+#     # register()
+#     # sendSmsCode()
+#     # logIn()
+#     # findPassword()
+#     # getTenderList()
+#     # re_generate_search_index()
+#     # re_generate_user_search_index()
+#     # getCityList()
+#     # getTenderDetail()
+#     # createFavorite()
+#     # deleteFavorite()
+#     # getFavoriteList()
+#     # # getUserInfoDetail()
+#     # info = {}
+#     # info['tokenID'] = YZTOKENID
+#     # info['companyID'] = '2017-03-1817570920a745ba3dc69398c16b14fd72b09826'
+#     # info['startIndex'] = 0
+#     # info['pageCount'] = 10
+#     # formatDic(info)
+# #     file_object = '''
+# # <img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E7%8B%90.png" alt="">
+# #
+# # <img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E7%8B%90%E7%8B%B8.png" alt="">
+# #
+# #
+# #     '''
+# #
+# #     listInfo = file_object.splitlines()
+# #     if "<img" in listInfo[1]:
+# #         listInfo = filter(lambda x: x.strip() != '', listInfo)
+# #         for item in listInfo:
+# #             startIndex = item.index('http')
+# #             endIndex = item.index('" alt')
+# #             print "'" + item[startIndex: endIndex] + "'" + ","
+# #
+# #     else:
+# #         listInfo = filter(lambda x:x.strip() != '', listInfo)
+# #         # listInfo = filter(lambda x:print x, listInfo)
+# #         for item in listInfo:
+# #             print "'" + item.replace('<br>', '').strip() + "'" + ","
+#
+#
+#
+#
+#
