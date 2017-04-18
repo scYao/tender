@@ -241,7 +241,7 @@ class AuditorManager(UserBaseManager):
             return (False, errorInfo)
         userManager = UserManager()
         info['userID'] = userID
-        (status, userInfo) = userManager.getUserInfo(info=info)
+        (status, userInfo) = self.getUserInfo(info=info)
         info['customizedCompanyID'] = userInfo['customizedCompanyID']
         return userManager.getTenderUserInfoList(info=info)
 
@@ -267,6 +267,7 @@ class AuditorManager(UserBaseManager):
 
         info['selfUserID'] = userID
         info['staffUserID'] = info['userID']
+        info['selfUserType'] = USER_TAG_AUDITOR
         pushedTenderManager = PushedTenderManager()
         (status, result) = pushedTenderManager.getAllPushedList(info=info)
         if status is True:

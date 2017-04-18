@@ -13,6 +13,7 @@ import json
 from datetime import datetime
 from models.flask_app import db, cache
 from models.WinBiddingPub import WinBiddingPub
+from models.WinBiddingPubSlave import WinBiddingPubSlave
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from models.Candidate import Candidate
@@ -43,7 +44,7 @@ class WinBiddingManager(Util):
 
         biddingID = self.generateID(biddingNum)
 
-        biddingNum = self.getMD5String(biddingNum.strip())
+        # biddingNum = self.getMD5String(biddingNum.strip())
         (status, reason) = self.doesBiddingExists(info=info)
         if status is True:
             return (False, ErrorInfo['TENDER_17'])
@@ -53,9 +54,11 @@ class WinBiddingManager(Util):
         winBidding = WinBiddingPub(biddingID=biddingID, title=title,
                                    publishDate=publishDate, biddingNum=biddingNum,
                                    detail=detail, cityID=cityID)
+        winBiddingPubSlave = WinBiddingPubSlave(biddingID=biddingID, title=title, biddingNum=biddingNum)
 
         try:
             db.session.add(winBidding)
+            db.session.add(winBiddingPubSlave)
             info['searchName'] = title
             info['description'] = detail
             info['foreignID'] = biddingID
@@ -80,8 +83,8 @@ class WinBiddingManager(Util):
     def doesBiddingExists(self, info):
         biddingNum = info['biddingNum']
         try:
-            result = db.session.query(WinBiddingPub).filter(
-                WinBiddingPub.biddingNum == biddingNum
+            result = db.session.query(WinBiddingPubSlave).filter(
+                WinBiddingPubSlave.biddingNum == biddingNum
             ).first()
             if result is not None:
                 return (True, result.biddingID)

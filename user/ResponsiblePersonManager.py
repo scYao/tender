@@ -300,7 +300,7 @@ class ResponsiblePersonManager(UserBaseManager):
             return (False, errorInfo)
         userManager = UserManager()
         info['userID'] = userID
-        (status, userInfo) = userManager.getUserInfo(info=info)
+        (status, userInfo) = self.getUserInfo(info=info)
         info['customizedCompanyID'] = userInfo['customizedCompanyID']
         return userManager.getTenderUserInfoList(info=info)
 
@@ -325,6 +325,7 @@ class ResponsiblePersonManager(UserBaseManager):
             return (False, errorInfo)
 
         info['selfUserID'] = userID
+        info['selfUserType'] = USER_TAG_RESPONSIBLEPERSON
         info['staffUserID'] = info['userID']
         pushedTenderManager = PushedTenderManager()
         (status, result) = pushedTenderManager.getAllPushedList(info=info)

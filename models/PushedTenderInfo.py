@@ -203,6 +203,7 @@ class PushedTenderInfo(db.Model):
             res['deadline'] = ''
         else:
             res['deadline'] = str(c.deadline)
+        res['winbidding'] = c.winbidding
         return res
 
     def __repr__(self):

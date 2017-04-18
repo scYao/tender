@@ -38,6 +38,7 @@ from user.BossManager import BossManager
 from pushedTender.PushedTenderManager import PushedTenderManager
 from tender.CustomizedTenderManager import CustomizedTenderManager
 from news.NewsManager import NewsManager
+from user.UserBaseManager import UserBaseManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -2723,6 +2724,21 @@ def get_tender_user_info_list_by_auditor():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = aauditorManager.getTenderUserInfoListByAuditor(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取用户自己的详情
+@app.route('/get_user_info_by_user_id/', methods=['POST', 'GET'])
+def get_user_info_by_user_id():
+    userBaseManager = UserBaseManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = userBaseManager.getUserInfoByUserID(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
