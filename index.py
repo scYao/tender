@@ -338,6 +338,21 @@ def get_bidding_detail():
         return json.dumps(data)
 
 # 获取中标信息详情
+@app.route('/get_bidding_detail_text/', methods=['POST', 'GET'])
+def get_bidding_detail_text():
+    winBiddingManager = WinBiddingManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = winBiddingManager.getBiddingDetailText(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取中标信息详情
 @app.route('/get_bid_detail/', methods=['POST', 'GET'])
 def get_bid_detail():
     winBiddingManager = WinBiddingManager()
