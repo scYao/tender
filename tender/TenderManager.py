@@ -18,6 +18,7 @@ from tool.config import ErrorInfo
 from models.Province import Province
 from models.City import City
 from models.Tender import Tender
+from models.TenderSlave import TenderSlave
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from models.PushedTenderInfo import PushedTenderInfo
@@ -93,8 +94,8 @@ class TenderManager(Util):
     def doesTenderExists(self, info):
         biddingNum = info['biddingNum']
         try:
-            result = db.session.query(Tender).filter(
-                Tender.biddingNum == biddingNum
+            result = db.session.query(TenderSlave).filter(
+                TenderSlave.biddingNum == biddingNum
             ).first()
             if result is not None:
                 return (True, result.tenderID)
@@ -132,9 +133,11 @@ class TenderManager(Util):
                         location=location, url=url, publishDate=publishDate,
                         detail=detail, typeID=typeID, biddingNum=biddingNum,
                         reviewType=reviewType)
+        tenderSlave = TenderSlave(tenderID=tenderID, title=title, biddingNum=biddingNum)
         info['tenderID'] = tenderID
         try:
             db.session.add(tender)
+            db.session.add(tenderSlave)
             info['searchName'] = info['title']
             info['description'] = info['detail']
             info['foreignID'] = info['tenderID']
