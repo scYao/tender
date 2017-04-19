@@ -235,6 +235,7 @@ class WinBiddingManager(Util):
         (status, callBackInfo) = self.getBiddingDetail(jsonInfo=jsonInfo)
         if status:
             soup = BeautifulSoup(callBackInfo['detail'], 'lxml')
+            [s.extract() for s in soup('style')]#删除所有剩余的style样式
             result =  soup.get_text().encode("utf-8")
             callBackInfo['detail'] = result.strip()
             return (True, callBackInfo)
