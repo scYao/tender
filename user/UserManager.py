@@ -483,7 +483,8 @@ class UserManager(Util):
             query = db.session.query(UserInfo).filter(
                 and_(
                     UserInfo.customizedCompanyID == info['customizedCompanyID'],
-                    UserInfo.userType >= userType
+                    UserInfo.userType >= userType,
+                    UserInfo.userType != USER_TAG_BOSS
                 )
             )
             if info.has_key('startIndex'):
