@@ -5,6 +5,7 @@ import urllib2
 import poster
 import requests
 
+from tool.tagconfig import SEARCH_KEY_TAG_PROJECT_MANAGER
 
 sys.path.append("..")
 import os
@@ -64,6 +65,15 @@ class PMManager(Util):
         )
         try:
             db.session.add(projectManager)
+            #添加搜索记录
+            searchInfo = {}
+            searchInfo['searchName'] = info['managerName']
+            searchInfo['foreignID'] = managerID
+            searchInfo['tag'] = SEARCH_KEY_TAG_PROJECT_MANAGER
+            now = datetime.now()
+            searchInfo['createTime'] = str(now)
+            searchInfo['joinID'] = self.generateID(info['managerName'])
+            SearchKey.createSearchInfo(info=searchInfo)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
@@ -122,6 +132,27 @@ class PMManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, managerResult)
+
+    def getProjectManagerListByIDTuple(self, info):
+        foreignIDTuple = info['foreignIDTuple']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        query = db.session.query(ProjectManager).filter(
+            ProjectManager.managerID.in_(foreignIDTuple)
+        )
+        info['query'] = query
+        query = query.offset(startIndex).limit(pageCount)
+        allResult = query.all()
+        companyList = [ProjectManager.generate(result) for result in allResult]
+        countQuery = db.session.query(func.count(ProjectManager.managerID)).filter(
+            ProjectManager.managerID.in_(foreignIDTuple)
+        )
+        count = countQuery.first()
+        count = count[0]
+        result = {}
+        result['dataList'] = companyList
+        result['count'] = count
+        return (True, result)
 
     # 获取项目经理详情，后台
     def getProjectManagerInfoBackground(self, jsonInfo):

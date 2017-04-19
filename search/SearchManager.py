@@ -26,10 +26,12 @@ from tender.TenderManager import TenderManager
 from user.UserManager import UserManager
 from user.AdminManager import AdminManager
 from winBidding.WinBiddingManager import WinBiddingManager
+from company.CompanyManager import CompanyManager
+from projectManager.PMManager import PMManager
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import SEARCH_KEY_TAG_USER, SEARCH_KEY_TAG_WIN_BIDDING
-from tool.tagconfig import SEARCH_KEY_TAG_TENDRE
+from tool.tagconfig import SEARCH_KEY_TAG_TENDRE, SEARCH_KEY_TAG_COMPANY, SEARCH_KEY_TAG_PROJECT_MANAGER
 from sqlalchemy import func
 
 
@@ -64,49 +66,42 @@ class SearchManager(Util):
         foreignIDTuple = tuple(foreignIDList)
         # allResult = query.offset(startIndex).limit(pageCount).all()
         info['foreignIDTuple'] = foreignIDTuple
-
-        if tag == SEARCH_KEY_TAG_USER:
-            # userIDList = [result.foreignID for result in allResult]
-            # userIDTuple = tuple(userIDList)
-            userInfoList = UserManager.getUserInfoListByIDTuple(info=info)
-            return (True, userInfoList)
-
-        if tag == SEARCH_KEY_TAG_TENDRE:
-            # tenderIDList = [result.foreignID for result in allResult]
-            # tenderIDTuple = tuple(tenderIDList)
-            tenderManager = TenderManager()
-            return tenderManager.getTenderListByIDTuple(info=info)
-
-
-        if tag == SEARCH_KEY_TAG_WIN_BIDDING:
-            # bidIDList = [result.foreignID for result in allResult]
-            # bidIDTuple = tuple(bidIDList)
-            winBiddingManager = WinBiddingManager()
-            return winBiddingManager.getBiddingListByIDTuple(info=info)
+        # 表驱动,定义一个字典,包含5种可能搜索情况
+        tenderManager = TenderManager()
+        winBiddingManager = WinBiddingManager()
+        companyManager = CompanyManager()
+        pMManager = PMManager()
+        searchTypeDic = {
+            SEARCH_KEY_TAG_USER: UserManager.getUserInfoListByIDTuple,
+            SEARCH_KEY_TAG_TENDRE: tenderManager.getTenderListByIDTuple,
+            SEARCH_KEY_TAG_WIN_BIDDING: winBiddingManager.getBiddingListByIDTuple,
+            SEARCH_KEY_TAG_COMPANY: companyManager.getCompanyListByIDTuple,
+            SEARCH_KEY_TAG_PROJECT_MANAGER: pMManager.getProjectManagerListByIDTuple
+        }
+        (status, value) = searchTypeDic[tag](info=info)
+        return (status, value)
 
 
-    # 搜索，小程序，tag=1，表示用户，2,表示招标，３，表示中标
+        #
+        # if tag == SEARCH_KEY_TAG_USER:
+        #     # userIDList = [result.foreignID for result in allResult]
+        #     # userIDTuple = tuple(userIDList)
+        #     userInfoList = UserManager.getUserInfoListByIDTuple(info=info)
+        #     return (True, userInfoList)
+        #
+        # if tag == SEARCH_KEY_TAG_TENDRE:
+        #     # tenderIDList = [result.foreignID for result in allResult]
+        #     # tenderIDTuple = tuple(tenderIDList)
+        #     tenderManager = TenderManager()
+        #     return tenderManager.getTenderListByIDTuple(info=info)
+        #
+        #
+        # if tag == SEARCH_KEY_TAG_WIN_BIDDING:
+        #     # bidIDList = [result.foreignID for result in allResult]
+        #     # bidIDTuple = tuple(bidIDList)
+        #     winBiddingManager = WinBiddingManager()
+        #     return winBiddingManager.getBiddingListByIDTuple(info=info)
 
-    def wechatSearch(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        tag = int(info['tag'])
-        startIndex = info['startIndex']
-        pageCount = info['pageCount']
-        (status, foreignIDTuple) = self.__wechatQuery(info)
-        info['foreignIDTuple'] = foreignIDTuple
-        if tag == 1:
-            userManager = UserManager()
-            userInfoList = userManager.getWechatUserInfoList(info=info)
-            return (True, userInfoList)
-
-        if tag == 2:
-            tenderManager = TenderManager()
-            tenderList = tenderManager.getWechatTenderList(info=info)
-            return (True, tenderList)
-
-        if tag == 3:
-            bidList = WinBiddingManager.getBiddingListByIDTuple(info=info)
-            return (True, bidList)
 
     def __wechatQuery(self, info):
         searchKey = info['searchKey']

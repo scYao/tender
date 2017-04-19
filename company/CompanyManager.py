@@ -16,7 +16,9 @@ from sqlalchemy import desc, and_
 from models.flask_app import db
 from models.Company import Company
 from models.ImgPath import ImgPath
+from models.SearchKey import SearchKey
 from models.CompanyAssistant import CompanyAssistant
+from tool.tagconfig import SEARCH_KEY_TAG_COMPANY
 
 from tool.Util import Util
 from tool.config import ErrorInfo
@@ -118,6 +120,15 @@ class CompanyManager(Util):
         try:
             db.session.add(company)
             db.session.add(companyAssistant)
+            #添加搜索记录
+            searchInfo = {}
+            searchInfo['searchName'] = info['companyName']
+            searchInfo['foreignID'] = companyID
+            searchInfo['tag'] = SEARCH_KEY_TAG_COMPANY
+            now = datetime.now()
+            searchInfo['createTime'] = str(now)
+            searchInfo['joinID'] = self.generateID(info['companyName'])
+            SearchKey.createSearchInfo(info=searchInfo)
             db.session.commit()
         except Exception as e:
             # traceback.print_stack()
@@ -177,6 +188,28 @@ class CompanyManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+
+    def getCompanyListByIDTuple(self, info):
+        foreignIDTuple = info['foreignIDTuple']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        query = db.session.query(Company).filter(
+            Company.companyID.in_(foreignIDTuple)
+        )
+        info['query'] = query
+        query = query.offset(startIndex).limit(pageCount)
+        allResult = query.all()
+        companyList = [Company.generateBrief(result) for result in allResult]
+        countQuery = db.session.query(func.count(Company.companyID)).filter(
+            Company.companyID.in_(foreignIDTuple)
+        )
+        count = countQuery.first()
+        count = count[0]
+        result = {}
+        result['dataList'] = companyList
+        result['count'] = count
+        return (True, result)
 
     def __generateCompanyDetail(self, result):
         # ossInfo = {}

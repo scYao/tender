@@ -13,6 +13,7 @@ from test_by_yz_config import ResultManager
 from bs4 import BeautifulSoup
 
 LOCALHOST = '127.0.0.1'
+# LOCALHOST = '192.168.30.150'
 REMOTE = '121.41.56.218'
 YZTOKENID = '2017-03-17145344588f6f132ddf7ccead74dcf06134ad63'
 
@@ -406,6 +407,24 @@ def search_background():
     info['pageCount'] = 10
     info['tokenID'] = YZTOKENID
     info['searchKey'] = '无锡'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+# 搜索，后台
+def search():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/search/' % LOCALHOST
+    info = {}
+    info['tag'] = 5
+    info['startIndex'] = 0
+    info['pageCount'] = 10
+    info['startDate'] = '-1'
+    info['endDate'] = '-1'
+    info['cityID'] = '-1'
+    info['tokenID'] = YZTOKENID
+    info['searchKey'] = '南京'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -810,7 +829,8 @@ def get_bidding_detail_text():
 
 
 if __name__ == '__main__':
-    get_bidding_detail_text()
+    search()
+    # get_bidding_detail_text()
     # get_tender_detail_text()
     # create_pushed_tender_by_boss()
 #     # get_tender_user_info_list_by_boss()
