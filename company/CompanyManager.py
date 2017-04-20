@@ -66,7 +66,7 @@ class CompanyManager(Util):
         technologyDirector = info['technologyDirector'].replace('\'', '\\\'').replace('\"', '\\\"')
         remarks = info['remarks'].replace('\'', '\\\'').replace('\"', '\\\"')
         licenseID = info['licenseID'].replace('\'', '\\\'').replace('\"', '\\\"')
-        registeredCapital = info['registeredCapital'].replace('\'', '\\\'').replace('\"', '\\\"')
+        registeredCapital = info['registeredCapital']
         companyType = info['companyType'].replace('\'', '\\\'').replace('\"', '\\\"')
         foundingTime = info['foundingTime']
         businessTermFrom = info['businessTermFrom'].replace('\'', '\\\'').replace('\"', '\\\"')

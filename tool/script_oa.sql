@@ -8,6 +8,7 @@ create table pushedTenderInfo(
 	pushedID nvarchar(100) primary key comment '推送ID',
 	userID nvarchar(100) comment '推送人',
 	createTime datetime comment '推送时间',
+	operatorPersonPushedTime datetime comment '经办人推送时间',
 	responsiblePersonPushedTime datetime comment '负责人推送时间',
 	auditorPushedTime datetime comment '审核人',
 	state int comment 'boss决定是否投标, 0 未确定, 1 投, 2 放弃',
