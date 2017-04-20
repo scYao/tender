@@ -47,11 +47,12 @@ create table qualificationGrade(
 	qualificationID nvarchar(100) primary key comment '资质ID',
 	qualificationName nvarchar(100)
 );
-
-create table companyQualification(
+-- 企业资质等级
+create table companyCertificate(
 	joinID nvarchar(100) primary key comment '组合ID',
 	companyID nvarchar(100) comment '公司ID',
-	qualificationID nvarchar(100) comment '资质ID' 
+	qualificationID nvarchar(100) comment '资质ID',
+	tag int comment '区别资质，0表示主项，１表示增项'
 );
 
 create table imgPath
@@ -189,7 +190,7 @@ create table companyAssistant(
 
 ALTER TABLE company CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE qualificationGrade CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE companyQualification CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE companyCertificate CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE projectManager CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE managerLicense CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE managerAchievement CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -203,8 +204,8 @@ ALTER TABLE winBiddingPub CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 ALTER TABLE candidate CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE companyAssistant CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-alter table companyQualification add constraint company_q_FK_company foreign key(companyID) references company(companyID);
-alter table companyQualification add constraint company_q_FK_qualification foreign key(qualificationID) references qualificationGrade(qualificationID);
+alter table companyCertificate add constraint company_q_FK_company foreign key(companyID) references company(companyID);
+--alter table companyCertificate add constraint company_q_FK_qualification foreign key(qualificationID) references qualificationGrade(qualificationID);
 alter table managerLicense add constraint manager_l_FK_manager foreign key(managerID) references projectManager(managerID);
 alter table managerAchievement add constraint manager_a_FK_manager foreign key(managerID) references projectManager(managerID);
 alter table certificationGrade2 add constraint grade_2_FK_1 foreign key(superiorID) references certificationGrade1(gradeID);

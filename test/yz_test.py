@@ -832,10 +832,13 @@ def get_bidding_detail_text():
 
 
 if __name__ == '__main__':
+    gradeType = u'主项'
+    tag = 0 if gradeType == '主项' else 1
+    print tag
     # search()
     # print '始发布之日止投标企业、企业法定代表人﹑项目经理、委托代理人无行贿犯罪档案查询结果原件。'
     # get_bidding_detail_text()
-    get_tender_detail_text()
+    # get_tender_detail_text()
     # create_pushed_tender_by_boss()
 #     # get_tender_user_info_list_by_boss()
 #     # delete_pushed_tender_by_operator()
@@ -857,7 +860,7 @@ if __name__ == '__main__':
 #     # create_pushed_tender_by_operator()
 #     # create_pushed_tender_by_operator()
 #     # find_password()
-    get_grade_1_list_background()
+#     get_grade_1_list_background()
 #     # get_grade_2_list_background()
 #     # get_grade_3_list_background()
 #     # get_grade_4_list_background()

@@ -18,6 +18,7 @@ from favorite.FavoriteManager import FavoriteManager
 from company.CompanyManager import CompanyManager
 from company.CompanyAchievementManager import CompanyAchievementManager
 from company.DelinquenentConductManager import DelinquenentConductManager
+from company.CompanyCertificateManager import CompanyCertificateManager
 from projectManager.PMManager import PMManager
 from projectManager.LicenseManager import LicenseManager
 from projectManager.AchievementManager import AchievementManager
@@ -925,6 +926,21 @@ def create_company_achievement():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = companyAchievementManager.createCompanyAchievement(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建公司资质表
+@app.route('/create_company_certificate/', methods=['POST', 'GET'])
+def create_company_certificate():
+    companyCertificateManager = CompanyCertificateManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = companyCertificateManager.createCompanyCertificate(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
