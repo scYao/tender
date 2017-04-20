@@ -31,25 +31,31 @@ class CompanyCertificateManager(Util):
         certList = info['certList']
         companyID = info['companyID']
         try:
-            def create(certInfo):
-                gradeType = certInfo['gradeType']
-                tag = 0 if gradeType == '主项' else 1
-                gradeName = certInfo['gradeName']
-                #判断是否存在资质信息
-                query = db.session.query(CertificationGrade4).filter(
-                    CertificationGrade4.gradeName == gradeName
-                )
-                result = query.first()
-                if result is not None:
-                    qualificationID = result.gradeID
-                    joinID = self.generateID(qualificationID + companyID)
-                    companyCertificate = CompanyCertificate(
-                        joinID=joinID, companyID=companyID,
-                        qualificationID=qualificationID, tag=tag
+            #判断是否已经添加
+            certQuery = db.session.query(CompanyCertificate).filter(
+                CompanyCertificate.companyID == companyID
+            )
+            certResult = certQuery.first()
+            if certResult is None:
+                def create(certInfo):
+                    gradeType = certInfo['gradeType']
+                    tag = 0 if gradeType == '主项' else 1
+                    gradeName = certInfo['gradeName']
+                    #判断是否存在资质信息
+                    query = db.session.query(CertificationGrade4).filter(
+                        CertificationGrade4.gradeName == gradeName
                     )
-                    db.session.add(companyCertificate)
-            [create(certInfo=certInfo) for certInfo in certList]
-            db.session.commit()
+                    result = query.first()
+                    if result is not None:
+                        qualificationID = result.gradeID
+                        joinID = self.generateID(qualificationID + companyID)
+                        companyCertificate = CompanyCertificate(
+                            joinID=joinID, companyID=companyID,
+                            qualificationID=qualificationID, tag=tag
+                        )
+                        db.session.add(companyCertificate)
+                [create(certInfo=certInfo) for certInfo in certList]
+                db.session.commit()
         except Exception as e:
             db.session.rollback()
             print e
