@@ -68,18 +68,18 @@ class CompanyManager(Util):
         licenseID = info['licenseID'].replace('\'', '\\\'').replace('\"', '\\\"')
         registeredCapital = info['registeredCapital'].replace('\'', '\\\'').replace('\"', '\\\"')
         companyType = info['companyType'].replace('\'', '\\\'').replace('\"', '\\\"')
-        foundingTime = info['foundingTime'].replace('\'', '\\\'').replace('\"', '\\\"')
+        foundingTime = info['foundingTime']
         businessTermFrom = info['businessTermFrom'].replace('\'', '\\\'').replace('\"', '\\\"')
         safetyProductionPermitID = info['safetyProductionPermitID'].replace('\'', '\\\'').replace('\"', '\\\"')
         safePrincipal = info['safePrincipal'].replace('\'', '\\\'').replace('\"', '\\\"')
         businessScope = info['businessScope'].replace('\'', '\\\'').replace('\"', '\\\"')
         safeAuthority = info['safeAuthority'].replace('\'', '\\\'').replace('\"', '\\\"')
-        safeFromDate = info['safeFromDate'].replace('\'', '\\\'').replace('\"', '\\\"')
-        safeEndDate = info['safeEndDate'].replace('\'', '\\\'').replace('\"', '\\\"')
+        safeFromDate = info['safeFromDate']
+        safeEndDate = info['safeEndDate']
         creditBookID = info['creditBookID'].replace('\'', '\\\'').replace('\"', '\\\"')
-        creditScore1 = info['creditScore1'].replace('\'', '\\\'').replace('\"', '\\\"')
-        creditScore2 = info['creditScore2'].replace('\'', '\\\'').replace('\"', '\\\"')
-        creditEndDate = info['creditEndDate'].replace('\'', '\\\'').replace('\"', '\\\"')
+        creditScore1 = info['creditScore1']
+        creditScore2 = info['creditScore2']
+        creditEndDate = info['creditEndDate']
         creditAuthority = info['creditAuthority'].replace('\'', '\\\'').replace('\"', '\\\"')
         creditAddress = info['creditAddress'].replace('\'', '\\\'').replace('\"', '\\\"')
         creditWebSet = info['creditWebSet'].replace('\'', '\\\'').replace('\"', '\\\"')
@@ -90,12 +90,28 @@ class CompanyManager(Util):
         creditFinancialStaff = info['creditFinancialStaff'].replace('\'', '\\\'').replace('\"', '\\\"')
         companyBrief = info['companyBrief'].replace('\'', '\\\'').replace('\"', '\\\"')
 
+
         companyID = self.generateID(companyName)
         (status, reason) = self.doesCompanyExists(info=info)
         if status is True:
             errorInfo = ErrorInfo['TENDER_18']
             errorInfo['detail'] = reason
             return (False, errorInfo)
+
+        if creditScore1 == '':
+            creditScore1 = 0
+
+        if creditScore2 == '':
+            creditScore2 = 0
+
+        if safeEndDate == '':
+            safeEndDate = None
+
+        if safeFromDate == '':
+            safeFromDate = None
+
+        if foundingTime == '':
+            foundingTime = None
 
         if businessTermFrom == '':
             businessTermFrom = None

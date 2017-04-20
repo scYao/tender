@@ -12,6 +12,7 @@ class PushedTenderInfo(db.Model):
     pushedID = db.Column(db.String(100), primary_key=True)
     userID = db.Column(db.String(100))
     createTime = db.Column(db.DateTime)
+    operatorPersonPushedTime = db.Column(db.DateTime)
     responsiblePersonPushedTime = db.Column(db.DateTime)
     auditorPushedTime = db.Column(db.DateTime)
     state = db.Column(db.Integer)
@@ -52,7 +53,7 @@ class PushedTenderInfo(db.Model):
     deadline = db.Column(db.Date)
     winbidding = db.Column(db.Boolean)
 
-    def __init__(self, pushedID=None, userID=None, createTime=None,
+    def __init__(self, pushedID=None, userID=None, createTime=None, operatorPersonPushedTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
                  tenderID=None, step=0, projectManagerName='',
                  openedDate=None, openedLocation='', ceilPrice=0,
@@ -68,6 +69,7 @@ class PushedTenderInfo(db.Model):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
+        self.operatorPersonPushedTime = operatorPersonPushedTime
         self.responsiblePersonPushedTime = responsiblePersonPushedTime
         self.auditorPushedTime = auditorPushedTime
         self.state = state
@@ -113,6 +115,7 @@ class PushedTenderInfo(db.Model):
             pushedID=info['pushedID'],
             userID=info['userID'],
             createTime=info['createTime'],
+            operatorPersonPushedTime=info['operatorPersonPushedTime'],
             responsiblePersonPushedTime=info['responsiblePersonPushedTime'],
             auditorPushedTime=info['auditorPushedTime'],
             state=info['state'],
@@ -136,10 +139,10 @@ class PushedTenderInfo(db.Model):
     def generateBrief(c):
         res = {}
         res['pushedID'] = c.pushedID
-        if c.createTime is None:
-            res['createTime'] = ''
+        if c.operatorPersonPushedTime is None:
+            res['operatorPersonPushedTime'] = ''
         else:
-            res['createTime'] = str(c.createTime)
+            res['operatorPersonPushedTime'] = str(c.operatorPersonPushedTime)
 
         if c.responsiblePersonPushedTime is None:
             res['responsiblePersonPushedTime'] = ''
@@ -164,7 +167,7 @@ class PushedTenderInfo(db.Model):
         res = {}
         res['pushedID'] = c.pushedID
         res['userID'] = c.userID
-        res['createTime'] = str(c.createTime)
+        res['operatorPersonPushedTime'] = str(c.operatorPersonPushedTime)
         res['responsiblePersonPushedTime'] = str(c.responsiblePersonPushedTime)
         res['auditorPushedTime'] = str(c.auditorPushedTime)
         res['state'] = c.state

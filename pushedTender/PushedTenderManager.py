@@ -114,16 +114,17 @@ class PushedTenderManager(Util):
         pushedID = self.generateID(userID + tenderID)
         info['pushedID'] = pushedID
         info['userID'] = userID
-        info['createTime'] = None
+        info['operatorPersonPushedTime'] = None
         info['responsiblePersonPushedTime'] = None
         info['auditorPushedTime'] = None
         info['state'] = 0
         info['step'] = 0
+        info['createTime'] = datetime.now()
         if not info.has_key('deadline'):
             info['deadline'] = None
         userType = info['userType']
         if userType == USER_TAG_OPERATOR:
-            info['createTime'] = datetime.now()
+            info['operatorPersonPushedTime'] = datetime.now()
         if userType == USER_TAG_AUDITOR:
             info['auditorPushedTime'] = datetime.now()
         if userType == USER_TAG_RESPONSIBLEPERSON:
@@ -169,7 +170,7 @@ class PushedTenderManager(Util):
             result = query.first()
             if result is None:
                 return (False, ErrorInfo['TENDER_28'])#推送消息不存在
-            createTime = result.createTime
+            operatorPersonPushedTime = result.operatorPersonPushedTime
             responsiblePersonPushedTime = result.responsiblePersonPushedTime
             auditorPushedTime = result.auditorPushedTime
             state = result.state
@@ -187,7 +188,7 @@ class PushedTenderManager(Util):
                              auditorPushedTime is not None:
                     return (False, ErrorInfo['TENDER_35'])
                 else:
-                    if createTime is not None:
+                    if operatorPersonPushedTime is not None:
                         query.update(
                             {PushedTenderInfo.responsiblePersonPushedTime: None},
                             synchronize_session=False
@@ -451,7 +452,7 @@ class PushedTenderManager(Util):
         if self.resp is not None:
             pushedUserList = []
             # 经办人推送了
-            if result.PushedTenderInfo.createTime is not None:
+            if result.PushedTenderInfo.operatorPersonPushedTime is not None:
                 u = {}
                 u['userID'] = result.UserInfo.userID
                 u['userName'] = result.UserInfo.userName
@@ -639,7 +640,7 @@ class PushedTenderManager(Util):
                 and_(Operator.userID == userID,
                      PushedTenderInfo.step == step)
             ).order_by(desc(
-                PushedTenderInfo.createTime
+                PushedTenderInfo.operatorPersonPushedTime
             ))
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
                 and_(PushedTenderInfo.userID == userID,
@@ -697,7 +698,7 @@ class PushedTenderManager(Util):
             ).filter(
                 PushedTenderInfo.step == step
             ).order_by(desc(
-                PushedTenderInfo.createTime
+                PushedTenderInfo.operatorPersonPushedTime
             ))
             countQuery = db.session.query(
                 func.count(PushedTenderInfo.pushedID)
@@ -850,7 +851,7 @@ class PushedTenderManager(Util):
                 or_(Operator.userID == '-1',
                     Operator.state == 2)
             )).order_by(desc(
-                PushedTenderInfo.createTime
+                PushedTenderInfo.operatorPersonPushedTime
             ))
 
             pushedInfoResult = query.offset(startIndex).limit(pageCount).all()
@@ -1508,11 +1509,11 @@ class PushedTenderManager(Util):
         if userType == USER_TAG_OPERATOR:
             if startDate != '-1':
                 query = query.filter(
-                    PushedTenderInfo.createTime >= startDate
+                    PushedTenderInfo.operatorPersonPushedTime >= startDate
                 )
             if endDate != '-1':
                 query = query.filter(
-                    PushedTenderInfo.createTime <= endDate
+                    PushedTenderInfo.operatorPersonPushedTime <= endDate
                 )
         elif userType == USER_TAG_RESPONSIBLEPERSON:
             if startDate != '-1':
