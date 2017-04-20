@@ -1,6 +1,7 @@
 # coding=utf8
 #
 import sys
+import chardet
 import urllib
 import types
 import datetime
@@ -12,8 +13,8 @@ import poster as poster
 from test_by_yz_config import ResultManager
 from bs4 import BeautifulSoup
 
-LOCALHOST = '127.0.0.1'
-# LOCALHOST = '192.168.30.150'
+# LOCALHOST = '127.0.0.1'
+LOCALHOST = '192.168.30.150'
 REMOTE = '121.41.56.218'
 YZTOKENID = '2017-03-17145344588f6f132ddf7ccead74dcf06134ad63'
 
@@ -417,14 +418,14 @@ def search():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/search/' % LOCALHOST
     info = {}
-    info['tag'] = 5
+    info['tag'] = 2
     info['startIndex'] = 0
     info['pageCount'] = 10
     info['startDate'] = '-1'
     info['endDate'] = '-1'
-    info['cityID'] = '-1'
+    info['cityID'] = '69'
     info['tokenID'] = YZTOKENID
-    info['searchKey'] = '南京'
+    info['searchKey'] = '光明粮食'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -797,13 +798,15 @@ def get_tender_detail_text():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/get_tender_detail_text/' % LOCALHOST
     info = {}
-    info['tenderID'] = '2017-04-171436577a688be6450e13821ab1edf4f5f19530'
+    info['tenderID'] = '2017-04-2009290674f43521db267225efcdfe311dcf931c'
     info['tokenID'] = ''
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
-    print result
-    print json.loads(result)['data']['detail']
+    # print result
+    detail = json.loads(result)['data']['detail']
+    print chardet.detect(detail)
+
 
 def get_bidding_detail_text():
     opener = poster.streaminghttp.register_openers()
@@ -829,9 +832,10 @@ def get_bidding_detail_text():
 
 
 if __name__ == '__main__':
-    search()
+    # search()
+    # print '始发布之日止投标企业、企业法定代表人﹑项目经理、委托代理人无行贿犯罪档案查询结果原件。'
     # get_bidding_detail_text()
-    # get_tender_detail_text()
+    get_tender_detail_text()
     # create_pushed_tender_by_boss()
 #     # get_tender_user_info_list_by_boss()
 #     # delete_pushed_tender_by_operator()
@@ -853,7 +857,7 @@ if __name__ == '__main__':
 #     # create_pushed_tender_by_operator()
 #     # create_pushed_tender_by_operator()
 #     # find_password()
-#     # get_grade_1_list_background()
+    get_grade_1_list_background()
 #     # get_grade_2_list_background()
 #     # get_grade_3_list_background()
 #     # get_grade_4_list_background()
