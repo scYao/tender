@@ -33,8 +33,8 @@ from stoken.TokenManager import TokenManager
 
 class UserManager(Util):
     def __init__(self):
-        self.appID = 'wxc9029ba1dcf6f2de'
-        self.appSecret = '7aba62050624812ba861146750e40de4'
+        self.appID = 'wx3f8eb38c63060bf4'
+        self.appSecret = '3e54449f22cf865507d7f9292ca4efe5'
 
     #重新生成所有招标检索
     def reGenerateUserSearchIndex(self, jsonInfo):
