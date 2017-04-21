@@ -19,7 +19,7 @@ class Company(db.Model):
     legalRepresentative = db.Column(db.String(100))
     enterprisePrincipal = db.Column(db.String(100))
     technologyDirector = db.Column(db.String(100))
-    remarks = db.Column(db.String(100))
+    remarks = db.Column(db.Text)
     licenseID = db.Column(db.String(100))
     registeredCapital = db.Column(db.Float)
     companyType = db.Column(db.String(100))

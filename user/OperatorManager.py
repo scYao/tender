@@ -305,7 +305,7 @@ class OperatorManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        info['userType'] = USER_TAG_OPERATOR
         info['userID'] = userID
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.getDataInfoByUserID(info=info)

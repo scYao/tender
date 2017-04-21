@@ -1064,7 +1064,7 @@ class PushedTenderManager(Util):
                 Operation.tag == operationTag,
                 Operation.operatorID == operatorID
             )
-        )
+        ).order_by(desc(Operation.createTime))
         operationResult = operationQuery.all()
 
         operationDataList = self.__generateBookInfo(bookResult=operationResult)
@@ -1516,6 +1516,9 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.operatorPersonPushedTime <= endDate
                 )
         elif userType == USER_TAG_RESPONSIBLEPERSON:
+            query = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.responsiblePersonPushedTime != None
+            )
             if startDate != '-1':
                 query = query.filter(
                     PushedTenderInfo.responsiblePersonPushedTime >= startDate
@@ -1525,6 +1528,9 @@ class PushedTenderManager(Util):
                     PushedTenderInfo.responsiblePersonPushedTime <= endDate
                 )
         elif userType == USER_TAG_AUDITOR:
+            query = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.auditorPushedTime != None
+            )
             if startDate != '-1':
                 query = query.filter(
                     PushedTenderInfo.auditorPushedTime >= startDate
