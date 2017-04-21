@@ -22,3 +22,15 @@ class CompanyCertificate(db.Model):
 
     def __repr__(self):
         return self.joinID
+
+    @staticmethod
+    def generate(c):
+        res = {}
+        res['joinID'] = c.joinID
+        res['companyID'] = c.companyID
+        res['qualificationID'] = c.qualificationID
+        if c.tag == 0:
+            res['tag'] = '主项'
+        else:
+            res['tag'] = '增项'
+        return res

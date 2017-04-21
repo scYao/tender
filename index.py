@@ -2774,3 +2774,19 @@ def get_user_info_by_user_id():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+
+# 获取公司资质等级列表
+@app.route('/get_company_certificate_list/', methods=['POST', 'GET'])
+def get_company_certificate_list():
+    companyCertificateManager = CompanyCertificateManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = companyCertificateManager.getCompanyCertificateList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)

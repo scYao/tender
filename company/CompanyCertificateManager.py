@@ -64,5 +64,37 @@ class CompanyCertificateManager(Util):
             return (False, errorInfo)
         return (True, None)
 
+    def getCompanyCertificateList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        companyID = info['companyID']
+        try:
+            certQuery = db.session.query(
+                CompanyCertificate, CertificationGrade4
+            ).outerjoin(
+                CertificationGrade4, CertificationGrade4.gradeID == CompanyCertificate.qualificationID
+            ).filter(
+                CompanyCertificate.companyID == companyID
+            )
+            allResult = certQuery.all()
+            if allResult is None:
+                return (False, ErrorInfo['TENDER_02'])
+            callBackData = [self.__generateCertificate(result) for result in allResult]
+            return (True, callBackData)
+        except Exception as e:
+            db.session.rollback()
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
+
+    def __generateCertificate(self, result):
+        certificationGrade4 = result.CertificationGrade4
+        companyCertificate = result.CompanyCertificate
+        res = {}
+        res.update(CompanyCertificate.generate(c=companyCertificate))
+        res.update(CertificationGrade4.generate(c=certificationGrade4))
+        return res
+
 
 

@@ -14,7 +14,8 @@ from test_by_yz_config import ResultManager
 from bs4 import BeautifulSoup
 
 # LOCALHOST = '127.0.0.1'
-LOCALHOST = '192.168.30.150'
+# LOCALHOST = '192.168.30.150'
+LOCALHOST = '192.168.30.156'
 REMOTE = '121.41.56.218'
 YZTOKENID = '2017-03-17145344588f6f132ddf7ccead74dcf06134ad63'
 
@@ -72,7 +73,7 @@ def administrator_login_background():
 
 
 #获取招标公告列表
-def getTenderList():
+def get_tender_list():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/get_tender_list/' % LOCALHOST
     info = {}
@@ -798,14 +799,14 @@ def get_tender_detail_text():
     opener = poster.streaminghttp.register_openers()
     upload_url = 'http://%s:5007/get_tender_detail_text/' % LOCALHOST
     info = {}
-    info['tenderID'] = '2017-04-2009290674f43521db267225efcdfe311dcf931c'
+    info['tenderID'] = '2017-04-20112040d0e5e6eada4086ca7e0d3712944b8d51'
     info['tokenID'] = ''
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
     # print result
     detail = json.loads(result)['data']['detail']
-    print chardet.detect(detail)
+    print detail
 
 
 def get_bidding_detail_text():
@@ -822,7 +823,16 @@ def get_bidding_detail_text():
     print json.loads(result)['data']['detail']
 
 
-
+def get_company_certificate_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/get_company_certificate_list/' % LOCALHOST
+    info = {}
+    info['tokenID'] = '2017-04-13155228ba95dd5fd2d8665f3274fbd9dcf538b6'
+    info['companyID'] = '2017-04-20180515136fb45f0afe078fa429b7fe03799461'
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
 
 
 
@@ -832,9 +842,11 @@ def get_bidding_detail_text():
 
 
 if __name__ == '__main__':
-    gradeType = u'主项'
-    tag = 0 if gradeType == '主项' else 1
-    print tag
+    get_company_certificate_list()
+    # get_tender_list()
+    # gradeType = u'主项'
+    # tag = 0 if gradeType == '主项' else 1
+    # print tag
     # search()
     # print '始发布之日止投标企业、企业法定代表人﹑项目经理、委托代理人无行贿犯罪档案查询结果原件。'
     # get_bidding_detail_text()
