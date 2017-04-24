@@ -2628,6 +2628,21 @@ def delete_user_info_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人 分配经办人
+@app.route('/update_operator_by_boss/', methods=['POST', 'GET'])
+def update_operator_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.updateOperatorByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 获取资讯列表
 @app.route('/get_news_list/', methods=['POST', 'GET'])
 def get_news_list():

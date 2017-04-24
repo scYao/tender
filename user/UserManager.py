@@ -186,6 +186,9 @@ class UserManager(Util):
         jobPosition = info['jobPosition']
         # portrait = 'ladyPortrait.png'
         portrait = 'gentlemanPortrait.png'
+        (status, reason) = self.checkSmsCode(info)
+        if status is not True:
+            return (False, reason)
         # 判断是否已经注册
         result = db.session.query(UserInfo).filter(
             UserInfo.tel == tel

@@ -1338,7 +1338,9 @@ class PushedTenderManager(Util):
             tenderID = result.tenderID
             query = db.session.query(TenderComment, UserInfo).outerjoin(
                 UserInfo, TenderComment.userID == UserInfo.userID
-            ).filter(TenderComment.tenderID == tenderID)
+            ).filter(
+                TenderComment.tenderID == tenderID
+            ).order_by(desc(TenderComment.createTime))
             allResult = query.all()
 
             def generateInfo(result):

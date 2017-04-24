@@ -19,7 +19,7 @@ from models.TenderComment import TenderComment
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS, \
-    PUSH_TENDER_INFO_TAG_TENDER
+    PUSH_TENDER_INFO_TAG_TENDER, OPERATOR_TAG_YES, PUSH_TENDER_INFO_TAG_STEP_DOING
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
 from pushedTender.TenderCommentManager import TenderCommentManager
 
@@ -315,3 +315,42 @@ class BossManager(UserBaseManager):
         pushedTenderManager = PushedTenderManager()
         _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
         return (True, dataInfo)
+
+    # 审定人 分配经办人
+    def updateOperatorByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        # 验证登录
+        userID = info['userID']
+        tenderID = info['tenderID']
+        try:
+            # boss 分配人时 直接将人分配，且状态变为进行中
+            query = db.session.query(Operator).filter(
+                Operator.tenderID == tenderID
+            )
+            updateInfo = {
+                Operator.userID: userID,
+                Operator.state : OPERATOR_TAG_YES
+            }
+            query.update(
+                updateInfo, synchronize_session=False
+            )
+
+            db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == tenderID
+            ).update({
+                PushedTenderInfo.step : PUSH_TENDER_INFO_TAG_STEP_DOING
+            }, synchronize_session=False)
+            db.session.commit()
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+        return (True, None)
