@@ -291,8 +291,12 @@ class BossManager(UserBaseManager):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
 
+        info['selfUserID'] = userID
+        info['selfUserType'] = USER_TAG_RESPONSIBLEPERSON
+        info['staffUserID'] = '-1'
+
         pushedTenderManager = PushedTenderManager()
-        return pushedTenderManager.getDiscardPushedList(info=info)
+        return pushedTenderManager.getDiscardPushedListWithPushedList(info=info)
 
     # 从回收站回收
     def recoverPushedTenderByBoss(self, jsonInfo):

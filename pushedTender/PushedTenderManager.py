@@ -1419,38 +1419,67 @@ class PushedTenderManager(Util):
     def getTenderHistoryDetail(self, jsonInfo):
         pass
 
+    def getDiscardPushedListWithPushedList(self, info):
+        userID = info['selfUserID']
+        userManager = UserManager()
+        info['userID'] = userID
+        # 获取自己的信息
+        (status, userInfo) = userManager.getUserInfo(info=info)
+        info['customizedCompanyID'] = userInfo['customizedCompanyID']
+        info['selfUserType'] = userInfo['userType']
+        info['tenderTag'] = '-1'
 
-    def getDiscardPushedList(self, info):
-        startIndex = info['startIndex']
-        pageCount = info['pageCount']
-        try:
-            query = db.session.query(
-                PushedTenderInfo, Tender
-            ).outerjoin(
-                Tender, PushedTenderInfo.tenderID == Tender.tenderID
-            ).filter(
-                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
-            )
-            countQuery = db.session.query(
-                func.count(PushedTenderInfo.pushedID)
-            ).filter(
-                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
-            )
+        info['staffUserType'] = '-1'
+        # 获取用户的信息
+        if info['staffUserID'] != '-1':
+            info['userID'] = info['staffUserID']
+            (status, userInfo) = userManager.getUserInfo(info=info)
+            info['staffUserType'] = userInfo['userType']
+        return self.getPushedTenderListByUserID(info=info)
 
-            allResult = query.offset(startIndex).limit(pageCount).all()
-            count = countQuery.first()
-            dataList = [self.__generatePushedBrief(result=result) for result in allResult]
-            callBackInfo = {}
-            callBackInfo['dataList'] = dataList
-            callBackInfo['count'] = count[0]
-            return (True, callBackInfo)
-        except Exception as e:
-            traceback.print_exc()
-            print e
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            db.session.rollback()
-            return (False, errorInfo)
+    # def getDiscardPushedList(self, info):
+    #     tokenID = info['tokenID']
+    #     (status, userID) = self.isTokenValid(tokenID)
+    #     if status is not True:
+    #         errorInfo = ErrorInfo['TENDER_01']
+    #         return (False, errorInfo)
+    #
+    #     info['selfUserID'] = userID
+    #     info['selfUserType'] = USER_TAG_RESPONSIBLEPERSON
+    #     info['staffUserID'] = '-1'
+    #     return self.getDiscardPushedListWithPushedList(info=info)
+
+
+        # startIndex = info['startIndex']
+        # pageCount = info['pageCount']
+        # try:
+        #     query = db.session.query(
+        #         PushedTenderInfo, Tender
+        #     ).outerjoin(
+        #         Tender, PushedTenderInfo.tenderID == Tender.tenderID
+        #     ).filter(
+        #         PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
+        #     )
+        #     countQuery = db.session.query(
+        #         func.count(PushedTenderInfo.pushedID)
+        #     ).filter(
+        #         PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_DISCARD
+        #     )
+        #
+        #     allResult = query.offset(startIndex).limit(pageCount).all()
+        #     count = countQuery.first()
+        #     dataList = [self.__generatePushedBrief(result=result) for result in allResult]
+        #     callBackInfo = {}
+        #     callBackInfo['dataList'] = dataList
+        #     callBackInfo['count'] = count[0]
+        #     return (True, callBackInfo)
+        # except Exception as e:
+        #     traceback.print_exc()
+        #     print e
+        #     errorInfo = ErrorInfo['TENDER_02']
+        #     errorInfo['detail'] = str(e)
+        #     db.session.rollback()
+        #     return (False, errorInfo)
 
     def recoverPushedTenderInfo(self, info):
         tenderID = info['tenderID']
