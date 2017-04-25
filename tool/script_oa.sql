@@ -91,7 +91,9 @@ create table operation(
 	operatorID nvarchar(100) comment '经办人ID, 不是用户ID, 需要通过经办人ID知道哪个项目',
 	state int comment '1 成功, 2 失败',
 	description text comment '备注',
-	createTime datetime comment '创建时间'
+	createTime datetime comment '创建时间',
+	typeID int default 0 comment '只有标书涉及此字段, 1 商务标,  2 技术标',
+	userName nvarchar(100) comment '只有标书涉及此字段, 开标人'
 );
 
 -- 标书推送流

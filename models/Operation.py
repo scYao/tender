@@ -15,15 +15,20 @@ class Operation(db.Model):
     state = db.Column(db.Integer)
     description = db.Column(db.Text)
     createTime = db.Column(db.DateTime)
+    typeID = db.Column(db.Integer)
+    userName = db.Column(db.String(100))
 
     def __init__(self, operationID=None, tag=0, operatorID=None,
-                 state=0, description=None, createTime=None):
+                 state=0, description=None, createTime=None,
+                 typeID=0, userName=None):
         self.operationID = operationID
         self.tag = tag
         self.operatorID = operatorID
         self.state = state
         self.description = description
         self.createTime = createTime
+        self.typeID = typeID
+        self.userName = userName
 
     @staticmethod
     def create(info):

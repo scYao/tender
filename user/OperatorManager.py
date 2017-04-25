@@ -22,15 +22,11 @@ from tool.tagconfig import OPERATION_TAG_TENDER_PLAN, OPERATION_TAG_MAKE_BIDDING
 from models.flask_app import db
 from models.Operator import Operator
 from models.PushedTenderInfo import PushedTenderInfo
-from models.Message import Message
 from models.UserInfo import UserInfo
-from models.Token import Token
 from models.Operation import Operation
 from models.ImgPath import ImgPath
 
-from ResponsiblePersonManager import ResponsiblePersonManager
 from pushedTender.PushedTenderManager import PushedTenderManager
-from image.ImageManager import ImageManager
 from tender.CustomizedTenderManager import CustomizedTenderManager
 
 
