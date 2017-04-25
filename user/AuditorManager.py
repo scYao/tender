@@ -296,3 +296,10 @@ class AuditorManager(UserBaseManager):
         pushedTenderManager = PushedTenderManager()
         _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
         return (True, dataInfo)
+
+    # 审核人创建标书
+    def createOperationBiddingBookByAuditor(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_AUDITOR
+        jsonInfo = json.dumps(info)
+        return self.createOperationBiddingBook(jsonInfo=jsonInfo, imgFileList=imgFileList)

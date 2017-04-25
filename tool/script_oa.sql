@@ -108,7 +108,8 @@ create table operation(
 	description text comment '备注',
 	createTime datetime comment '创建时间',
 	typeID int default 0 comment '只有标书涉及此字段, 1 商务标,  2 技术标',
-	userName nvarchar(100) comment '只有标书涉及此字段, 开标人'
+	userName nvarchar(100) comment '只有标书涉及此字段, 开标人',
+	userType int comment '只有标书涉及此字段, 上传人的类型'
 );
 
 -- 标书推送流

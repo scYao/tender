@@ -1045,6 +1045,7 @@ class PushedTenderManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    # 如果是标书, 只能看到自己和下级的
     def __getOperationList(self, info):
         operatorID = info['operatorID']
         operationTag = info['operationTag']
@@ -1055,7 +1056,16 @@ class PushedTenderManager(Util):
                 Operation.tag == operationTag,
                 Operation.operatorID == operatorID
             )
-        ).order_by(desc(Operation.createTime))
+        )
+
+        # 获取标书时的特殊操作
+        if operationTag == OPERATION_TAG_MAKE_BIDDING_BOOK:
+            userType = info['userType']
+            operationQuery = operationQuery.filter(
+                Operation.userType >= userType
+            )
+
+        operationQuery = operationQuery.order_by(desc(Operation.createTime))
         operationResult = operationQuery.all()
 
         operationDataList = self.__generateBookInfo(bookResult=operationResult)

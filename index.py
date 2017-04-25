@@ -1827,7 +1827,7 @@ def create_operation():
         return json.dumps(data)
 
 # 上传标书
-@app.route('/create_operation_bidding_book/', methods=['POST', 'GET'])
+@app.route('/create_operation_bidding_book_by_operator/', methods=['POST', 'GET'])
 def create_operation_bidding_book():
     if request.method == 'POST':
         paramsJson = request.form['data']
@@ -1843,7 +1843,7 @@ def create_operation_bidding_book():
             imgDic['file'] = f
             imgList.append(imgDic)
         operatorManager = OperatorManager()
-        (status, ret) = operatorManager.createOperationBiddingBook(paramsJson, imgList)
+        (status, ret) = operatorManager.createOperationBiddingBookByOperator(paramsJson, imgList)
         result = {}
         result['status'] = 'FAILED'
         result['data'] = 'NULL'
@@ -2122,6 +2122,32 @@ def get_all_data_info_by_resp():
         data['data'] = result
         return json.dumps(data)
 
+# 负责人上传标书
+@app.route('/create_operation_bidding_book_by_resp/', methods=['POST', 'GET'])
+def create_operation_bidding_book_by_resp():
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        info = json.loads(paramsJson)
+        imgNameList = info['imgNameList']
+        imgList = []
+        for img in imgNameList:
+            _imgName = img['imgName']
+            f = request.files[_imgName]
+            imgName = f.filename
+            imgDic = {}
+            imgDic['imgName'] = imgName
+            imgDic['file'] = f
+            imgList.append(imgDic)
+        responsiblePersonManager = ResponsiblePersonManager()
+        (status, ret) = responsiblePersonManager.createOperationBiddingBookByResp(paramsJson, imgList)
+        result = {}
+        result['status'] = 'FAILED'
+        result['data'] = 'NULL'
+        if status is True:
+            result['status'] = 'SUCCESS'
+        result['data'] = ret
+        return json.dumps(result)
+
 #审核人创建推送
 @app.route('/create_pushed_tender_by_auditor/', methods=['POST', 'GET'])
 def create_pushed_tender_by_auditor():
@@ -2177,6 +2203,32 @@ def create_customized_tender_by_auditor():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+# 审核人上传标书
+@app.route('/create_operation_bidding_book_by_auditor/', methods=['POST', 'GET'])
+def create_operation_bidding_book_by_auditor():
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        info = json.loads(paramsJson)
+        imgNameList = info['imgNameList']
+        imgList = []
+        for img in imgNameList:
+            _imgName = img['imgName']
+            f = request.files[_imgName]
+            imgName = f.filename
+            imgDic = {}
+            imgDic['imgName'] = imgName
+            imgDic['file'] = f
+            imgList.append(imgDic)
+        auditorManager = AuditorManager()
+        (status, ret) = auditorManager.createOperationBiddingBookByAuditor(paramsJson, imgList)
+        result = {}
+        result['status'] = 'FAILED'
+        result['data'] = 'NULL'
+        if status is True:
+            result['status'] = 'SUCCESS'
+        result['data'] = ret
+        return json.dumps(result)
 
 #审定人创建推送
 @app.route('/create_pushed_tender_by_boss/', methods=['POST', 'GET'])

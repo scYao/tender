@@ -12,11 +12,10 @@ from datetime import datetime
 from sqlalchemy import and_, text, func, desc
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS, \
+from tool.tagconfig import USER_TAG_OPERATOR, \
     PUSH_TENDER_INFO_TAG_STEP_DONE, PUSH_TENDER_INFO_TAG_STEP_HISTORY, PUSH_TENDER_INFO_TAG_CUS, \
     PUSH_TENDER_INFO_TAG_TENDER
-from tool.tagconfig import OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, BID_DOC_DIRECTORY
-from tool.tagconfig import OPERATION_TAG_CONFIRM_USER, OPERATION_TAG_MAKE_BIDDING_BOOK
+
 
 
 from models.flask_app import db
@@ -28,9 +27,10 @@ from models.ImgPath import ImgPath
 
 from pushedTender.PushedTenderManager import PushedTenderManager
 from tender.CustomizedTenderManager import CustomizedTenderManager
+from user.UserBaseManager import UserBaseManager
 
 
-class OperatorManager(Util):
+class OperatorManager(UserBaseManager):
     def __init__(self):
         pass
 
@@ -104,65 +104,11 @@ class OperatorManager(Util):
         pushedTenderManager = PushedTenderManager()
         return pushedTenderManager.updateDonePushedTender(info)
 
-    # 记录动作, 打保证金等
-    def createOperation(self, jsonInfo):
+    def createOperationBiddingBookByOperator(self, jsonInfo, imgFileList):
         info = json.loads(jsonInfo)
-        operatorID = info['operatorID']
-        operationID = self.generateID(operatorID)
-        info['operationID'] = operationID
-        info['createTime'] = datetime.now()
-        if not info.has_key('typeID'):
-            info['typeID'] = 0
-            info['userName'] = ''
-        try:
-            Operation.create(info=info)
-            # #如果状态是制作标书，需要上传标书文件
-            # if info['tag'] == OPERATION_TAG_MAKE_BIDDING_BOOK:
-            #     info['directory'] = BID_DOC_DIRECTORY
-            #     info['foreignID'] = operationID
-            #     imageManager = ImageManager()
-            #     imageManager.addImagesWithOSS(info=info)
-            db.session.commit()
-        except Exception as e:
-            print e
-            errorInfo = ErrorInfo['TENDER_02']
-            errorInfo['detail'] = str(e)
-            db.session.rollback()
-            return (False, errorInfo)
-        return (True, operationID)
-
-    # 上传标书
-    def createOperationBiddingBook(self, jsonInfo, imgFileList):
-        (status, operationID) = self.createOperation(jsonInfo=jsonInfo)
-        if status is not True:
-            return (False, operationID)
-        ossInfo = {}
-        ossInfo['bucket'] = 'sjtender'
-        try:
-            index = 0
-            for i in imgFileList:
-                imgID = self.generateID(str(index) + i['imgName'])
-                postFix = str(i['imgName']).split('.')
-                if len(postFix) > 0:
-                    postFix = '.' + postFix[-1]
-                else:
-                    postFix = ''
-                imgPath = imgID + postFix
-                imagePath = ImgPath(imgPathID=imgID, path=imgPath,
-                                    foreignID=operationID, imgName=i['imgName'])
-                db.session.add(imagePath)
-                index = index + 1
-                self.uploadOSSImage('biddocument/%s' % imgPath, ossInfo, i['file'])
-            db.session.commit()
-            return (True, operationID)
-        except Exception as e:
-            print e
-            print 'upload file to oss error'
-            errorInfo = ErrorInfo['TENDER_31']
-            errorInfo['detail'] = str(e)
-            return (False, errorInfo)
-
-
+        info['userType'] = USER_TAG_OPERATOR
+        jsonInfo = json.dumps(info)
+        return self.createOperationBiddingBook(jsonInfo=jsonInfo, imgFileList=imgFileList)
 
     # 经办人获取我的推送列表
     def getPushedListByOperator(self, jsonInfo):
