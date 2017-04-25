@@ -6,9 +6,9 @@ import poster
 import requests
 from sqlalchemy import desc
 from tool.tagconfig import USER_TAG_RESPONSIBLEPERSON, PUSH_TENDER_INFO_TAG_STATE_APPROVE, \
-    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_TENDER_PLAN, \
-    OPERATION_TAG_TENDER_PRICE, OPERATION_TAG_DEPOSIT, OPERATION_TAG_MAKE_BIDDING_BOOK, BID_DOC_DIRECTORY, \
-    CUS_TENDER_DOC_DIRECTORY, OPERATION_TAG_MANAGER_ARRANGEMENT, PUSH_TENDER_INFO_TAG_STATE_DISCARD, \
+    PUSH_TENDER_INFO_TAG_STEP_WAIT, PUSH_TENDER_INFO_TAG_STEP_DOING, OPERATOR_TAG_YES, OPERATION_TAG_CONFIRM_USER, \
+    OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, OPERATION_TAG_MAKE_BIDDING_BOOK, BID_DOC_DIRECTORY, \
+    CUS_TENDER_DOC_DIRECTORY, PUSH_TENDER_INFO_TAG_STATE_DISCARD, \
     PUSH_TENDER_INFO_TAG_STATE_UNREAD
 from tool.Util import Util
 from tool.config import ErrorInfo
@@ -235,16 +235,18 @@ class PushedTenderManager(Util):
             result = query.first()
             if result:
                 updateInfo = {
-                    PushedTenderInfo.projectManagerName: info['projectManagerName'],
-                    PushedTenderInfo.openedDate: info['openedDate'],
-                    PushedTenderInfo.openedLocation: info['openedLocation'],
-                    PushedTenderInfo.ceilPrice: info['ceilPrice'],
-                    PushedTenderInfo.tenderInfoDescription: info['tenderInfoDescription'],
-                    PushedTenderInfo.tenderCompanyName: info['tenderCompanyName'],
+                    PushedTenderInfo.tenderee: info['tenderee'],
+                    PushedTenderInfo.tenderProxy: info['tenderProxy'],
+                    PushedTenderInfo.tenderer: info['tenderer'],
                     PushedTenderInfo.projectType: info['projectType'],
-                    PushedTenderInfo.workContent: info['workContent'],
+                    PushedTenderInfo.constructionLocation: info['constructionLocation'],
+                    PushedTenderInfo.plannedProjectDuration: info['plannedProjectDuration'],
+                    PushedTenderInfo.answerDeadline: info['answerDeadline'],
+                    PushedTenderInfo.tenderDeadline: info['tenderDeadline'],
+                    PushedTenderInfo.attender: info['attender'],
                     PushedTenderInfo.deposit: info['deposit'],
-                    PushedTenderInfo.planScore: info['planScore'],
+                    PushedTenderInfo.companyAchievement: info['companyAchievement'],
+                    PushedTenderInfo.pmAchievement: info['pmAchievement'],
                     PushedTenderInfo.tenderType: info['tenderType']
                 }
                 query.update(
@@ -1001,8 +1003,8 @@ class PushedTenderManager(Util):
             #         l4.append(o)
 
 
-            # 确定投标价格
-            info['operationTag'] = OPERATION_TAG_TENDER_PRICE
+            # 报名
+            info['operationTag'] = OPERATION_TAG_ENLIST
             l1 = self.__getOperationList(info=info)
 
             # 保证金支付
@@ -1010,23 +1012,23 @@ class PushedTenderManager(Util):
             l2 = self.__getOperationList(info=info)
 
             # 投标方案
-            info['operationTag'] = OPERATION_TAG_TENDER_PLAN
+            info['operationTag'] = OPERATION_TAG_CONFIRM_USER
             l3 = self.__getOperationList(info=info)
 
             # 标书制作
             info['operationTag'] = OPERATION_TAG_MAKE_BIDDING_BOOK
             l4 = self.__getOperationList(info=info)
 
-            # 项目经理安排
-            info['operationTag'] = OPERATION_TAG_MANAGER_ARRANGEMENT
-            l5 = self.__getOperationList(info=info)
+            # # 项目经理安排
+            # info['operationTag'] = OPERATION_TAG_MANAGER_ARRANGEMENT
+            # l5 = self.__getOperationList(info=info)
 
             resultDic = {}
-            resultDic[OPERATION_TAG_TENDER_PRICE] = l1
+            resultDic[OPERATION_TAG_ENLIST] = l1
             resultDic[OPERATION_TAG_DEPOSIT] = l2
-            resultDic[OPERATION_TAG_TENDER_PLAN] = l3
+            resultDic[OPERATION_TAG_CONFIRM_USER] = l3
             resultDic[OPERATION_TAG_MAKE_BIDDING_BOOK] = l4
-            resultDic[OPERATION_TAG_MANAGER_ARRANGEMENT] = l5
+            # resultDic[OPERATION_TAG_MANAGER_ARRANGEMENT] = l5
             # 获取项目信息模块
             (status, projectInfo) = self.__getProjectInfoInDoingDetail(info=info)
             (status, tenderComment) = self.__getTenderCommentInDoingDetail(info=info)
@@ -1081,7 +1083,12 @@ class PushedTenderManager(Util):
         info['companyID'] = companyID
 
         result = {}
-        if userType == USER_TAG_RESPONSIBLEPERSON:
+        if userType == USER_TAG_OPERATOR:
+            # 获取审定人
+            info['userType'] = USER_TAG_BOSS
+            (status, respQuote) = self.__getQuoteItem(info=info)
+            result['bossQuote'] = respQuote
+        elif userType == USER_TAG_RESPONSIBLEPERSON:
             # 获取负责人
             info['userType'] = USER_TAG_RESPONSIBLEPERSON
             (status, respQuote) = self.__getQuoteItem(info=info)
@@ -1127,9 +1134,10 @@ class PushedTenderManager(Util):
             leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f723213'
         quote = {}
         quote['quotedID'] = ''
-        quote['quotedPrice'] = ''
+        quote['fixedPrice'] = ''
         quote['price'] = ''
         quote['costPrice'] = ''
+        quote['ceilingPrice'] = ''
         quote['createTime'] = ''
         quote['description'] = ''
         respQResult = db.session.query(QuotedPrice).filter(and_(
@@ -1138,9 +1146,10 @@ class PushedTenderManager(Util):
         )).first()
         if respQResult is not None:
             quote['quotedID'] = respQResult.quotedID
-            quote['quotedPrice'] = respQResult.quotedPrice
+            quote['fixedPrice'] = respQResult.fixedPrice
             quote['price'] = respQResult.price
             quote['costPrice'] = respQResult.costPrice
+            quote['ceilingPrice'] = respQResult.ceilingPrice
             quote['createTime'] = str(respQResult.createTime)[0:10]
             quote['description'] = respQResult.description
         return (True, quote)
@@ -1148,20 +1157,34 @@ class PushedTenderManager(Util):
     def __getProjectInfoInDoingDetail(self, info):
         tenderID = info['tenderID']
         res = {}
-        res['projectManagerName'] = ''
-        res['openedDate'] = ''
-        res['openedLocation'] = ''
-        res['ceilPrice'] = ''
-        res['tenderInfoDescription'] = ''
-        res['quotedPrice'] = ''
-        res['quotedDate'] = ''
-        res['quotedDescription'] = ''
-        res['tenderCompanyName'] = ''
+        res['tenderee'] = ''
+        res['tenderProxy'] = ''
+        res['tenderer'] = ''
         res['projectType'] = ''
-        res['workContent'] = ''
+        res['constructionLocation'] = ''
+        res['plannedProjectDuration'] = ''
+        res['answerDeadline'] = ''
+        res['tenderDeadline'] = ''
+        res['attender'] = ''
         res['deposit'] = ''
-        res['planScore'] = ''
+        res['companyAchievement'] = ''
+        res['pmAchievement'] = ''
         res['tenderType'] = ''
+        # res['projectManagerName'] = ''
+        # res['openedDate'] = ''
+        # res['openedLocation'] = ''
+        # res['ceilPrice'] = ''
+        # res['tenderInfoDescription'] = ''
+        # res['quotedPrice'] = ''
+        # res['quotedDate'] = ''
+        # res['quotedDescription'] = ''
+        # res['tenderCompanyName'] = ''
+        # res['projectType'] = ''
+        # res['workContent'] = ''
+        # res['deposit'] = ''
+        # res['planScore'] = ''
+        # res['tenderType'] = ''
+
 
         result = db.session.query(PushedTenderInfo, Tender).outerjoin(
             Tender, PushedTenderInfo.tenderID == Tender.tenderID
@@ -1169,154 +1192,172 @@ class PushedTenderManager(Util):
             PushedTenderInfo.tenderID == tenderID
         ).first()
         if result is not None:
-            res['projectManagerName'] = result.PushedTenderInfo.projectManagerName
-            if result.PushedTenderInfo.openedDate is not None:
-                res['openedDate'] = str(result.PushedTenderInfo.openedDate)
-            res['openedLocation'] = result.PushedTenderInfo.openedLocation
-            if result.PushedTenderInfo.ceilPrice > 0:
-                res['ceilPrice'] = result.PushedTenderInfo.ceilPrice
-            res['tenderInfoDescription'] = result.PushedTenderInfo.tenderInfoDescription
-            res['pushedID'] = result.PushedTenderInfo.pushedID
-            res['tenderCompanyName'] = result.PushedTenderInfo.tenderCompanyName
+            res['tenderee'] = result.PushedTenderInfo.tenderee
+            res['tenderProxy'] = result.PushedTenderInfo.tenderProxy
+            res['tenderer'] = result.PushedTenderInfo.tenderer
             res['projectType'] = result.PushedTenderInfo.projectType
-            res['workContent'] = result.PushedTenderInfo.workContent
+            res['constructionLocation'] = result.PushedTenderInfo.constructionLocation
+            res['plannedProjectDuration'] = result.PushedTenderInfo.plannedProjectDuration
+            if result.PushedTenderInfo.answerDeadline is not None:
+                res['answerDeadline'] = str(result.PushedTenderInfo.answerDeadline)
+            else:
+                res['answerDeadline'] = None
+            if result.PushedTenderInfo.tenderDeadline is not None:
+                res['tenderDeadline'] = str(result.PushedTenderInfo.tenderDeadline)
+            else:
+                res['tenderDeadline'] = None
+            res['attender'] = result.PushedTenderInfo.attender
             res['deposit'] = result.PushedTenderInfo.deposit
-            res['planScore'] = result.PushedTenderInfo.planScore
+            res['companyAchievement'] = result.PushedTenderInfo.companyAchievement
+            res['pmAchievement'] = result.PushedTenderInfo.pmAchievement
             res['tenderType'] = result.PushedTenderInfo.tenderType
+
             res.update(Tender.generateBrief(tender=result.Tender))
             # 只有经办人能看到
-            if info['userType'] == USER_TAG_OPERATOR:
-                if result.PushedTenderInfo.quotedPrice > 0:
-                    res['quotedPrice'] = result.PushedTenderInfo.quotedPrice
-                if result.PushedTenderInfo.quotedDate is not None:
-                    res['quotedDate'] = str(result.PushedTenderInfo.quotedDate)
-                res['quotedDescription'] = result.PushedTenderInfo.quotedDescription
-            elif info['userType'] == USER_TAG_RESPONSIBLEPERSON:
-                (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
-                res['respQuotedPrice'] = respQuotedPrice
-            elif info['userType'] == USER_TAG_AUDITOR:
-                (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
-                res['respQuotedPrice'] = respQuotedPrice
-                (status, auditorQuotedPrice) = self.__getAuditorQuotedPrice(info=info)
-                res['auditorQuotedPrice'] = auditorQuotedPrice
-            elif info['userType'] == USER_TAG_BOSS:
-                (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
-                res['respQuotedPrice'] = respQuotedPrice
-                (status, auditorQuotedPrice) = self.__getAuditorQuotedPrice(info=info)
-                res['auditorQuotedPrice'] = auditorQuotedPrice
-                (status, bossQuotedPrice) = self.__getBossQuotedPrice(info=info)
-                res['bossQuotedPrice'] = bossQuotedPrice
+            # if info['userType'] == USER_TAG_OPERATOR:
+            #     if result.PushedTenderInfo.quotedPrice > 0:
+            #         res['quotedPrice'] = result.PushedTenderInfo.quotedPrice
+            #     if result.PushedTenderInfo.quotedDate is not None:
+            #         res['quotedDate'] = str(result.PushedTenderInfo.quotedDate)
+            #     res['quotedDescription'] = result.PushedTenderInfo.quotedDescription
+            # elif info['userType'] == USER_TAG_RESPONSIBLEPERSON:
+            #     (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
+            #     res['respQuotedPrice'] = respQuotedPrice
+            # elif info['userType'] == USER_TAG_AUDITOR:
+            #     (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
+            #     res['respQuotedPrice'] = respQuotedPrice
+            #     (status, auditorQuotedPrice) = self.__getAuditorQuotedPrice(info=info)
+            #     res['auditorQuotedPrice'] = auditorQuotedPrice
+            # elif info['userType'] == USER_TAG_BOSS:
+            #     (status, respQuotedPrice) = self.__getRespQuotedPrice(info=info)
+            #     res['respQuotedPrice'] = respQuotedPrice
+            #     (status, auditorQuotedPrice) = self.__getAuditorQuotedPrice(info=info)
+            #     res['auditorQuotedPrice'] = auditorQuotedPrice
+            #     (status, bossQuotedPrice) = self.__getBossQuotedPrice(info=info)
+            #     res['bossQuotedPrice'] = bossQuotedPrice
 
         return (True, res)
 
-    def __getRespQuotedPrice(self, info):
-        userID = info['userID']
-        tenderID = info['tenderID']
-        userType = info['userType']
-        if userType != USER_TAG_RESPONSIBLEPERSON:
-            # 先获取负责人的报价 再获取自己的报价
-            selfResult = db.session.query(UserInfo).filter(
-                UserInfo.userID == userID
-            ).first()
-            companyID = selfResult.customizedCompanyID
-            respResult = db.session.query(UserInfo).filter(and_(
-                UserInfo.customizedCompanyID == companyID,
-                UserInfo.userType == USER_TAG_RESPONSIBLEPERSON
-            )).first()
-            respUserID = respResult.userID
-            userName = respResult.userName
-        else:
-            respUserID = userID
-            userName = ''
-
-        # 获取负责人的报价
-        respQuotedPrice = {}
-        respQuotedPrice['quotedPrice'] = ''
-        respQuotedPrice['price'] = ''
-        respQuotedPrice['costPrice'] = ''
-        respQuotedPrice['createTime'] = ''
-        respQuotedPrice['description'] = ''
-
-        respQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
-            QuotedPrice.tenderID == tenderID,
-            QuotedPrice.userID == respUserID
-        )).first()
-        if respQuotedPriceResult is not None:
-            respQuotedPrice['quotedPrice'] = respQuotedPriceResult.quotedPrice
-            respQuotedPrice['price'] = respQuotedPriceResult.price
-            respQuotedPrice['costPrice'] = respQuotedPriceResult.costPrice
-            respQuotedPrice['createTime'] = str(respQuotedPriceResult.createTime)
-            respQuotedPrice['description'] = respQuotedPriceResult.description
-            respQuotedPrice['userName'] = userName
-        return (True, respQuotedPrice)
-
-    def __getAuditorQuotedPrice(self, info):
-        userID = info['userID']
-        tenderID = info['tenderID']
-        userType = info['userType']
-        # 先获取负责人的报价 再获取自己的报价
-        if userType != USER_TAG_AUDITOR:
-            selfResult = db.session.query(UserInfo).filter(
-                UserInfo.userID == userID
-            ).first()
-            companyID = selfResult.customizedCompanyID
-            auditorResult = db.session.query(UserInfo).filter(and_(
-                UserInfo.customizedCompanyID == companyID,
-                UserInfo.userType == USER_TAG_AUDITOR
-            )).first()
-            auditorUserID = auditorResult.userID
-            userName = auditorResult.userName
-        else:
-            auditorUserID = userID
-            userName = ''
-
-        # 获取负责人的报价
-        selfQuotedPrice = {}
-        selfQuotedPrice['quotedPrice'] = ''
-        selfQuotedPrice['price'] = ''
-        selfQuotedPrice['costPrice'] = ''
-        selfQuotedPrice['createTime'] = ''
-        selfQuotedPrice['description'] = ''
-
-
-        # 获取自己的报价
-        selfQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
-            QuotedPrice.tenderID == tenderID,
-            QuotedPrice.userID == auditorUserID
-        )).first()
-        if selfQuotedPriceResult is not None:
-            selfQuotedPrice['quotedPrice'] = selfQuotedPriceResult.quotedPrice
-            selfQuotedPrice['price'] = selfQuotedPriceResult.price
-            selfQuotedPrice['costPrice'] = selfQuotedPriceResult.costPrice
-            selfQuotedPrice['createTime'] = str(selfQuotedPriceResult.createTime)
-            selfQuotedPrice['description'] = selfQuotedPriceResult.description
-            selfQuotedPrice['userName'] = userName
-
-        return (True, selfQuotedPrice)
-
-
-    def __getBossQuotedPrice(self, info):
-        userID = info['userID']
-        tenderID = info['tenderID']
-
-        selfQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
-            QuotedPrice.tenderID == tenderID,
-            QuotedPrice.userID == userID
-        )).first()
-        selfQuotedPrice = {}
-        selfQuotedPrice['quotedPrice'] = ''
-        selfQuotedPrice['price'] = ''
-        selfQuotedPrice['costPrice'] = ''
-        selfQuotedPrice['createTime'] = ''
-        selfQuotedPrice['description'] = ''
-        if selfQuotedPriceResult is not None:
-            selfQuotedPrice['quotedPrice'] = selfQuotedPriceResult.quotedPrice
-            selfQuotedPrice['price'] = selfQuotedPriceResult.price
-            selfQuotedPrice['costPrice'] = selfQuotedPriceResult.costPrice
-            selfQuotedPrice['createTime'] = str(selfQuotedPriceResult.createTime)
-            selfQuotedPrice['description'] = selfQuotedPriceResult.description
-            selfQuotedPrice['userName'] = ''
-        return (True, selfQuotedPrice)
+    # def __getRespQuotedPrice(self, info):
+    #     userID = info['userID']
+    #     tenderID = info['tenderID']
+    #     userType = info['userType']
+    #     if userType != USER_TAG_RESPONSIBLEPERSON:
+    #         # 先获取负责人的报价 再获取自己的报价
+    #         selfResult = db.session.query(UserInfo).filter(
+    #             UserInfo.userID == userID
+    #         ).first()
+    #         companyID = selfResult.customizedCompanyID
+    #         respResult = db.session.query(UserInfo).filter(and_(
+    #             UserInfo.customizedCompanyID == companyID,
+    #             UserInfo.userType == USER_TAG_RESPONSIBLEPERSON
+    #         )).first()
+    #         respUserID = respResult.userID
+    #         userName = respResult.userName
+    #     else:
+    #         respUserID = userID
+    #         userName = ''
+    #
+    #     # 获取负责人的报价
+    #     respQuotedPrice = {}
+    #     respQuotedPrice['quotedPrice'] = ''
+    #     respQuotedPrice['price'] = ''
+    #     respQuotedPrice['costPrice'] = ''
+    #     respQuotedPrice['ceilingPrice'] = ''
+    #     respQuotedPrice['fixedPrice'] = ''
+    #     respQuotedPrice['createTime'] = ''
+    #     respQuotedPrice['description'] = ''
+    #
+    #     respQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
+    #         QuotedPrice.tenderID == tenderID,
+    #         QuotedPrice.userID == respUserID
+    #     )).first()
+    #     if respQuotedPriceResult is not None:
+    #         respQuotedPrice['quotedPrice'] = respQuotedPriceResult.quotedPrice
+    #         respQuotedPrice['price'] = respQuotedPriceResult.price
+    #         respQuotedPrice['costPrice'] = respQuotedPriceResult.costPrice
+    #         respQuotedPrice['ceilingPrice'] = respQuotedPriceResult.ceilingPrice
+    #         respQuotedPrice['fixedPrice'] = respQuotedPriceResult.fixedPrice
+    #         respQuotedPrice['createTime'] = str(respQuotedPriceResult.createTime)
+    #         respQuotedPrice['description'] = respQuotedPriceResult.description
+    #         respQuotedPrice['userName'] = userName
+    #     return (True, respQuotedPrice)
+    #
+    # def __getAuditorQuotedPrice(self, info):
+    #     userID = info['userID']
+    #     tenderID = info['tenderID']
+    #     userType = info['userType']
+    #     # 先获取负责人的报价 再获取自己的报价
+    #     if userType != USER_TAG_AUDITOR:
+    #         selfResult = db.session.query(UserInfo).filter(
+    #             UserInfo.userID == userID
+    #         ).first()
+    #         companyID = selfResult.customizedCompanyID
+    #         auditorResult = db.session.query(UserInfo).filter(and_(
+    #             UserInfo.customizedCompanyID == companyID,
+    #             UserInfo.userType == USER_TAG_AUDITOR
+    #         )).first()
+    #         auditorUserID = auditorResult.userID
+    #         userName = auditorResult.userName
+    #     else:
+    #         auditorUserID = userID
+    #         userName = ''
+    #
+    #     # 获取负责人的报价
+    #     selfQuotedPrice = {}
+    #     selfQuotedPrice['quotedPrice'] = ''
+    #     selfQuotedPrice['price'] = ''
+    #     selfQuotedPrice['costPrice'] = ''
+    #     selfQuotedPrice['ceilingPrice'] = ''
+    #     selfQuotedPrice['fixedPrice'] = ''
+    #     selfQuotedPrice['createTime'] = ''
+    #     selfQuotedPrice['description'] = ''
+    #
+    #
+    #     # 获取自己的报价
+    #     selfQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
+    #         QuotedPrice.tenderID == tenderID,
+    #         QuotedPrice.userID == auditorUserID
+    #     )).first()
+    #     if selfQuotedPriceResult is not None:
+    #         selfQuotedPrice['quotedPrice'] = selfQuotedPriceResult.quotedPrice
+    #         selfQuotedPrice['price'] = selfQuotedPriceResult.price
+    #         selfQuotedPrice['costPrice'] = selfQuotedPriceResult.costPrice
+    #         selfQuotedPrice['ceilingPrice'] = selfQuotedPriceResult.ceilingPrice
+    #         selfQuotedPrice['fixedPrice'] = selfQuotedPriceResult.fixedPrice
+    #         selfQuotedPrice['createTime'] = str(selfQuotedPriceResult.createTime)
+    #         selfQuotedPrice['description'] = selfQuotedPriceResult.description
+    #         selfQuotedPrice['userName'] = userName
+    #
+    #     return (True, selfQuotedPrice)
+    #
+    #
+    # def __getBossQuotedPrice(self, info):
+    #     userID = info['userID']
+    #     tenderID = info['tenderID']
+    #
+    #     selfQuotedPriceResult = db.session.query(QuotedPrice).filter(and_(
+    #         QuotedPrice.tenderID == tenderID,
+    #         QuotedPrice.userID == userID
+    #     )).first()
+    #     selfQuotedPrice = {}
+    #     selfQuotedPrice['quotedPrice'] = ''
+    #     selfQuotedPrice['price'] = ''
+    #     selfQuotedPrice['costPrice'] = ''
+    #     selfQuotedPrice['ceilingPrice'] = ''
+    #     selfQuotedPrice['fixedPrice'] = ''
+    #     selfQuotedPrice['createTime'] = ''
+    #     selfQuotedPrice['description'] = ''
+    #     if selfQuotedPriceResult is not None:
+    #         selfQuotedPrice['quotedPrice'] = selfQuotedPriceResult.quotedPrice
+    #         selfQuotedPrice['price'] = selfQuotedPriceResult.price
+    #         selfQuotedPrice['costPrice'] = selfQuotedPriceResult.costPrice
+    #         selfQuotedPrice['ceilingPrice'] = selfQuotedPriceResult.ceilingPrice
+    #         selfQuotedPrice['fixedPrice'] = selfQuotedPriceResult.fixedPrice
+    #         selfQuotedPrice['createTime'] = str(selfQuotedPriceResult.createTime)
+    #         selfQuotedPrice['description'] = selfQuotedPriceResult.description
+    #         selfQuotedPrice['userName'] = ''
+    #     return (True, selfQuotedPrice)
 
 
     def __getTenderCommentInDoingDetail(self, info):

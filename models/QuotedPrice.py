@@ -17,10 +17,13 @@ class QuotedPrice(db.Model):
     costPrice = db.Column(db.Float)
     createTime = db.Column(db.DateTime)
     description = db.Column(db.Text)
+    ceilingPrice = db.Column(db.Float)
+    fixedPrice = db.Column(db.Float)
 
     def __init__(self, quotedID=None, tenderID=None, userID=None,
                  quotedPrice=0, price=0, costPrice=0,
-                 createTime=None, description=None):
+                 createTime=None, description=None, ceilingPrice=0,
+                 fixedPrice=0):
         self.quotedID = quotedID
         self.tenderID = tenderID
         self.userID = userID
@@ -29,6 +32,8 @@ class QuotedPrice(db.Model):
         self.costPrice = costPrice
         self.createTime = createTime
         self.description = description
+        self.ceilingPrice = ceilingPrice
+        self.fixedPrice = fixedPrice
 
     @staticmethod
     def create(info):
@@ -36,9 +41,11 @@ class QuotedPrice(db.Model):
             quotedID=info['quotedID'],
             tenderID=info['tenderID'],
             userID=info['userID'],
-            quotedPrice=info['quotedPrice'],
+            # quotedPrice=info['quotedPrice'],
             price=info['price'],
             costPrice=info['costPrice'],
+            ceilingPrice=info['ceilingPrice'],
+            fixedPrice=info['fixedPrice'],
             createTime=info['createTime'],
             description=info['description'],
         )
@@ -56,6 +63,8 @@ class QuotedPrice(db.Model):
         res['costPrice'] = c.costPrice
         res['createTime'] = c.createTime
         res['description'] = c.description
+        res['ceilingPrice'] = c.ceilingPrice
+        res['fixedPrice'] = c.fixedPrice
         return res
 
     def __repr__(self):

@@ -15,8 +15,8 @@ from tool.config import ErrorInfo
 from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS, \
     PUSH_TENDER_INFO_TAG_STEP_DONE, PUSH_TENDER_INFO_TAG_STEP_HISTORY, PUSH_TENDER_INFO_TAG_CUS, \
     PUSH_TENDER_INFO_TAG_TENDER
-from tool.tagconfig import OPERATION_TAG_TENDER_PRICE, OPERATION_TAG_DEPOSIT, BID_DOC_DIRECTORY
-from tool.tagconfig import OPERATION_TAG_TENDER_PLAN, OPERATION_TAG_MAKE_BIDDING_BOOK
+from tool.tagconfig import OPERATION_TAG_ENLIST, OPERATION_TAG_DEPOSIT, BID_DOC_DIRECTORY
+from tool.tagconfig import OPERATION_TAG_CONFIRM_USER, OPERATION_TAG_MAKE_BIDDING_BOOK
 
 
 from models.flask_app import db
@@ -111,6 +111,9 @@ class OperatorManager(Util):
         operationID = self.generateID(operatorID)
         info['operationID'] = operationID
         info['createTime'] = datetime.now()
+        if not info.has_key('typeID'):
+            info['typeID'] = 0
+            info['userName'] = ''
         try:
             Operation.create(info=info)
             # #如果状态是制作标书，需要上传标书文件

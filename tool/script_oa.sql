@@ -50,7 +50,18 @@ create table pushedTenderInfo(
 	tenderType nvarchar(100) comment '评标方法',
 	-- 新增报名截止时间
 	deadline date comment '报名截止日期',
-	winbidding boolean default 0 comment '是否中标'
+	winbidding boolean default 0 comment '是否中标',
+	-- 新增13项
+	tenderee text comment '招标人',
+	tenderProxy text comment '招标代理',
+	tenderer text comment '投标人',
+	constructionLocation text comment '建设地点',
+	plannedProjectDuration text comment '计划工期',
+	answerDeadline date comment '答疑截止日期',
+	tenderDeadline date comment '投标截止日期',
+	attender text comment '开标人',
+	companyAchievement text comment '企业业绩要求',
+	pmAchievement text comment '项目经理业绩要求'
 );
 
 create table quotedPrice(
@@ -58,10 +69,14 @@ create table quotedPrice(
 	tenderID nvarchar(100) comment '标段ID',
 	userID nvarchar(100) comment '用户ID',
 	quotedPrice float comment '预估价',
-	price float comment '定价',
+	-- 定价 变为报价
+	price float comment '报价',
 	costPrice float comment '成本价',
 	createTime datetime comment '创建时间',
-	description text comment '备注'
+	description text comment '备注',
+	-- 增加最高限价，定额价
+	ceilingPrice float comment '最高限价',
+	fixedPrice float comment '定额价'
 );
 
 -- 领导批注

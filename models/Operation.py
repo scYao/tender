@@ -39,6 +39,8 @@ class Operation(db.Model):
             state=info['state'],
             description=info['description'],
             createTime=info['createTime'],
+            typeID=info['typeID'],
+            userName=info['userName']
         )
         db.session.add(operation)
         return (True, info['operationID'])
@@ -52,6 +54,8 @@ class Operation(db.Model):
         res['state'] = c.state
         res['description'] = c.description
         res['createTime'] = str(c.createTime)
+        res['typeID'] = c.typeID
+        res['userName'] = c.userName
         return res
 
     def __repr__(self):

@@ -52,6 +52,18 @@ class PushedTenderInfo(db.Model):
     tenderType = db.Column(db.String(100))
     deadline = db.Column(db.Date)
     winbidding = db.Column(db.Boolean)
+    tenderee = db.Column(db.Text)
+    tenderProxy = db.Column(db.Text)
+    tenderer = db.Column(db.Text)
+    constructionLocation = db.Column(db.Text)
+    plannedProjectDuration = db.Column(db.Text)
+    answerDeadline = db.Column(db.Date)
+    tenderDeadline = db.Column(db.Date)
+    attender = db.Column(db.Text)
+    companyAchievement = db.Column(db.Text)
+    pmAchievement = db.Column(db.Text)
+
+
 
     def __init__(self, pushedID=None, userID=None, createTime=None, operatorPersonPushedTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
@@ -65,7 +77,10 @@ class PushedTenderInfo(db.Model):
                  candidateName2='', candidatePrice2=0, candidateName3='',
                  candidatePrice3=0, tag=0, tenderCompanyName=None, projectType=None,
                  workContent=None, deposit=0, planScore=0, tenderType=None,
-                 deadline=None, winbidding=False):
+                 deadline=None, winbidding=False, tenderee=None, tenderProxy=None,
+                 tenderer=None, constructionLocation=None, plannedProjectDuration=None,
+                 answerDeadline=None, tenderDeadline=None, attender=None,
+                 companyAchievement=None, pmAchievement=None):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -107,6 +122,16 @@ class PushedTenderInfo(db.Model):
         self.tenderType = tenderType
         self.deadline = deadline
         self.winbidding = winbidding
+        self.tenderee = tenderee
+        self.tenderProxy = tenderProxy
+        self.tenderer = tenderer
+        self.constructionLocation = constructionLocation
+        self.plannedProjectDuration = plannedProjectDuration
+        self.answerDeadline = answerDeadline
+        self.tenderDeadline = tenderDeadline
+        self.attender = attender
+        self.companyAchievement = companyAchievement
+        self.pmAchievement = pmAchievement
 
 
     @staticmethod
