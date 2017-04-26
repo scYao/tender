@@ -201,30 +201,30 @@ class PushedTenderInfo(db.Model):
         res['projectManagerName'] = c.projectManagerName
         res['openedDate'] = str(c.openedDate)
         res['openedLocation'] = c.openedLocation
-        res['ceilPrice'] = c.ceilPrice
+        res['ceilPrice'] = c.ceilPrice==0 and ' ' or c.ceilPrice
         res['tenderInfoDescription'] = c.tenderInfoDescription
-        res['quotedPrice'] = c.quotedPrice
+        res['quotedPrice'] = c.quotedPrice==0 and ' ' or c.quotedPrice
         res['quotedDate'] = str(c.quotedDate)
         res['quotedDescription'] = c.quotedDescription
-        res['averagePrice'] = c.averagePrice
-        res['benchmarkPrice'] = c.benchmarkPrice
-        res['K1'] = c.K1
-        res['K2'] = c.K2
-        res['Q1'] = c.Q1
-        res['Q2'] = c.Q2
-        res['deductedRate1'] = c.deductedRate1
-        res['deductedRate2'] = c.deductedRate2
+        res['averagePrice'] = c.averagePrice==0 and ' ' or c.averagePrice
+        res['benchmarkPrice'] = c.benchmarkPrice==0 and ' ' or c.benchmarkPrice
+        res['K1'] = c.K1==0 and ' ' or c.K1
+        res['K2'] = c.K2==0 and ' ' or c.K2
+        res['Q1'] = c.Q1==0 and ' ' or c.Q1
+        res['Q2'] = c.Q2==0 and ' ' or c.Q2
+        res['deductedRate1'] = c.deductedRate1==0 and ' ' or c.deductedRate1
+        res['deductedRate2'] = c.deductedRate2==0 and ' ' or c.deductedRate2
         res['workerName'] = c.workerName
         res['candidateName1'] = c.candidateName1
-        res['candidatePrice1'] = c.candidatePrice1
+        res['candidatePrice1'] = c.candidatePrice1==0 and ' ' or c.candidatePrice1
         res['candidateName2'] = c.candidateName2
-        res['candidatePrice2'] = c.candidatePrice2
+        res['candidatePrice2'] = c.candidatePrice2==0 and ' ' or c.candidatePrice2
         res['candidateName3'] = c.candidateName3
-        res['candidatePrice3'] = c.candidatePrice3
+        res['candidatePrice3'] = c.candidatePrice3==0 and ' ' or c.candidatePrice3
         res['tenderCompanyName'] = c.tenderCompanyName
         res['projectType'] = c.projectType
         res['workContent'] = c.workContent
-        res['deposit'] = c.deposit
+        res['deposit'] = c.deposit==0 and ' ' or c.deposit
         res['planScore'] = c.planScore
         res['tenderType'] = c.tenderType
         if c.deadline is None:

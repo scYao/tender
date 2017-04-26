@@ -1220,7 +1220,7 @@ class PushedTenderManager(Util):
             else:
                 res['tenderDeadline'] = None
             res['attender'] = result.PushedTenderInfo.attender
-            res['deposit'] = result.PushedTenderInfo.deposit
+            res['deposit'] = result.PushedTenderInfo.deposit==0 and ' ' or result.PushedTenderInfo.deposit
             res['companyAchievement'] = result.PushedTenderInfo.companyAchievement
             res['pmAchievement'] = result.PushedTenderInfo.pmAchievement
             res['tenderType'] = result.PushedTenderInfo.tenderType

@@ -19,34 +19,34 @@ create table pushedTenderInfo(
 	projectManagerName nvarchar(100) comment '项目经理姓名',
 	openedDate date comment '开标时间',
 	openedLocation text comment '开标地点',
-	ceilPrice float comment 'B 最高限价',
+	ceilPrice double comment 'B 最高限价',
 	tenderInfoDescription text comment '项目信息备注',
 	-- 老板填写的报价字段
-	quotedPrice float comment '报价,定价',
+	quotedPrice double comment '报价,定价',
 	quotedDate date comment '报价时间',
 	quotedDescription text comment '报价备注',
 	-- 投标已完成详情字段
-	averagePrice float comment 'A 平均价',
-	benchmarkPrice float comment 'C(评标基准价)',
-	K1 float comment 'K1 值',
-	K2 float comment 'K2 值',
-	Q1 float comment 'Q1 值',
-	Q2 float comment 'Q2 值',
-	deductedRate1 float comment '啟勋下浮率',
-	deductedRate2 float comment '下浮率',
+	averagePrice double comment 'A 平均价',
+	benchmarkPrice double comment 'C(评标基准价)',
+	K1 double comment 'K1 值',
+	K2 double comment 'K2 值',
+	Q1 double comment 'Q1 值',
+	Q2 double comment 'Q2 值',
+	deductedRate1 double comment '啟勋下浮率',
+	deductedRate2 double comment '下浮率',
 	workerName nvarchar(100) comment '开标人',
 	candidateName1 nvarchar(100) comment '候选人1',
-	candidatePrice1 float comment '候选人1报价',
+	candidatePrice1 double comment '候选人1报价',
 	candidateName2 nvarchar(100) comment '候选人2',
-	candidatePrice2 float comment '候选人2报价',
+	candidatePrice2 double comment '候选人2报价',
 	candidateName3 nvarchar(100) comment '候选人3',
-	candidatePrice3 float comment '候选人3报价'
+	candidatePrice3 double comment '候选人3报价'
 	-- 新增的进行中的详情
 	tenderCompanyName nvarchar(100) comment '投标单位',
 	projectType nvarchar(100) comment '项目类型',
 	workContent nvarchar(100) comment '工作内容',
-	deposit float comment '投标保证金',
-	planScore float comment '方案评分',
+	deposit double comment '投标保证金',
+	planScore double comment '方案评分',
 	tenderType nvarchar(100) comment '评标方法',
 	-- 新增报名截止时间
 	deadline date comment '报名截止日期',
@@ -68,15 +68,15 @@ create table quotedPrice(
 	quotedID nvarchar(100) primary key comment '报价ID',
 	tenderID nvarchar(100) comment '标段ID',
 	userID nvarchar(100) comment '用户ID',
-	quotedPrice float comment '预估价',
+	quotedPrice double comment '预估价',
 	-- 定价 变为报价
-	price float comment '报价',
-	costPrice float comment '成本价',
+	price double comment '报价',
+	costPrice double comment '成本价',
 	createTime datetime comment '创建时间',
 	description text comment '备注',
 	-- 增加最高限价，定额价
-	ceilingPrice float comment '最高限价',
-	fixedPrice float comment '定额价'
+	ceilingPrice double comment '最高限价',
+	fixedPrice double comment '定额价'
 );
 
 -- 领导批注
