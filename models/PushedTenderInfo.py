@@ -15,6 +15,7 @@ class PushedTenderInfo(db.Model):
     operatorPersonPushedTime = db.Column(db.DateTime)
     responsiblePersonPushedTime = db.Column(db.DateTime)
     auditorPushedTime = db.Column(db.DateTime)
+    bossPushedTime = db.Column(db.DateTime)
     state = db.Column(db.Integer)
     step = db.Column(db.Integer)
     tag = db.Column(db.Integer)
@@ -66,8 +67,8 @@ class PushedTenderInfo(db.Model):
 
 
     def __init__(self, pushedID=None, userID=None, createTime=None, operatorPersonPushedTime=None,
-                 responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
-                 tenderID=None, step=0, projectManagerName='',
+                 responsiblePersonPushedTime=None, auditorPushedTime=None, bossPushedTime=None,
+                 state=0, tenderID=None, step=0, projectManagerName='',
                  openedDate=None, openedLocation='', ceilPrice=0,
                  tenderInfoDescription='', quotedPrice=0, quotedDate=None,
                  quotedDescription='', averagePrice=0, benchmarkPrice=0,
@@ -87,6 +88,7 @@ class PushedTenderInfo(db.Model):
         self.operatorPersonPushedTime = operatorPersonPushedTime
         self.responsiblePersonPushedTime = responsiblePersonPushedTime
         self.auditorPushedTime = auditorPushedTime
+        self.bossPushedTime = bossPushedTime
         self.state = state
         self.step = step
         self.tenderID = tenderID
@@ -143,6 +145,7 @@ class PushedTenderInfo(db.Model):
             operatorPersonPushedTime=info['operatorPersonPushedTime'],
             responsiblePersonPushedTime=info['responsiblePersonPushedTime'],
             auditorPushedTime=info['auditorPushedTime'],
+            bossPushedTime=info['bossPushedTime'],
             state=info['state'],
             step=info['step'],
             tenderID=info['tenderID'],

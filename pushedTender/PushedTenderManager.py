@@ -117,6 +117,7 @@ class PushedTenderManager(Util):
         info['operatorPersonPushedTime'] = None
         info['responsiblePersonPushedTime'] = None
         info['auditorPushedTime'] = None
+        info['bossPushedTime'] = None
         info['state'] = 0
         info['step'] = 0
         info['createTime'] = datetime.now()
@@ -132,6 +133,7 @@ class PushedTenderManager(Util):
         #推送人是审定人，直接视为推送到审定人且审定人决定投标,分配一个默认的经办人
         if userType == USER_TAG_BOSS:
             info['state'] = 1
+            info['bossPushedTime'] = datetime.now()
         try:
             #判断是否已经创建过推送消息
             result = db.session.query(PushedTenderInfo).filter(
@@ -518,11 +520,11 @@ class PushedTenderManager(Util):
             ).outerjoin(
                 UserInfo, PushedTenderInfo.userID == UserInfo.userID
             ).filter(
-                PushedTenderInfo.state != PUSH_TENDER_INFO_TAG_STATE_DISCARD
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_UNREAD
             )
 
             countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
-                PushedTenderInfo.state != PUSH_TENDER_INFO_TAG_STATE_DISCARD
+                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_UNREAD
             )
 
             if tenderTag != '-1':
@@ -543,17 +545,18 @@ class PushedTenderManager(Util):
                     query = query.filter(PushedTenderInfo.auditorPushedTime != None)
                     countQuery = countQuery.filter(PushedTenderInfo.auditorPushedTime != None)
 
-            # else:
-            #     print 'hhhhhh'
-            #     #  -1 就是获取该用户角色下能获取的
-            #     selfUserType = info['selfUserType']
-            #     userResult = db.session.query(UserInfo).filter(
-            #         UserInfo.userType <= selfUserType
-            #     ).all()
-            #     staffUserIDTuple = (o.userID for o in userResult)
-            #     query = query.filter(
-            #         PushedTenderInfo.userID.in_(staffUserIDTuple)
-            #     )
+            else:
+                #  -1 就是获取该用户角色下能获取的
+                selfUserType = info['selfUserType']
+                customizedCompanyID = info['customizedCompanyID']
+                userResult = db.session.query(UserInfo).filter(
+                    and_(UserInfo.userType >= selfUserType,
+                         UserInfo.customizedCompanyID == customizedCompanyID)
+                ).all()
+                staffUserIDTuple = (o.userID for o in userResult)
+                query = query.filter(
+                    PushedTenderInfo.userID.in_(staffUserIDTuple)
+                )
 
             count = countQuery.first()
             count = count[0]
@@ -845,7 +848,7 @@ class PushedTenderManager(Util):
                 or_(Operator.userID == '-1',
                     Operator.state == 2)
             )).order_by(desc(
-                PushedTenderInfo.operatorPersonPushedTime
+                PushedTenderInfo.createTime
             ))
 
             pushedInfoResult = query.offset(startIndex).limit(pageCount).all()
@@ -986,10 +989,12 @@ class PushedTenderManager(Util):
         operatorID = info['operatorID']
 
         try:
-            OperatorResult = db.session.query(Operator).filter(
+            operatorResult = db.session.query(Operator).filter(
                 Operator.operatorID == operatorID
             ).first()
-            tenderID = OperatorResult.tenderID
+            if operatorResult is None:
+                return (False, ErrorInfo['TENDER_28'])
+            tenderID = operatorResult.tenderID
             info['tenderID'] = tenderID
             # query = db.session.query(Operation).filter(Operation.operatorID == operatorID)
             # allResult = query.all()
