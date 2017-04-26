@@ -355,3 +355,10 @@ class ResponsiblePersonManager(UserBaseManager):
         pushedTenderManager = PushedTenderManager()
         _ = [self.addPushedDataInfoToUser(o=o, pushedTenderManager=pushedTenderManager, info=info) for o in dataList]
         return (True, dataInfo)
+
+    # 负责人创建标书
+    def createOperationBiddingBookByResp(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_RESPONSIBLEPERSON
+        jsonInfo = json.dumps(info)
+        return self.createOperationBiddingBook(jsonInfo=jsonInfo, imgFileList=imgFileList)

@@ -14,13 +14,10 @@ from datetime import datetime
 from sqlalchemy import and_, text, func, desc
 
 from models.flask_app import db
-from models.UserInfo import UserInfo
+from models.Operation import Operation
+from models.ImgPath import ImgPath
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import OPERATOR_TAG_CREATED, DOING_STEP, DONE_STEP, HISTORY_STEP, PUSH_TENDER_INFO_TAG_CUS, \
-    PUSH_TENDER_INFO_TAG_TENDER
-from tool.tagconfig import USER_TAG_OPERATOR, USER_TAG_RESPONSIBLEPERSON, USER_TAG_AUDITOR, USER_TAG_BOSS
-from pushedTender.TenderCommentManager import TenderCommentManager
 
 from UserManager import UserManager
 
@@ -51,3 +48,61 @@ class UserBaseManager(Util):
     def getUserInfo(self, info):
         userManager = UserManager()
         return userManager.getUserInfo(info=info)
+
+    # 记录动作, 打保证金等
+    def createOperation(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        operatorID = info['operatorID']
+        operationID = self.generateID(operatorID)
+        info['operationID'] = operationID
+        info['createTime'] = datetime.now()
+        if not info.has_key('typeID'):
+            info['typeID'] = 0
+            info['userName'] = ''
+        try:
+            Operation.create(info=info)
+            # #如果状态是制作标书，需要上传标书文件
+            # if info['tag'] == OPERATION_TAG_MAKE_BIDDING_BOOK:
+            #     info['directory'] = BID_DOC_DIRECTORY
+            #     info['foreignID'] = operationID
+            #     imageManager = ImageManager()
+            #     imageManager.addImagesWithOSS(info=info)
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+        return (True, operationID)
+
+    # 上传标书
+    def createOperationBiddingBook(self, jsonInfo, imgFileList):
+        (status, operationID) = self.createOperation(jsonInfo=jsonInfo)
+        if status is not True:
+            return (False, operationID)
+        ossInfo = {}
+        ossInfo['bucket'] = 'sjtender'
+        try:
+            index = 0
+            for i in imgFileList:
+                imgID = self.generateID(str(index) + i['imgName'])
+                postFix = str(i['imgName']).split('.')
+                if len(postFix) > 0:
+                    postFix = '.' + postFix[-1]
+                else:
+                    postFix = ''
+                imgPath = imgID + postFix
+                imagePath = ImgPath(imgPathID=imgID, path=imgPath,
+                                    foreignID=operationID, imgName=i['imgName'])
+                db.session.add(imagePath)
+                index = index + 1
+                self.uploadOSSImage('biddocument/%s' % imgPath, ossInfo, i['file'])
+            db.session.commit()
+            return (True, operationID)
+        except Exception as e:
+            print e
+            print 'upload file to oss error'
+            errorInfo = ErrorInfo['TENDER_31']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)

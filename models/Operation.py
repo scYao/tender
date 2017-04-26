@@ -15,15 +15,22 @@ class Operation(db.Model):
     state = db.Column(db.Integer)
     description = db.Column(db.Text)
     createTime = db.Column(db.DateTime)
+    typeID = db.Column(db.Integer)
+    userName = db.Column(db.String(100))
+    userType = db.Column(db.Integer)
 
     def __init__(self, operationID=None, tag=0, operatorID=None,
-                 state=0, description=None, createTime=None):
+                 state=0, description=None, createTime=None,
+                 typeID=0, userName=None, userType=0):
         self.operationID = operationID
         self.tag = tag
         self.operatorID = operatorID
         self.state = state
         self.description = description
         self.createTime = createTime
+        self.typeID = typeID
+        self.userName = userName
+        self.userType = userType
 
     @staticmethod
     def create(info):
@@ -34,6 +41,9 @@ class Operation(db.Model):
             state=info['state'],
             description=info['description'],
             createTime=info['createTime'],
+            typeID=info['typeID'],
+            userName=info['userName'],
+            userType=info['userType']
         )
         db.session.add(operation)
         return (True, info['operationID'])
@@ -47,6 +57,9 @@ class Operation(db.Model):
         res['state'] = c.state
         res['description'] = c.description
         res['createTime'] = str(c.createTime)
+        res['typeID'] = c.typeID
+        res['userName'] = c.userName
+        res['userType'] = c.userType
         return res
 
     def __repr__(self):

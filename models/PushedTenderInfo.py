@@ -52,6 +52,18 @@ class PushedTenderInfo(db.Model):
     tenderType = db.Column(db.String(100))
     deadline = db.Column(db.Date)
     winbidding = db.Column(db.Boolean)
+    tenderee = db.Column(db.Text)
+    tenderProxy = db.Column(db.Text)
+    tenderer = db.Column(db.Text)
+    constructionLocation = db.Column(db.Text)
+    plannedProjectDuration = db.Column(db.Text)
+    answerDeadline = db.Column(db.Date)
+    tenderDeadline = db.Column(db.Date)
+    attender = db.Column(db.Text)
+    companyAchievement = db.Column(db.Text)
+    pmAchievement = db.Column(db.Text)
+
+
 
     def __init__(self, pushedID=None, userID=None, createTime=None, operatorPersonPushedTime=None,
                  responsiblePersonPushedTime=None, auditorPushedTime=None, state=0,
@@ -65,7 +77,10 @@ class PushedTenderInfo(db.Model):
                  candidateName2='', candidatePrice2=0, candidateName3='',
                  candidatePrice3=0, tag=0, tenderCompanyName=None, projectType=None,
                  workContent=None, deposit=0, planScore=0, tenderType=None,
-                 deadline=None, winbidding=False):
+                 deadline=None, winbidding=False, tenderee=None, tenderProxy=None,
+                 tenderer=None, constructionLocation=None, plannedProjectDuration=None,
+                 answerDeadline=None, tenderDeadline=None, attender=None,
+                 companyAchievement=None, pmAchievement=None):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
@@ -107,6 +122,16 @@ class PushedTenderInfo(db.Model):
         self.tenderType = tenderType
         self.deadline = deadline
         self.winbidding = winbidding
+        self.tenderee = tenderee
+        self.tenderProxy = tenderProxy
+        self.tenderer = tenderer
+        self.constructionLocation = constructionLocation
+        self.plannedProjectDuration = plannedProjectDuration
+        self.answerDeadline = answerDeadline
+        self.tenderDeadline = tenderDeadline
+        self.attender = attender
+        self.companyAchievement = companyAchievement
+        self.pmAchievement = pmAchievement
 
 
     @staticmethod
@@ -176,30 +201,30 @@ class PushedTenderInfo(db.Model):
         res['projectManagerName'] = c.projectManagerName
         res['openedDate'] = str(c.openedDate)
         res['openedLocation'] = c.openedLocation
-        res['ceilPrice'] = c.ceilPrice
+        res['ceilPrice'] = c.ceilPrice==0 and ' ' or c.ceilPrice
         res['tenderInfoDescription'] = c.tenderInfoDescription
-        res['quotedPrice'] = c.quotedPrice
+        res['quotedPrice'] = c.quotedPrice==0 and ' ' or c.quotedPrice
         res['quotedDate'] = str(c.quotedDate)
         res['quotedDescription'] = c.quotedDescription
-        res['averagePrice'] = c.averagePrice
-        res['benchmarkPrice'] = c.benchmarkPrice
-        res['K1'] = c.K1
-        res['K2'] = c.K2
-        res['Q1'] = c.Q1
-        res['Q2'] = c.Q2
-        res['deductedRate1'] = c.deductedRate1
-        res['deductedRate2'] = c.deductedRate2
+        res['averagePrice'] = c.averagePrice==0 and ' ' or c.averagePrice
+        res['benchmarkPrice'] = c.benchmarkPrice==0 and ' ' or c.benchmarkPrice
+        res['K1'] = c.K1==0 and ' ' or c.K1
+        res['K2'] = c.K2==0 and ' ' or c.K2
+        res['Q1'] = c.Q1==0 and ' ' or c.Q1
+        res['Q2'] = c.Q2==0 and ' ' or c.Q2
+        res['deductedRate1'] = c.deductedRate1==0 and ' ' or c.deductedRate1
+        res['deductedRate2'] = c.deductedRate2==0 and ' ' or c.deductedRate2
         res['workerName'] = c.workerName
         res['candidateName1'] = c.candidateName1
-        res['candidatePrice1'] = c.candidatePrice1
+        res['candidatePrice1'] = c.candidatePrice1==0 and ' ' or c.candidatePrice1
         res['candidateName2'] = c.candidateName2
-        res['candidatePrice2'] = c.candidatePrice2
+        res['candidatePrice2'] = c.candidatePrice2==0 and ' ' or c.candidatePrice2
         res['candidateName3'] = c.candidateName3
-        res['candidatePrice3'] = c.candidatePrice3
+        res['candidatePrice3'] = c.candidatePrice3==0 and ' ' or c.candidatePrice3
         res['tenderCompanyName'] = c.tenderCompanyName
         res['projectType'] = c.projectType
         res['workContent'] = c.workContent
-        res['deposit'] = c.deposit
+        res['deposit'] = c.deposit==0 and ' ' or c.deposit
         res['planScore'] = c.planScore
         res['tenderType'] = c.tenderType
         if c.deadline is None:

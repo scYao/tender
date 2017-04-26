@@ -188,6 +188,9 @@ class UserManager(Util):
         jobPosition = info['jobPosition']
         # portrait = 'ladyPortrait.png'
         portrait = 'gentlemanPortrait.png'
+        (status, reason) = self.checkSmsCode(info)
+        if status is not True:
+            return (False, reason)
         # 判断是否已经注册
         result = db.session.query(UserInfo).filter(
             UserInfo.tel == tel
@@ -539,7 +542,7 @@ class UserManager(Util):
                 UserInfo.userID == bossUserID
             ).first()
             if bossResult is None:
-                return (False, ErrorInfo['TENDER_07'])
+                return (False, ErrorInfo['TENDER_09'])
             customizedCompanyID = bossResult.customizedCompanyID
             info['customizedCompanyID'] = customizedCompanyID
             #判断是否已经存在该员工
@@ -547,11 +550,12 @@ class UserManager(Util):
             result = query.first()
             if result is not None:
                 # 如果用户已存在 判断用户的公司是否是0
-                customizedCompanyID = result.customizedCompanyID
-                if customizedCompanyID != 0:
+                staffCustomizedCompanyID = result.customizedCompanyID
+                if staffCustomizedCompanyID is not None and staffCustomizedCompanyID != 0:
                     return (False, ErrorInfo['TENDER_37'])
                 query.update({
-                    UserInfo.customizedCompanyID : customizedCompanyID
+                    UserInfo.customizedCompanyID : customizedCompanyID,
+                    UserInfo.userType : info['userType']
                 }, synchronize_session=False)
                 # return (False, ErrorInfo['TENDER_07'])
             else:
