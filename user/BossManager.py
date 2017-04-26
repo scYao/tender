@@ -358,3 +358,10 @@ class BossManager(UserBaseManager):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, None)
+
+    # 审定人创建标书
+    def createOperationBiddingBookByBoss(self, jsonInfo, imgFileList):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        jsonInfo = json.dumps(info)
+        return self.createOperationBiddingBook(jsonInfo=jsonInfo, imgFileList=imgFileList)

@@ -154,6 +154,16 @@ create table news(
 	createTime datetime comment '创建时间'
 );
 
+-- 订阅
+create table subscribedKey(
+	subscribedID nvarchar(100) primary key comment '订阅ID',
+	userID nvarchar(100) comment '用户ID',
+	keywords nvarchar(100) comment '关键字',
+	createTime datetime comment '创建时间',
+	frequency int comment '推送频率',
+	pushType int comment '推送方式'
+);
+
 ALTER TABLE pushedTenderInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operator CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -163,6 +173,7 @@ ALTER TABLE message CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tenderComment CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE quotedPrice CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE news CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE subscribedKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);
@@ -173,3 +184,4 @@ alter table tenderComment add constraint comment_FK_F_user foreign key(userID) r
 alter table quotedPrice add constraint quote_FK_F_user foreign key(userID) references userInfo(userID);
 alter table quotedPrice add constraint quote_FK_tender foreign key(tenderID) references tender(tenderID);
 alter table tenderComment add constraint comment_FK_user foreign key(userID) references userInfo(userID);
+alter table subscribedKey add constraint subscribed_FK_user foreign key(userID) references userInfo(userID);

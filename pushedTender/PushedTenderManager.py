@@ -440,10 +440,11 @@ class PushedTenderManager(Util):
             db.session.commit()
             return (True, None)
         except Exception as e:
+            db.session.rollback()
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
-            db.session.rollback()
             return (False, errorInfo)
 
     def __generatePushedBrief(self, result):
@@ -604,6 +605,7 @@ class PushedTenderManager(Util):
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
+            traceback.print_exc()
             return (False, errorInfo)
 
     # 获取正在进行中的列表
@@ -822,6 +824,7 @@ class PushedTenderManager(Util):
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
+            traceback.print_exc()
             return (False, errorInfo)
 
 
@@ -1436,6 +1439,7 @@ class PushedTenderManager(Util):
                 return (False, ErrorInfo['TENDER_28'])
         except Exception as e:
             print e
+            traceback.print_exc()
             errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
