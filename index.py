@@ -1,12 +1,11 @@
 # coding=utf8
-import os
-import os.path
-from flask import request
 import sys
+
+from flask import request
 
 sys.path.append('..')
 import json
-from models.flask_app import app, cache
+from models.flask_app import app
 from user.AdminManager import AdminManager
 from tender.TenderManager import TenderManager
 from type.Type1Manager import Type1Manager
@@ -37,15 +36,35 @@ from user.ResponsiblePersonManager import ResponsiblePersonManager
 from user.AuditorManager import AuditorManager
 from user.BossManager import BossManager
 from pushedTender.PushedTenderManager import PushedTenderManager
-from tender.CustomizedTenderManager import CustomizedTenderManager
 from news.NewsManager import NewsManager
 from user.UserBaseManager import UserBaseManager
 from tender.SubscribedKeyManager import SubscribedKeyManager
+from wechatPublic.WechatManager import WechatManager
+from wechatPublic.WechatMessageManager import WechatMessageManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+@app.route('/wx', methods=['POST', 'GET'])
+def wx():
+    wechatMessageManager = WechatMessageManager()
+    wechatManager = WechatManager()
+    if request.method == 'POST':
+        xmlData = request.get_data()
+        return wechatMessageManager.getMessageInfo(xmlData=xmlData)
+
+    elif request.method == 'GET':
+        paramsJson = {}
+        paramsJson['signature'] = request.args.get('signature')
+        paramsJson['timestamp'] = request.args.get('timestamp')
+        paramsJson['nonce'] = request.args.get('nonce')
+        paramsJson['echostr'] = request.args.get('echostr')
+        paramsJson = json.dumps(paramsJson)
+        (status, ret) = wechatManager.login(jsonInfo=paramsJson)
+        return ret
 
 # 管理员登录，后台管理
 @app.route('/administrator_login_background/', methods=['POST', 'GET'])
@@ -2885,7 +2904,7 @@ def get_company_certificate_list():
         data['data'] = result
         return json.dumps(data)
 
-# 获取公司资质等级列表
+#创建订阅记录
 @app.route('/create_subscribed_key/', methods=['POST', 'GET'])
 def create_subscribed_key():
     subscribedKeyManager = SubscribedKeyManager()
@@ -2895,6 +2914,22 @@ def create_subscribed_key():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = subscribedKeyManager.createSubscribedKey(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 获取个人订阅信息
+@app.route('/get_subscribe_info/', methods=['POST', 'GET'])
+def get_subscribe_info():
+    subscribedKeyManager = SubscribedKeyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = subscribedKeyManager.getSubscribeInfo(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

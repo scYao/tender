@@ -5,7 +5,7 @@ import random
 import re
 import sys
 import urllib
-
+import xml.etree.ElementTree as ET
 from tool.config import ErrorInfo
 
 sys.path.append('..')
@@ -139,6 +139,46 @@ class Util:
     def generateCode(self, value):
         code = (hex(int(value)).upper())[2:]
         return code
+
+    def findElement(self, xmlData, tag):
+        element = xmlData.find(tag)
+        if element is None:
+            return ''
+        else:
+            return element.text
+
+    def parseXmlData(self, xmlData):
+        if len(xmlData) == 0:
+            return (False, None)
+        else:
+            xmlData = ET.fromstring(xmlData)
+            messageInfo = {}
+            messageInfo['toUserName'] = ((xmlData.find('ToUserName') is not None) and xmlData.find('ToUserName').text)
+            messageInfo['fromUserName'] = ((xmlData.find('FromUserName') is not None) and xmlData.find('FromUserName').text)
+            messageInfo['createTime'] = ((xmlData.find('CreateTime') is not None) and xmlData.find('CreateTime').text)
+            messageInfo['megType'] = ((xmlData.find('MsgType') is not None) and xmlData.find('MsgType').text)
+            messageInfo['msgId'] = ((xmlData.find('MsgId') is not None) and xmlData.find('MsgId').text)
+            messageInfo['content'] = ((xmlData.find('Content') is not None) and xmlData.find('Content').text)
+            messageInfo['event'] = ((xmlData.find('Event') is not None) and xmlData.find('Event').text)
+            return (True, messageInfo)
+
+    def sendTextMessage(self, info):
+        sendInfo = {}
+        sendInfo['ToUserName'] = info['fromUserName']
+        sendInfo['FromUserName'] = info['toUserName']
+        sendInfo['CreateTime'] = int(time.time())
+        sendInfo['Content'] = info['content']
+        XmlForm = """
+        <xml>
+        <ToUserName><![CDATA[{ToUserName}]]></ToUserName>
+        <FromUserName><![CDATA[{FromUserName}]]></FromUserName>
+        <CreateTime>{CreateTime}</CreateTime>
+        <MsgType><![CDATA[text]]></MsgType>
+        <Content><![CDATA[{Content}]]></Content>
+        </xml>
+        """
+        return XmlForm.format(**sendInfo)
+
 
 
 if __name__ == '__main__':

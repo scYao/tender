@@ -643,9 +643,6 @@ class UserManager(Util):
                 resultDict = self.decrypt(encryptedData, iv, sessionKey)
                 tokenManager = TokenManager()
                 tokenID = tokenManager.createToken(openID)
-                # db.session.query(Token).filter(
-                #     Token.tokenID == tokenID
-                # ).update({Token.sessionKey: sessionKey}, synchronize_session=False)
                 #查询是否存在已经创建的用户
                 allResult = db.session.query(UserInfo).filter(UserInfo.userID == openID).all()
                 if(len(allResult) < 1):
