@@ -7,6 +7,7 @@ import sys
 import urllib
 import xml.etree.ElementTree as ET
 from tool.config import ErrorInfo
+from tool.tagconfig import PUBLICAPPID, PUBLICSECRET, INTERVALTIME
 
 sys.path.append('..')
 import hashlib
@@ -17,6 +18,7 @@ import datetime
 from models.flask_app import db
 from sqlalchemy import and_
 from models.Token import Token
+from models.AccessToken import AccessToken
 
 class Util:
     def __init__(self):
@@ -146,6 +148,59 @@ class Util:
             return ''
         else:
             return element.text
+
+    #获取accessToken, 微信公众号获取用户信息使用
+    def getAccessToken(self):
+        try:
+            now = datetime.datetime.now()
+            query = db.session.query(AccessToken)
+            result = query.first()
+            if result is not None:
+                createTime = result.createTime
+                validity = result.validity
+                intervalTime = validity - (now - createTime).total_seconds()
+                #如果已经过期，重新请求微信服务器获取
+                if intervalTime < INTERVALTIME:
+                    (status, callBackInfo) = self.__getAccessToken()
+                    if status is True:
+                        updateInfo = {
+                                AccessToken.createTime: now,
+                                AccessToken.accessTokenID: callBackInfo['accessTokenID'],
+                                AccessToken.validity: callBackInfo['validity']
+                             },
+                        query.update(updateInfo, synchronize_session=False)
+                        db.session.commit()
+                    return (True, callBackInfo['accessTokenID'])
+                else:
+                    return (True, result.accessTokenID)
+            else:
+                (status, callBackInfo) = self.__getAccessToken()
+                accessTokenID = callBackInfo['accessTokenID']
+                validity = callBackInfo['validity']
+                accessToken = AccessToken(
+                    accessTokenID=accessTokenID, createTime=now, validity=validity
+                )
+                db.session.add(accessToken)
+                db.session.commit()
+                return (True, accessTokenID)
+
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['SPORTS_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def __getAccessToken(self):
+        postUrl = ("https://api.weixin.qq.com/cgi-bin/token?grant_type="
+                   "client_credential&appid=%s&secret=%s" % (PUBLICAPPID, PUBLICSECRET))
+        urlResp = urllib.urlopen(postUrl)
+        urlResp = json.loads(urlResp.read())
+        callBackInfo = {}
+        callBackInfo['accessTokenID'] = urlResp['access_token']
+        callBackInfo['validity'] = urlResp['expires_in']
+        return (True, callBackInfo)
+
 
     def parseXmlData(self, xmlData):
         if len(xmlData) == 0:

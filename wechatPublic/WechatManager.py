@@ -4,22 +4,13 @@ import web
 import json
 import urllib
 from tasks import add
+from tool.Util import Util
 
-class WechatManager():
+class WechatManager(Util):
     def __init__(self):
         self.appID = 'wxe56d1e66d153e211'
         self.appSecret = 'ec37ced1ae89e57b250ac43493124823'
         self.accessToken = ''
-
-    #获取accessToken
-    def getAccessToken(self):
-        postUrl = ("https://api.weixin.qq.com/cgi-bin/token?grant_type="
-                   "client_credential&appid=%s&secret=%s" % (self.appID, self.appSecret))
-        urlResp = urllib.urlopen(postUrl)
-        urlResp = json.loads(urlResp.read())
-        accessToken = urlResp['access_token']
-        leftTime = urlResp['expires_in']
-        return accessToken
 
     #获取用户信息（网页授权）
     def getOpenID(self):
@@ -50,12 +41,15 @@ class WechatManager():
 
     #获取用户列表
     def getUserList(self):
-        accessToken = self.getAccessToken()
-        postUrl = ("https://api.weixin.qq.com/cgi-bin/user/get?access_token=%s" % accessToken)
-        urlResp = urllib.urlopen(postUrl)
-        urlResp = json.loads(urlResp.read())
-        print urlResp
-        return (True, None)
+        (status, accessToken) = self.getAccessToken()
+        if status is True:
+            postUrl = ("https://api.weixin.qq.com/cgi-bin/user/get?access_token=%s" % accessToken)
+            urlResp = urllib.urlopen(postUrl)
+            urlResp = json.loads(urlResp.read())
+            print urlResp
+            return (True, None)
+        else:
+            return (False, None)
 
     #验证服务合法性
     def login(self, jsonInfo):
@@ -105,9 +99,9 @@ class WechatManager():
 
 if __name__ == '__main__':
     weChatManager = WechatManager()
-    weChatManager.testCelery()
+    weChatManager.getUserList()
+    # weChatManager.testCelery()
     # wechatPublic.getOpenID()
-    # wechatPublic.getUserList()
     # wechatPublic.getAccessToken()
     # postData = """{
     #     "touser": "o-U_Uwi9_kk_WeqO57nZI8SB0aiI",
