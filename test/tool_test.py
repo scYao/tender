@@ -153,12 +153,9 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''	subscribedID nvarchar(100) primary key comment '订阅ID',
-	userID nvarchar(100) comment '用户ID',
-	keywords nvarchar(100) comment '关键字',
-	createTime datetime comment '创建时间',
-	frequency int comment '推送频率',
-	pushType int comment '推送方式' '''
+    sql = '''	    openid1 nvarchar(100) comment '微信公众号的openid',
+    openid2 nvarchar(100) comment '小程序的openid',
+    unionid nvarchar(100) comment '公众号, 小程序统一ID'  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)
