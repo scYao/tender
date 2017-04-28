@@ -16,6 +16,7 @@ from sqlalchemy import and_, text, func, desc
 from models.flask_app import db
 from models.Operation import Operation
 from models.ImgPath import ImgPath
+from models.UserInfo import UserInfo
 from tool.Util import Util
 from tool.config import ErrorInfo
 
@@ -106,3 +107,17 @@ class UserBaseManager(Util):
             errorInfo = ErrorInfo['TENDER_31']
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
+
+    def getUserIDListByType(self, info):
+        userType = info['userType']
+        customizedCompanyID = info['companyID']
+
+        query = db.session.query(UserInfo).filter(and_(
+            UserInfo.customizedCompanyID == customizedCompanyID,
+            UserInfo.userType == userType
+        ))
+
+        allResult = query.all()
+        userIDList = [o.userID for o in allResult]
+
+        return (True, userIDList)

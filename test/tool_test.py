@@ -153,9 +153,7 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''	    openid1 nvarchar(100) comment '微信公众号的openid',
-    openid2 nvarchar(100) comment '小程序的openid',
-    unionid nvarchar(100) comment '公众号, 小程序统一ID'  '''
+    sql = '''	   disable boolean default false comment '是否被禁用'  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)
