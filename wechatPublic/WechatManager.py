@@ -1,6 +1,5 @@
 # coding=utf8
 import hashlib
-import web
 import json
 import urllib
 from tasks import add
