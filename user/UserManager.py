@@ -35,6 +35,8 @@ class UserManager(Util):
     def __init__(self):
         self.appID = 'wx3f8eb38c63060bf4'
         self.appSecret = '3e54449f22cf865507d7f9292ca4efe5'
+        # self.appID = 'wxc9029ba1dcf6f2de'
+        # self.appSecret = '299e6304e4bb135f38e8534bc772cc7d'
 
     #重新生成所有招标检索
     def reGenerateUserSearchIndex(self, jsonInfo):
@@ -654,7 +656,6 @@ class UserManager(Util):
                     userInfo = UserInfo(userID=openID, userName=resultDict['nickName'],
                                         gender=resultDict['gender'], createTime=now)
                     db.session.add(userInfo)
-
                 db.session.commit()
                 resultDict['tokenID'] = tokenID
                 return (True, tokenID)
