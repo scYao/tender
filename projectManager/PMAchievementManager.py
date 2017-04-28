@@ -11,15 +11,14 @@ import os
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
-from sqlalchemy import and_
-from datetime import datetime
+from sqlalchemy import and_, func
 from models.flask_app import db
 from models.ManagerAchievement import ManagerAchievement
 
 from tool.Util import Util
 from tool.config import ErrorInfo
 
-class AchievementManager(Util):
+class PMAchievementManager(Util):
 
     def __init__(self):
         pass
@@ -69,6 +68,63 @@ class AchievementManager(Util):
                 return (True, result.achievementID)
             else:
                 return (False, None)
+        except Exception as e:
+            print str(e)
+            # traceback.print_stack()
+            db.session.rollback()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
+    def __generateAchievement(self, o):
+        res = {}
+        res.update(ManagerAchievement.generate(c=o))
+        return res
+
+    # 获取项目经理业绩列表
+    def getPMAchievementList(self, jsonInfo):
+        print jsonInfo
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        managerID = info['managerID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        tag = info['tag']
+
+        try:
+            query = db.session.query(
+                ManagerAchievement
+            ).filter(
+                and_(ManagerAchievement.tag == tag,
+                     ManagerAchievement.managerID == managerID)
+            ).offset(startIndex).limit(pageCount)
+
+            allResult = query.all()
+            countQuery = db.session.query(
+                func.count(ManagerAchievement.achievementID)
+            ).filter(
+                and_(ManagerAchievement.tag == tag,
+                     ManagerAchievement.managerID == managerID)
+            )
+            dataList = [self.__generateAchievement(o=o) for o in allResult]
+            count = countQuery.first()
+            print count
+            if count is None:
+                count = 0
+            else:
+                count = count[0]
+
+            print count
+            result = {}
+            result['dataList'] = dataList
+            result['count'] = count
+            return (True, result)
+
         except Exception as e:
             print str(e)
             # traceback.print_stack()

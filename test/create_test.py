@@ -492,9 +492,26 @@ def test_get_tender_list_time():
     dt2 = datetime.now()
 
     print dt2 - dt1
+import xapian
+
 
 if __name__ == '__main__':
-    get_all_pushed_list_by_boss()
+    testdatas = [u'abc test python1',u'abcd testing python2']
+    def buildtest():
+        database = xapian.WritableDatabase('indexes/', xapian.DB_CREATE_OR_OPEN)
+        indexer = xapian.TermGenerator()
+        stemmer = xapian.Stem("english")
+        indexer.set_stemmer(stemmer)
+        for data in testdatas:
+            doc = xapian.Document()
+            doc.set_data(data)
+            for term in data.split():
+                doc.add_term(term)
+            database.add_document(doc)
+
+    buildtest()
+
+    # get_all_pushed_list_by_boss()
     # get_news_detail_background()
     # get_news_list_background()
     # get_favorite_tender_list()

@@ -20,7 +20,7 @@ from company.DelinquenentConductManager import DelinquenentConductManager
 from company.CompanyCertificateManager import CompanyCertificateManager
 from projectManager.PMManager import PMManager
 from projectManager.LicenseManager import LicenseManager
-from projectManager.AchievementManager import AchievementManager
+from projectManager.PMAchievementManager import PMAchievementManager
 from certificationGrade.CertificationGrade1Manager import CertificationGrade1Manager
 from certificationGrade.CertificationGrade2Manager import CertificationGrade2Manager
 from certificationGrade.CertificationGrade3Manager import CertificationGrade3Manager
@@ -99,17 +99,12 @@ def create_tender():
 # 判断招标信息是否存在
 @app.route('/does_tender_exists/', methods=['POST', 'GET'])
 def does_tender_exists():
-    from datetime import datetime
-    t1 = datetime.now()
-    print 't1', t1
     tenderManager = TenderManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
-        t2 = datetime.now()
-        print 't2 - t1', t2 - t1
         (status, jsonlist) = tenderManager.doesTenderExists(info=json.loads(paramsJson))
         if status is not False:
             data['status'] = 'SUCCESS'
@@ -924,13 +919,29 @@ def create_manager_license():
 # 创建项目经理业绩表
 @app.route('/create_manager_achievement/', methods=['POST', 'GET'])
 def create_manager_achievement():
-    achievementManager = AchievementManager()
+    achievementManager = PMAchievementManager()
     data = {}
     data['status'] = 'FAILED'
     data['data'] = 'NULL'
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = achievementManager.createManagerAchievement(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 获取项目经理业绩列表
+@app.route('/get_pm_achievement_list/', methods=['POST', 'GET'])
+def get_pm_achievement_list():
+    achievementManager = PMAchievementManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = achievementManager.getPMAchievementList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
