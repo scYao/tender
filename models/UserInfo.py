@@ -32,6 +32,7 @@ class UserInfo(db.Model):
     openid1 = db.Column(db.String(100))
     openid2 = db.Column(db.String(100))
     unionid = db.Column(db.String(100))
+    disable = db.Column(db.Boolean)
 
     userIp = db.relationship('UserIP', backref='UserInfo', lazy='dynamic')
 
@@ -41,7 +42,7 @@ class UserInfo(db.Model):
                  createTime=None, deviceID=None, code=None,
                  cityID=63, provinceID=10, companyName=None, jobPosition=None,
                  customizedCompanyID=None, userType=0, jobNumber=None,
-                 openid1=None, openid2=None, unionid=None):
+                 openid1=None, openid2=None, unionid=None, disable=False):
         self.userID = userID
         self.userName = userName
         self.password = password
@@ -64,6 +65,7 @@ class UserInfo(db.Model):
         self.openid1 = openid1
         self.openid2 = openid2
         self.unionid = unionid
+        self.disable = disable
 
     def __repr__(self):
         return self.userID
@@ -85,6 +87,7 @@ class UserInfo(db.Model):
         res['customizedCompanyID'] = userInfo.customizedCompanyID
         res['userType'] = userInfo.userType
         res['jobNumber'] = userInfo.jobNumber
+        res['disable'] = userInfo.disable
         return res
 
     @staticmethod
@@ -104,6 +107,7 @@ class UserInfo(db.Model):
         res['userTypeName'] = USER_TAG_DIC[userInfo.userType]
         res['tel'] = userInfo.tel
         res['jobNumber'] = userInfo.jobNumber
+        res['disable'] = userInfo.disable
         return res
 
     @staticmethod

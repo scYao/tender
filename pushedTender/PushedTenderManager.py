@@ -39,6 +39,7 @@ from models.TenderComment import TenderComment
 
 from message.MessageManager import MessageManager
 from user.UserManager import UserManager
+from user.UserBaseManager import UserBaseManager
 
 class PushedTenderManager(Util):
 
@@ -535,15 +536,17 @@ class PushedTenderManager(Util):
             if userID != '-1':
                 # 获取本人的, 或者获取某个人的
                 # 如果非经办人 不能看userID字段
-                if staffUserType == USER_TAG_OPERATOR:
-                    query = query.filter(PushedTenderInfo.userID == userID)
-                    countQuery = countQuery.filter(PushedTenderInfo.userID == userID)
-                elif staffUserType == USER_TAG_RESPONSIBLEPERSON:
-                    query = query.filter(PushedTenderInfo.responsiblePersonPushedTime != None)
-                    countQuery = countQuery.filter(PushedTenderInfo.responsiblePersonPushedTime != None)
-                elif staffUserType == USER_TAG_AUDITOR:
-                    query = query.filter(PushedTenderInfo.auditorPushedTime != None)
-                    countQuery = countQuery.filter(PushedTenderInfo.auditorPushedTime != None)
+                query = query.filter(PushedTenderInfo.userID == userID)
+                countQuery = countQuery.filter(PushedTenderInfo.userID == userID)
+                # if staffUserType == USER_TAG_OPERATOR:
+                #     query = query.filter(PushedTenderInfo.userID == userID)
+                #     countQuery = countQuery.filter(PushedTenderInfo.userID == userID)
+                # elif staffUserType == USER_TAG_RESPONSIBLEPERSON:
+                #     query = query.filter(PushedTenderInfo.responsiblePersonPushedTime != None)
+                #     countQuery = countQuery.filter(PushedTenderInfo.responsiblePersonPushedTime != None)
+                # elif staffUserType == USER_TAG_AUDITOR:
+                #     query = query.filter(PushedTenderInfo.auditorPushedTime != None)
+                #     countQuery = countQuery.filter(PushedTenderInfo.auditorPushedTime != None)
 
             else:
                 #  -1 就是获取该用户角色下能获取的
@@ -1135,21 +1138,21 @@ class PushedTenderManager(Util):
 
 
     def __getQuoteItem(self, info):
-        companyID = info['companyID']
         tenderID = info['tenderID']
-        userType = info['userType']
-        respResult = db.session.query(UserInfo).filter(and_(
-                UserInfo.customizedCompanyID == companyID,
-                UserInfo.userType == userType
-            )).first()
-        leaderUserID = respResult.userID
-        # # 测试期间使用
-        if userType == USER_TAG_BOSS:
-            leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f713213'
-        elif userType == USER_TAG_RESPONSIBLEPERSON:
-            leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62d723213'
-        elif userType == USER_TAG_AUDITOR:
-            leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f723213'
+        # respResult = db.session.query(UserInfo).filter(and_(
+        #         UserInfo.customizedCompanyID == companyID,
+        #         UserInfo.userType == userType
+        #     )).first()
+        # leaderUserID = respResult.userID
+        # # # 测试期间使用
+        # if userType == USER_TAG_BOSS:
+        #     leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f713213'
+        # elif userType == USER_TAG_RESPONSIBLEPERSON:
+        #     leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62d723213'
+        # elif userType == USER_TAG_AUDITOR:
+        #     leaderUserID = '2017-03-3011152863861f7ccd1b1b62b8d8f6b62f723213'
+        userBaseManager = UserBaseManager()
+        (status, userIDList) = userBaseManager.getUserIDListByType(info=info)
         quote = {}
         quote['quotedID'] = ''
         quote['fixedPrice'] = ''
@@ -1160,7 +1163,7 @@ class PushedTenderManager(Util):
         quote['description'] = ''
         respQResult = db.session.query(QuotedPrice).filter(and_(
             QuotedPrice.tenderID == tenderID,
-            QuotedPrice.userID == leaderUserID
+            QuotedPrice.userID.in_(tuple(userIDList))
         )).first()
         if respQResult is not None:
             quote['quotedID'] = respQResult.quotedID
