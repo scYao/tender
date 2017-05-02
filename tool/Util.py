@@ -138,6 +138,10 @@ class Util:
         resultID = ''.join(re.split(':', resultID))
         return resultID
 
+    def generateUnionID(self, value):
+        resultID = self.getMD5String(value)
+        return resultID
+
     def generateCode(self, value):
         code = (hex(int(value)).upper())[2:]
         return code
@@ -159,18 +163,19 @@ class Util:
                 createTime = result.createTime
                 validity = result.validity
                 intervalTime = validity - (now - createTime).total_seconds()
+                accessTokenID = result.accessTokenID
                 #如果已经过期，重新请求微信服务器获取
                 if intervalTime < INTERVALTIME:
+                    query.delete(synchronize_session=False)
                     (status, callBackInfo) = self.__getAccessToken()
-                    if status is True:
-                        updateInfo = {
-                                AccessToken.createTime: now,
-                                AccessToken.accessTokenID: callBackInfo['accessTokenID'],
-                                AccessToken.validity: callBackInfo['validity']
-                             },
-                        query.update(updateInfo, synchronize_session=False)
-                        db.session.commit()
-                    return (True, callBackInfo['accessTokenID'])
+                    accessTokenID = callBackInfo['accessTokenID']
+                    validity = callBackInfo['validity']
+                    accessToken = AccessToken(
+                        accessTokenID=accessTokenID, createTime=now, validity=validity
+                    )
+                    db.session.add(accessToken)
+                    db.session.commit()
+                    return (True, accessTokenID)
                 else:
                     return (True, result.accessTokenID)
             else:
@@ -200,6 +205,7 @@ class Util:
         callBackInfo['accessTokenID'] = urlResp['access_token']
         callBackInfo['validity'] = urlResp['expires_in']
         return (True, callBackInfo)
+
 
 
     def parseXmlData(self, xmlData):

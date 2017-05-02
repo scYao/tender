@@ -121,3 +121,34 @@ class UserInfo(db.Model):
         )
         db.session.add(userInfo)
         return (True, None)
+
+    @staticmethod
+    def createPublic(createInfo):
+        userInfo = UserInfo(
+            userID=createInfo['userID'], userName=createInfo['userName'],
+            tel=createInfo['tel'], createTime=createInfo['createTime'],
+            openid1=createInfo['openid1'], unionid = createInfo['unionid']
+        )
+        db.session.add(userInfo)
+        return (True, None)
+
+    @staticmethod
+    def createApplet(createInfo):
+        userInfo = UserInfo(
+            userID=createInfo['userID'], userName=createInfo['userName'],
+            tel=createInfo['tel'], createTime=createInfo['createTime'],
+            openid2=createInfo['openid2'], unionid = createInfo['unionid']
+        )
+        db.session.add(userInfo)
+        return (True, None)
+
+    @staticmethod
+    def createWeChat(createInfo):
+        userInfo = UserInfo(
+            userID=createInfo['userID'], userName=createInfo['userName'],
+            tel=createInfo['tel'], createTime=createInfo['createTime'],
+            openid1=createInfo['openid1'],openid2=createInfo['openid2'],
+            unionid = createInfo['unionid'],
+        )
+        db.session.add(userInfo)
+        return (True, None)

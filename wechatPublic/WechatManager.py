@@ -2,7 +2,6 @@
 import hashlib
 import json
 import urllib
-from tasks import add
 from tool.Util import Util
 
 class WechatManager(Util):
@@ -11,20 +10,15 @@ class WechatManager(Util):
         self.appSecret = 'ec37ced1ae89e57b250ac43493124823'
         self.accessToken = ''
 
-    #获取用户信息（网页授权）
-    def getOpenID(self):
-        redirect_uri = 'http://1b6d01ea.ngrok.io/callback'
-        response_type = 'code'
-        scope = 'snsapi_base'
-        state = '1234'
-        # postUrl = ("https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=%s&scope=%s&state=%s#wechat_redirect" %
-        #            (self.appID, redirect_uri, response_type, scope, state))
-        postUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect"
-        postUrl = ("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxe56d1e66d153e211&redirect_uri=http%3A%2F%2Fapi.fellowplus.com%2Fexam%2F&response_type=code&scope=snsapi_base&state=123#wechat_redirect")
+    #获取用户基本信息
+    def getUserInfo(self, openID):
+        (status, accessToken) = self.getAccessToken()
+        postUrl = ("https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=%s&lang=zh_CN" % (
+            accessToken, openID
+        ))
         urlResp = urllib.urlopen(postUrl)
         urlResp = json.loads(urlResp.read())
-        print urlResp
-        return (True, None)
+        return (True, urlResp)
 
     #获取用户信息的回调函数
     def callBack(self, jsonInfo):
@@ -35,18 +29,16 @@ class WechatManager(Util):
                    (self.appID, self.appSecret, code, grant_type))
         urlResp = urllib.urlopen(postUrl)
         urlResp = json.loads(urlResp.read())
-        print urlResp
         return (True, 'hello, sunshine!')
 
     #获取用户列表
-    def getUserList(self):
+    def wxGetUserInfoList(self, jsonInfo):
         (status, accessToken) = self.getAccessToken()
         if status is True:
             postUrl = ("https://api.weixin.qq.com/cgi-bin/user/get?access_token=%s" % accessToken)
             urlResp = urllib.urlopen(postUrl)
             urlResp = json.loads(urlResp.read())
-            print urlResp
-            return (True, None)
+            return (True, urlResp)
         else:
             return (False, None)
 
@@ -92,7 +84,7 @@ class WechatManager(Util):
 
     #test celery
     def testCelery(self):
-        add.delay(22, 33)
+        # add.delay(22, 33)
         return 'hello, sunshine!'
 
 

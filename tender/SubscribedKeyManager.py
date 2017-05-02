@@ -22,8 +22,6 @@ class SubscribedKeyManager(Util):
     def __init__(self):
         pass
 
-
-
     #创建订阅记录
     def createSubscribedKey(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -66,9 +64,6 @@ class SubscribedKeyManager(Util):
     #获取个人订阅信息
     def getSubscribeInfo(self, jsonInfo):
         #测试在小程序中获取微信公众号的信息
-        postUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxe56d1e66d153e211&redirect_uri=http://1b6d01ea.ngrok.io/callback/&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
-        urlResp = urllib.urlopen(postUrl)
-        print urlResp
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
