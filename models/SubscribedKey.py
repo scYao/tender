@@ -35,3 +35,7 @@ class SubscribedKey(db.Model):
         res['frequency'] = o.frequency
         res['pushType'] = o.pushType
         return res
+
+
+    def __repr__(self):
+        return self.subscribedID

@@ -149,6 +149,16 @@ create table tenderSlave(
     biddingNum nvarchar(100) comment '标段编号'
 );
 
+-- sts 临时授权访问
+create table stsToken(
+    tokenID nvarchar(100) primary key comment 'tokenID',
+    AccessKeySecret nvarchar(100) comment '临时密码',
+    AccessKeyId nvarchar(100) comment '临时id',
+    Expiration datetime comment '有效期',
+    SecurityToken nvarchar(1000) comment '临时token',
+    createTime datetime comment '创建时间'
+);
+
 ALTER TABLE province CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE city CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tender CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -164,7 +174,7 @@ ALTER TABLE Token CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE SmsCode CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE adminInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE tenderSlave CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
+ALTER TABLE stsToken CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table city add constraint city_FK_province foreign key(provinceID) references province(provinceID);
 alter table tender add constraint tender_FK_city foreign key(cityID) references city(cityID);

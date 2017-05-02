@@ -153,7 +153,12 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''	   disable boolean default false comment '是否被禁用'  '''
+    sql = ''' tokenID nvarchar(100) primary key comment 'tokenID',
+    AccessKeySecret nvarchar(100) comment '临时密码',
+    AccessKeyId nvarchar(100) comment '临时id',
+    Expiration datetime comment '有效期',
+    SecurityToken nvarchar(1000) comment '临时token',
+    createTime datetime comment '创建时间'  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)

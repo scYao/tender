@@ -496,20 +496,34 @@ import xapian
 
 
 if __name__ == '__main__':
-    testdatas = [u'abc test python1',u'abcd testing python2']
-    def buildtest():
-        database = xapian.WritableDatabase('indexes/', xapian.DB_CREATE_OR_OPEN)
-        indexer = xapian.TermGenerator()
-        stemmer = xapian.Stem("english")
-        indexer.set_stemmer(stemmer)
-        for data in testdatas:
-            doc = xapian.Document()
-            doc.set_data(data)
-            for term in data.split():
-                doc.add_term(term)
-            database.add_document(doc)
+    # testdatas = [u'abc test python1',u'abcd testing python2']
+    # def buildtest():
+    #     database = xapian.WritableDatabase('indexes/', xapian.DB_CREATE_OR_OPEN)
+    #     indexer = xapian.TermGenerator()
+    #     stemmer = xapian.Stem("english")
+    #     indexer.set_stemmer(stemmer)
+    #     for data in testdatas:
+    #         doc = xapian.Document()
+    #         doc.set_data(data)
+    #         for term in data.split():
+    #             doc.add_term(term)
+    #         database.add_document(doc)
+    #
+    # buildtest()
+    from aliyunsdkcore import client
+    from aliyunsdksts.request.v20150401 import AssumeRoleRequest
+    clt = client.AcsClient('LTAImKuptPCdzEDX', 'OH4e5QvhOHdI5jlWDa1YsW9heRTrVg', 'cn-hangzhou')
+    # clt = client.AcsClient('HReEC1sQufBRLcQC', '5rqWY7jXhGeF0HBhYpl10mSkgrrHZt', 'cn-hangzhou')
+    request = AssumeRoleRequest.AssumeRoleRequest()
+    # 指定角色
+    request.set_RoleArn('acs:ram::1406019938967626:role/tenderputrole')
+    # 设置会话名称，审计服务使用此名称区分调用者
+    request.set_RoleSessionName('tenderPutRole')
 
-    buildtest()
+    # 发起请求，并得到response
+    response = clt.do_action(request)
+
+    print response
 
     # get_all_pushed_list_by_boss()
     # get_news_detail_background()

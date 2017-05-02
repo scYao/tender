@@ -83,7 +83,6 @@ class PMAchievementManager(Util):
 
     # 获取项目经理业绩列表
     def getPMAchievementList(self, jsonInfo):
-        print jsonInfo
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
         (status, userID) = self.isTokenValid(tokenID)
@@ -113,7 +112,6 @@ class PMAchievementManager(Util):
             )
             dataList = [self.__generateAchievement(o=o) for o in allResult]
             count = countQuery.first()
-            print count
             if count is None:
                 count = 0
             else:
