@@ -1,5 +1,7 @@
 # coding=utf8
 from tool.Util import Util
+from celery_app import task1
+
 
 class WechatMessageManager(Util):
 
@@ -16,6 +18,7 @@ class WechatMessageManager(Util):
                 return self.sendTextMessage(info=messageInfo)
             elif type == 'event':
                 if messageInfo['event'] == 'subscribe':
+                    task1.createUser.apply_async(args=[messageInfo])
                     messageInfo['content'] = '欢迎订阅！'
                     return self.sendTextMessage(info=messageInfo)
             return 'success'

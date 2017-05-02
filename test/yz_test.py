@@ -834,6 +834,18 @@ def get_company_certificate_list():
     result = resultManager.getResult(params, upload_url)
     print result
 
+#获取公众号人员列表
+def wx_get_user_info_list():
+    opener = poster.streaminghttp.register_openers()
+    upload_url = 'http://%s:5007/wx_get_user_info_list/' % LOCALHOST
+    info = {}
+    params = {'data': json.dumps(info)}
+    resultManager = ResultManager()
+    result = resultManager.getResult(params, upload_url)
+    print result
+
+
+
 
 
 
@@ -842,6 +854,7 @@ def get_company_certificate_list():
 
 
 if __name__ == '__main__':
+    wx_get_user_info_list()
     # get_company_certificate_list()
     # get_tender_list()
     # gradeType = u'主项'
@@ -936,27 +949,27 @@ if __name__ == '__main__':
 #     # info['startIndex'] = 0
 #     # info['pageCount'] = 10
 #     # formatDic(info)
-    file_object = '''
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/xingcai" alt="">
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E8%8D%87%E8%8F%9C.png" alt="">
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E9%9B%8E%E9%B8%A01" alt="">
-<img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E9%9B%8E%E9%B8%A02" alt="">
-
-    '''
-
-    listInfo = file_object.splitlines()
-    if "<img" in listInfo[1]:
-        listInfo = filter(lambda x: x.strip() != '', listInfo)
-        for item in listInfo:
-            startIndex = item.index('http')
-            endIndex = item.index('" alt')
-            print "'" + item[startIndex: endIndex] + "'" + ","
-
-    else:
-        listInfo = filter(lambda x:x.strip() != '', listInfo)
-        # listInfo = filter(lambda x:print x, listInfo)
-        for item in listInfo:
-            print "'" + item.replace('<br>', '').strip() + "'" + ","
+#     file_object = '''
+# <img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/xingcai" alt="">
+# <img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E8%8D%87%E8%8F%9C.png" alt="">
+# <img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E9%9B%8E%E9%B8%A01" alt="">
+# <img class="songs-img" src="http://on2lyilwb.bkt.clouddn.com/%E9%9B%8E%E9%B8%A02" alt="">
+#
+#     '''
+#
+#     listInfo = file_object.splitlines()
+#     if "<img" in listInfo[1]:
+#         listInfo = filter(lambda x: x.strip() != '', listInfo)
+#         for item in listInfo:
+#             startIndex = item.index('http')
+#             endIndex = item.index('" alt')
+#             print "'" + item[startIndex: endIndex] + "'" + ","
+#
+#     else:
+#         listInfo = filter(lambda x:x.strip() != '', listInfo)
+#         # listInfo = filter(lambda x:print x, listInfo)
+#         for item in listInfo:
+#             print "'" + item.replace('<br>', '').strip() + "'" + ","
 #
 #
 #

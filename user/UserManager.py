@@ -642,19 +642,37 @@ class UserManager(Util):
                 encryptedData = encryptedData.encode('utf-8')
                 resultDict = self.decrypt(encryptedData, iv, sessionKey)
                 tokenManager = TokenManager()
-                tokenID = tokenManager.createToken(openID)
+                unionid = self.generateUnionID(resultDict['nickName'])
                 #查询是否存在已经创建的用户
-                allResult = db.session.query(UserInfo).filter(UserInfo.userID == openID).all()
-                if(len(allResult) < 1):
-                    now = datetime.now()
-                    uInfo = {}
-                    uInfo['url'] = resultDict['avatarUrl']
-                    uInfo['userName'] = resultDict['nickName']
-                    userInfo = UserInfo(userID=openID, userName=resultDict['nickName'],
-                                        gender=resultDict['gender'], createTime=now)
-                    db.session.add(userInfo)
+                query = db.session.query(UserInfo).filter(UserInfo.unionid == unionid)
+                result = query.first()
+                userQuery = query.filter(UserInfo.openid2 == openID)
+                userResult = userQuery.first()
+                if userResult is not None:
+                    #第一种情况，用户已经登录过小程序
+                    userID = userResult.userID
+                else:
+
+                    #第二种情况，用户登录过公众号， 小程序为第一次登录
+                    userID = self.generateID(openID)
+                    if result is not None:
+                        updateInfo = {
+                            UserInfo.userID: userID,
+                            UserInfo.openid2: openID
+                        }
+                        query.update(updateInfo, synchronize_session=False)
+                    else:
+                        #第三种情况，用户没有登录过公众号， 小程序为第一次登录
+                        createInfo = {}
+                        createInfo['userID'] = userID
+                        createInfo['userName'] = resultDict['nickName']
+                        createInfo['tel'] = ''
+                        createInfo['openid2'] = openID
+                        createInfo['createTime'] = datetime.now()
+                        createInfo['unionid'] = self.generateUnionID(resultDict['nickName'])
+                        UserInfo.createApplet(createInfo=createInfo)
                 db.session.commit()
-                resultDict['tokenID'] = tokenID
+                tokenID = tokenManager.createToken(userID=userID)
                 return (True, tokenID)
         else:
             return (False, None)

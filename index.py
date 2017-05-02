@@ -47,25 +47,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-
-@app.route('/wx', methods=['POST', 'GET'])
-def wx():
-    wechatMessageManager = WechatMessageManager()
-    wechatManager = WechatManager()
-    if request.method == 'POST':
-        xmlData = request.get_data()
-        return wechatMessageManager.getMessageInfo(xmlData=xmlData)
-
-    elif request.method == 'GET':
-        paramsJson = {}
-        paramsJson['signature'] = request.args.get('signature')
-        paramsJson['timestamp'] = request.args.get('timestamp')
-        paramsJson['nonce'] = request.args.get('nonce')
-        paramsJson['echostr'] = request.args.get('echostr')
-        paramsJson = json.dumps(paramsJson)
-        (status, ret) = wechatManager.login(jsonInfo=paramsJson)
-        return ret
-
 # 管理员登录，后台管理
 @app.route('/administrator_login_background/', methods=['POST', 'GET'])
 def administrator_login_background():
@@ -2941,6 +2922,42 @@ def get_subscribe_info():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = subscribedKeyManager.getSubscribeInfo(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+#==========================================
+#微信公众号，自动回复接口
+@app.route('/wx', methods=['POST', 'GET'])
+def wx():
+    wechatMessageManager = WechatMessageManager()
+    wechatManager = WechatManager()
+    if request.method == 'POST':
+        xmlData = request.get_data()
+        return wechatMessageManager.getMessageInfo(xmlData=xmlData)
+
+    elif request.method == 'GET':
+        paramsJson = {}
+        paramsJson['signature'] = request.args.get('signature')
+        paramsJson['timestamp'] = request.args.get('timestamp')
+        paramsJson['nonce'] = request.args.get('nonce')
+        paramsJson['echostr'] = request.args.get('echostr')
+        paramsJson = json.dumps(paramsJson)
+        (status, ret) = wechatManager.login(jsonInfo=paramsJson)
+        return ret
+
+#获取公众号人员列表
+@app.route('/wx_get_user_info_list/', methods=['POST', 'GET'])
+def wx_get_user_info_list():
+    wechatManager = WechatManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = wechatManager.wxGetUserInfoList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
