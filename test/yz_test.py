@@ -8,10 +8,12 @@ import datetime
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
+import jieba
 import urllib2
 import poster as poster
 from test_by_yz_config import ResultManager
 from bs4 import BeautifulSoup
+import re
 
 # LOCALHOST = '127.0.0.1'
 # LOCALHOST = '192.168.30.150'
@@ -424,9 +426,9 @@ def search():
     info['pageCount'] = 10
     info['startDate'] = '-1'
     info['endDate'] = '-1'
-    info['cityID'] = '69'
+    info['cityID'] = '63'
     info['tokenID'] = YZTOKENID
-    info['searchKey'] = '光明粮食'
+    info['searchKey'] = '六合区'
     params = {'data': json.dumps(info)}
     resultManager = ResultManager()
     result = resultManager.getResult(params, upload_url)
@@ -854,7 +856,33 @@ def wx_get_user_info_list():
 
 
 if __name__ == '__main__':
-    wx_get_user_info_list()
+    postDic = {}
+    postData = {}
+    postData['touser'] = '1111'
+    postData['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
+    postData['url'] = 'http://weixin.qq.com/download'
+    postData['data'] = {len(postDic): '----'}
+    postDic = {'11111': postData}
+    postData1 = {}
+    postData1['touser'] = '1111'
+    postData1['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
+    postData1['url'] = 'http://weixin.qq.com/download'
+    postData1['data'] = {len(postDic): '======'}
+    postDic['11111']['data'].update(postData1['data'])
+    print postDic
+    # title = u'（六合分中心）六合区小北门路（长江路至棠城西路）道路改造工程监理'
+    # title = re.sub(r'[\[\]（）]', ' ', title)
+    # print title
+    # fenciList = jieba.cut_for_search(title)
+    #
+    # def generate(result):
+    #     if result.strip() != '':
+    #         print '====', result
+    #
+    #
+    # [generate(result) for result in fenciList]
+    # search()
+    # wx_get_user_info_list()
     # get_company_certificate_list()
     # get_tender_list()
     # gradeType = u'主项'

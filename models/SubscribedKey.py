@@ -26,6 +26,19 @@ class SubscribedKey(db.Model):
         self.pushType = pushType
 
     @staticmethod
+    def create(createInfo):
+        subscribedKey = SubscribedKey(
+            subscribedID=createInfo['subscribedID'],
+            userID=createInfo['userID'],
+            keywords=createInfo['keywords'],
+            createTime=createInfo['createTime'],
+            frequency=createInfo['frequency'],
+            pushType=createInfo['pushType']
+        )
+        db.session.add(subscribedKey)
+        return (True, None)
+
+    @staticmethod
     def generate(o):
         res = {}
         res['subscribedID'] = o.subscribedID
