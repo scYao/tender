@@ -2979,7 +2979,7 @@ def get_wechat_subscribe_list():
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
-        return json.dumps(data)        return json.dumps(data)
+        return json.dumps(data)
 
 
 # 获取sts token
