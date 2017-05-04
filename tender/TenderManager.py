@@ -26,6 +26,7 @@ from tool.tagconfig import SEARCH_KEY_TAG_TENDRE, PUSH_TENDER_INFO_TAG_TENDER
 from sqlalchemy import desc, and_, func
 from user.AdminManager import AdminManager
 from bs4 import BeautifulSoup
+from celery_app import task1
 
 class TenderManager(Util):
     def __init__(self):
@@ -144,12 +145,12 @@ class TenderManager(Util):
             info['foreignID'] = info['tenderID']
             info['tag'] = SEARCH_KEY_TAG_TENDRE
             now = datetime.now()
-
             info['createTime'] = str(now)
             info['joinID'] = self.generateID(info['title'])
-
             SearchKey.createSearchInfo(info=info)
             db.session.commit()
+            task1.createWeChatPush.apply_async(args=[info])
+
         except Exception as e:
             print str(e)
             # traceback.print_stack()

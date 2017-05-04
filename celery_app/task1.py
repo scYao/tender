@@ -1,5 +1,6 @@
 #coding: utf-8
-
+import urllib
+import json
 from datetime import datetime
 from celery_app import app
 from models.UserInfo import UserInfo
@@ -12,8 +13,10 @@ from models.Candidate import Candidate
 from models.SubscribedKey import SubscribedKey
 from models.Favorite import Favorite
 from models.Token import Token
+from models.WeChatPush import WeChatPush
 from models.flask_app import db
 from wechatPublic.WechatManager import WechatManager
+from tender.SubscribedKeyManager import SubscribedKeyManager
 from tool.Util import Util
 
 #创建用户(公众号）
@@ -70,5 +73,55 @@ def createUser(info):
             db.session.commit()
         except Exception, Argument:
             return (False, Argument)
+
+
+#创建推送信息
+@app.task
+def createWeChatPush(info):
+    subscribedKeyManager = SubscribedKeyManager()
+    return subscribedKeyManager.createWeChatSubscriberList(info=info)
+
+
+#公众号推送
+@app.task
+def pushTemplateMessage():
+    util = Util()
+    (status, accessToken) = util.getAccessToken()
+    query = db.session.query(
+        WeChatPush, UserInfo, Tender
+    ).outerjoin(
+        UserInfo, WeChatPush.toUserID == UserInfo.userID
+    ).outerjoin(
+        Tender, WeChatPush.tenderID == Tender.tenderID
+    ).group_by(WeChatPush.toUserID)
+    allResult = query.all()
+    postDic = {}
+    def generate(result):
+        index = len(postDic)
+        userInfo = result.UserInfo
+        tender = result.Tender
+        userID = userInfo.openid1
+        postData = {}
+        postData['touser'] = userID
+        postData['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
+        postData['url'] = 'http://weixin.qq.com/download'
+        postData['data'] = {index: tender.title}
+        if not postDic.has_key(userID):
+            postDic[userID] = postData
+        else:
+            postDic[userID]['data'].update(postData['data'])
+    [generate(result) for result in allResult]
+
+    for key, value in postDic.iteritems():
+        postData = json.dumps(value)
+        print '====', postData
+        postUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s" % accessToken
+        urlResp = urllib.urlopen(url=postUrl, data=postData)
+        urlResp = json.loads(urlResp.read())
+        return (True, urlResp)
+
+
+
+
 
 
