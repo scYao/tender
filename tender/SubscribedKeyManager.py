@@ -13,14 +13,18 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import json
 import urllib
+from sqlalchemy import desc, and_, func
 from models.flask_app import db, cache
 from datetime import datetime, timedelta
 from tool.Util import Util
 from tool.config import ErrorInfo
 from models.SubscribedKey import SubscribedKey
 from models.SearchKey import SearchKey
+from models.City import City
 from models.WeChatPush import WeChatPush
-from sqlalchemy import desc, and_
+from models.Tender import Tender
+from models.WeChatPushHistory import WeChatPushHistory
+from models.UserInfo import UserInfo
 from tool.tagconfig import SEARCH_KEY_TAG_SUBSCRIBE
 
 class SubscribedKeyManager(Util):
@@ -144,3 +148,51 @@ class SubscribedKeyManager(Util):
             return (True, None)
         except Exception, Argument:
             return (False, Argument)
+
+    #获取订阅列表（小程序使用）
+    def getWeChatSubscribeList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        try:
+            pushQuery = db.session.query(
+                WeChatPushHistory, Tender, City
+            ).outerjoin(
+                Tender, WeChatPushHistory.tenderID == Tender.tenderID
+            ).outerjoin(
+                City, City.cityID == Tender.cityID
+            ).filter(
+                WeChatPushHistory.toUserID == userID
+            )
+            allResult = pushQuery.offset(startIndex).limit(pageCount).all()
+            tenderList = [self.__generateTender(t=t) for t in allResult]
+            countQuery = db.session.query(
+                func.count(WeChatPushHistory.pushedID)
+            ).filter(
+                WeChatPushHistory.toUserID == userID
+            )
+            count = countQuery.first()
+            callBackInfo = {}
+            callBackInfo['dataList'] = tenderList
+            callBackInfo['count'] = count[0]
+            return (True, callBackInfo)
+
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+
+    def __generateTender(self, t):
+        res = {}
+        res.update(Tender.generateBrief(tender=t.Tender))
+        res.update(City.generate(city=t.City))
+        return res
+

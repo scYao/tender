@@ -2966,6 +2966,22 @@ def wx_get_user_info_list():
         return json.dumps(data)
 
 
+#小程序使用，获取我的订阅列表
+@app.route('/get_wechat_subscribe_list/', methods=['POST', 'GET'])
+def get_wechat_subscribe_list():
+    subscribedKeyManager = SubscribedKeyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = subscribedKeyManager.getWeChatSubscribeList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)        return json.dumps(data)
+
+
 # 获取sts token
 @app.route('/get_sts_token_info/', methods=['POST', 'GET'])
 def get_sts_token_info():
