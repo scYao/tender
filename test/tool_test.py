@@ -54,6 +54,7 @@ def sql_to_model_members(info):
     typeDic['date'] = 'Date'
     typeDic['datetime'] = 'DateTime'
     typeDic['bool'] = 'Boolean'
+    typeDic['boolean'] = 'Boolean'
     typeDic['bigint'] = 'BigInteger'
     typeDic['int'] = 'Integer'
     typeDic['smallint'] = 'Integer'
@@ -95,13 +96,20 @@ def sql_to_model_init(info):
         name = words[0]
         stype = words[1]
 
+        default = 'None'
 
-        if 'int' in stype or 'float' == stype or 'double' == stype:
-            default = '0'
-        elif 'bool' == stype:
-            default = 'False'
-        else:
-            default = 'None'
+        try:
+            index = words.index('default')
+            index = index + 1
+            default = words[index]
+            print default
+        except Exception as e:
+            if 'int' in stype or 'float' == stype or 'double' == stype:
+                default = '0'
+            elif 'bool' == stype:
+                default = 'False'
+            else:
+                default = 'None'
 
 
         template = ' %s=%s' % (name, default)
@@ -153,12 +161,9 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = ''' tokenID nvarchar(100) primary key comment 'tokenID',
-    AccessKeySecret nvarchar(100) comment '临时密码',
-    AccessKeyId nvarchar(100) comment '临时id',
-    Expiration datetime comment '有效期',
-    SecurityToken nvarchar(1000) comment '临时token',
-    createTime datetime comment '创建时间'  '''
+    sql = ''' superID nvarchar(100) default '-1' comment '上级ID'',
+	isDirectory boolean default false comment '是否是文件夹',
+	privateLevel int default 0 comment '私密等级, 0 代表public'  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)
@@ -172,3 +177,4 @@ if __name__ == '__main__':
     sql_to_generate_info(sql)
     print '\n'
     sql_to_create_info(sql)
+
