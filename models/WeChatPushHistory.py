@@ -6,8 +6,8 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 from flask_app import db
 
-class WeChatPush(db.Model):
-    __tablename__ = 'WeChatPush'
+class WeChatPushHistory(db.Model):
+    __tablename__ = 'WeChatPushHistory'
     pushedID = db.Column(db.String(100), primary_key=True)
     tenderID = db.Column(db.String(100))
     toUserID = db.Column(db.String(100))
@@ -22,6 +22,16 @@ class WeChatPush(db.Model):
         self.toUserID = toUserID
         self.createTime = createTime
         self.publishTime = publishTime
+
+    @staticmethod
+    def create(createInfo):
+        weChatPushHistory = WeChatPushHistory(
+            pushedID=createInfo['pushedID'], tenderID=createInfo['tenderID'],
+            toUserID=createInfo['toUserID'], createTime=createInfo['createTime'],
+            publishTime=createInfo['publishTime'],
+        )
+        db.session.add(weChatPushHistory)
+        return (True, None)
 
     def __repr__(self):
         return self.pushedID

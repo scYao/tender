@@ -11,6 +11,7 @@ from models.WinBiddingPub import WinBiddingPub
 from models.UserIP import UserIP
 from models.Candidate import Candidate
 from models.SubscribedKey import SubscribedKey
+from models.WeChatPushHistory import WeChatPushHistory
 from models.Favorite import Favorite
 from models.Token import Token
 from models.WeChatPush import WeChatPush
@@ -103,6 +104,7 @@ def pushTemplateMessage():
         userID = userInfo.openid1
         postData = {}
         postData['touser'] = userID
+        postData['userid'] = userInfo.userID
         postData['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
         postData['url'] = 'http://weixin.qq.com/download'
         postData['data'] = {index: tender.title}
@@ -113,8 +115,24 @@ def pushTemplateMessage():
     [generate(result) for result in allResult]
 
     for key, value in postDic.iteritems():
+        #更新推送历史
+        toUserID = value['userid']
+        publishTime = datetime.now()
+        pushQuery = db.session.query(WeChatPush).filter(
+            WeChatPush.toUserID == toUserID
+        )
+        pushAllResult = pushQuery.all()
+        for result in pushAllResult:
+            createInfo = {}
+            createInfo['pushedID'] = result.pushedID
+            createInfo['tenderID'] = result.tenderID
+            createInfo['toUserID'] = result.toUserID
+            createInfo['createTime'] = result.createTime
+            createInfo['publishTime'] = publishTime
+            WeChatPushHistory.create(createInfo=createInfo)
+        pushQuery.delete(synchronize_session=False)
+        db.session.commit()
         postData = json.dumps(value)
-        print '====', postData
         postUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s" % accessToken
         urlResp = urllib.urlopen(url=postUrl, data=postData)
         urlResp = json.loads(urlResp.read())
