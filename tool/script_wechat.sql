@@ -1,6 +1,7 @@
 -- 公众号接口中参数accseeToken
 create table accessToken(
-	accessTokenID nvarchar(200) primary key comment '获取到的凭证',
+    tokenID nvarchar(100) primary key comment '主键',
+	accessTokenID nvarchar(200)  comment '获取到的凭证',
 	validity int comment '凭证有效时间，单位：秒',
     createTime datetime comment '创建时间'
 );
