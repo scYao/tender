@@ -89,8 +89,8 @@ class FileInfoManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
 
-        if superID != '-1':
-            query = query.filter(FileInfo.superID == superID)
+        query = query.filter(FileInfo.superID == superID)
+        countQuery = countQuery.filter(FileInfo.superID == superID)
 
         query = query.order_by(desc(
             FileInfo.createTime
@@ -148,6 +148,9 @@ class FileInfoManager(Util):
             dataResult = query.first()
 
             if dataResult is None:
+                return (False, ErrorInfo['TENDER_40'])
+            # 文件夹暂时不让删除
+            if dataResult.isDirectory is True:
                 return (False, ErrorInfo['TENDER_40'])
             filePath = dataResult.filePath
             deleteList = ['files/%s' % filePath]
