@@ -70,7 +70,7 @@ def createUser(info):
                 ).delete(synchronize_session=False)
             else:
                 # 第二种情况，用户没有登录过小程序
-                createInfo = {}
+                # createInfo = {}
                 UserInfo.createPublic(createInfo=createInfo)
             db.session.commit()
         except Exception, Argument:
