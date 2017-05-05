@@ -224,6 +224,24 @@ ErrorInfo['TENDER_37'] = {
     'zhInfo' : '用户可能已经存在账户, 或者已经是其他公司的员工!'
 }
 
+ErrorInfo['TENDER_38'] = {
+    'code' : 'TENDER_38',
+    'info' : 'get sts token error!',
+    'zhInfo' : '获取Sts token错误!'
+}
+
+ErrorInfo['TENDER_39'] = {
+    'code' : 'TENDER_39',
+    'info' : 'can not delete file!',
+    'zhInfo' : '没有删除文件的权限!'
+}
+
+ErrorInfo['TENDER_40'] = {
+    'code' : 'TENDER_40',
+    'info' : 'no such file!',
+    'zhInfo' : '没有该文件!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

@@ -41,6 +41,8 @@ from user.UserBaseManager import UserBaseManager
 from tender.SubscribedKeyManager import SubscribedKeyManager
 from wechatPublic.WechatManager import WechatManager
 from wechatPublic.WechatMessageManager import WechatMessageManager
+from stoken.StsTokenManager import StsTokenManager
+from fileInfo.FileInfoManager import FileInfoManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -2978,6 +2980,70 @@ def get_wechat_subscribe_list():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+
+# 获取sts token
+@app.route('/get_sts_token_info/', methods=['POST', 'GET'])
+def get_sts_token_info():
+    stsTokenManager = StsTokenManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = stsTokenManager.getStsTokenInfo(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 用户获取文件列表
+@app.route('/get_file_list_by_user/', methods=['POST', 'GET'])
+def get_file_list_by_user():
+    fileInfoManager = FileInfoManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = fileInfoManager.getFileListByUser(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 用户上传
+@app.route('/create_file_info/', methods=['POST', 'GET'])
+def create_file_info():
+    fileInfoManager = FileInfoManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = fileInfoManager.createFileInfo(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 用户删除文件
+@app.route('/delete_file_by_user/', methods=['POST', 'GET'])
+def delete_file_by_user():
+    fileInfoManager = FileInfoManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = fileInfoManager.deleteFileByUser(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
 
 #创建自定义菜单
 @app.route('/create_menu/', methods=['POST', 'GET'])
