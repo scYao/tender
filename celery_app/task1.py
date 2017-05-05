@@ -15,11 +15,13 @@ from models.WeChatPushHistory import WeChatPushHistory
 from models.Favorite import Favorite
 from models.Token import Token
 from models.WeChatPush import WeChatPush
+from models.SearchKey import SearchKey
 from models.flask_app import db
 from wechatPublic.WechatManager import WechatManager
 from tender.SubscribedKeyManager import SubscribedKeyManager
 from tool.Util import Util
-from tool.tagconfig import TEMPLATEID, MINIAPPID
+from tool.tagconfig import TEMPLATEID, MINIAPPID, SEARCH_KEY_TAG_SUBSCRIBE
+from sqlalchemy import and_
 
 #创建用户(公众号）
 @app.task
@@ -64,6 +66,11 @@ def createUser(info):
                 db.session.query(Token).filter(
                     Token.userID == appUserID
                 ).update({Token.userID: userID}, synchronize_session=False)
+                # search key update
+                db.session.query(SearchKey).filter(
+                    and_(SearchKey.tag == SEARCH_KEY_TAG_SUBSCRIBE,
+                         SearchKey.foreignID == appUserID)
+                ).update({SearchKey.foreignID: userID}, synchronize_session=False)
                 #(5)删除userInfo中的appUserID
                 db.session.query(UserInfo).filter(
                     UserInfo.userID == appUserID
