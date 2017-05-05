@@ -170,8 +170,10 @@ class Util:
                     (status, callBackInfo) = self.__getAccessToken()
                     accessTokenID = callBackInfo['accessTokenID']
                     validity = callBackInfo['validity']
+                    tokenID = self.generateID(accessTokenID)
                     accessToken = AccessToken(
-                        accessTokenID=accessTokenID, createTime=now, validity=validity
+                        tokenID=tokenID, accessTokenID=accessTokenID,
+                        createTime=now, validity=validity
                     )
                     db.session.add(accessToken)
                     db.session.commit()
