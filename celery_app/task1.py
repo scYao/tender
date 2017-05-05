@@ -19,6 +19,7 @@ from models.flask_app import db
 from wechatPublic.WechatManager import WechatManager
 from tender.SubscribedKeyManager import SubscribedKeyManager
 from tool.Util import Util
+from tool.tagconfig import TEMPLATEID, MINIAPPID
 
 #创建用户(公众号）
 @app.task
@@ -105,13 +106,17 @@ def pushTemplateMessage():
         postData = {}
         postData['touser'] = userID
         postData['userid'] = userInfo.userID
-        postData['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
+        postData['template_id'] = TEMPLATEID
         postData['url'] = 'http://weixin.qq.com/download'
-        postData['data'] = {index: tender.title}
+        postData['miniprogram'] = {
+             "appid": MINIAPPID,
+             "pagepath":"pages/myFavorite/myFavorite"
+        }
+        postData['remark'] = {index: tender.title}
         if not postDic.has_key(userID):
             postDic[userID] = postData
         else:
-            postDic[userID]['data'].update(postData['data'])
+            postDic[userID]['remark'].update(postData['remark'])
     [generate(result) for result in allResult]
 
     for key, value in postDic.iteritems():
@@ -132,6 +137,21 @@ def pushTemplateMessage():
             WeChatPushHistory.create(createInfo=createInfo)
         pushQuery.delete(synchronize_session=False)
         db.session.commit()
+        value['data'] = {
+            "first": {
+                "value": "最新提醒！"
+            },
+            "keyword1": {
+                "value": "订阅提醒"
+            },
+            "keyword2": {
+                "value": "最新",
+            },
+            "remark": {
+                "value": value['remark'],
+                "color": "#1ebdff"
+            }
+        }
         postData = json.dumps(value)
         postUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s" % accessToken
         urlResp = urllib.urlopen(url=postUrl, data=postData)

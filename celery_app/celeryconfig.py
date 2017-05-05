@@ -14,14 +14,19 @@ CELERY_IMPORTS = (                                  # 指定导入的任务模�
 
 # schedules
 CELERYBEAT_SCHEDULE = {
-    'add-every-30-seconds': {
-         'task': 'celery_app.task2.pushTemplateMessage',
-         'schedule': timedelta(minutes=1),       # 每 30 秒执行一次
-         'args': ()                           # 任务函数参数
+    # 'add-every-30-seconds': {
+    #      'task': 'celery_app.task2.pushTemplateMessage',
+    #      'schedule': timedelta(hours=12),       # 每 30 秒执行一次
+    #      'args': ()                           # 任务函数参数
+    # },
+    'multiply-at-morning-time': {
+        'task': 'celery_app.task2.pushTemplateMessage',
+        'schedule': crontab(hour=9, minute=00),   # 每天早上 9 点执行一次
+        'args': ()                                # 任务函数参数
     },
-    # 'multiply-at-some-time': {
-    #     'task': 'celery_app.task2.multiply',
-    #     'schedule': crontab(hour=9, minute=50),   # 每天早上 9 点 50 分执行一次
-    #     'args': (3, 7)                            # 任务函数参数
-    # }
+    'multiply-at-afternoon-time': {
+        'task': 'celery_app.task2.pushTemplateMessage',
+        'schedule': crontab(hour=15, minute=04),  # 每天早上 17 点 执行一次
+        'args': ()  # 任务函数参数
+    }
 }

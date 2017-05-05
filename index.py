@@ -2978,3 +2978,18 @@ def get_wechat_subscribe_list():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+#创建自定义菜单
+@app.route('/create_menu/', methods=['POST', 'GET'])
+def create_menu():
+    wechatManager = WechatManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = wechatManager.createMenu(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)

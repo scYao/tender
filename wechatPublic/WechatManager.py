@@ -6,9 +6,10 @@ from tool.Util import Util
 
 class WechatManager(Util):
     def __init__(self):
-        self.appID = 'wxe56d1e66d153e211'
-        self.appSecret = 'ec37ced1ae89e57b250ac43493124823'
-        self.accessToken = ''
+        # self.appID = 'wxe56d1e66d153e211'
+        # self.appSecret = 'ec37ced1ae89e57b250ac43493124823'
+        self.appID = 'wx6b06cac8fee40771'
+        self.appSecret = 'd6e12e186ec9e1dbf756f5cb3395b622'
 
     #获取用户基本信息
     def getUserInfo(self, openID):
@@ -90,7 +91,7 @@ class WechatManager(Util):
 
 if __name__ == '__main__':
     weChatManager = WechatManager()
-    weChatManager.getUserList()
+    # weChatManager.getUserList()
     # weChatManager.testCelery()
     # wechatPublic.getOpenID()
     # wechatPublic.getAccessToken()
@@ -102,44 +103,45 @@ if __name__ == '__main__':
     # }
     # """
     # wechatPublic.pushTemplateMessage(postData=postData)
-    # postData = """
-    #   {
-    #       "button":
-    #       [
-    #           {
-    #            "type":"view",
-    #            "name":"搜索",
-    #            "url":"http://mp.weixin.qq.com"
-    #           },
-    #           {
-    #              "type":"view",
-    #              "name":"订阅",
-    #              "url":"http://www.soso.com/"
-    #           },
-    #           {
-    #               "name": "关于",
-    #               "sub_button":
-    #               [
-    #                   {
-    #                      "type":"view",
-    #                      "name":"关于我们",
-    #                      "url":"http://www.soso.com/"
-    #                   },
-    #                   {
-    #                       "type": "view",
-    #                       "name": "使用技巧",
-    #                       "url": "http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1418702138&token=&lang=zh_CN"
-    #                   },
-    #                   {
-    #                       "type": "view",
-    #                       "name": "意见反馈",
-    #                       "url": "http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1433747234&token=&lang=zh_CN"
-    #                   }
-    #               ]
-    #           }
-    #         ]
-    #   }
-    #   """
+    postData = {}
+    postData['button'] = [
+        {
+            "type": "miniprogram",
+            "name": "搜索",
+            "url": "http://mp.weixin.qq.com",
+            "appid": "wx3f8eb38c63060bf4",
+            "pagepath": "pages/index/index"
+        },
+        {
+            "type": "miniprogram",
+            "name": "订阅",
+            "url": "http://mp.weixin.qq.com",
+            "appid": "wx3f8eb38c63060bf4",
+            "pagepath": "pages/subscribe/subscribe"
+        }
+    ]
+
+    postData = """
+      {
+          "button":
+          [
+              {
+                "type":"miniprogram",
+                "name":"搜索",
+                "url":"http://mp.weixin.qq.com",
+                "appid":"wx3f8eb38c63060bf4",
+                "pagepath":"pages/index/index"
+              },
+              {
+                "type":"miniprogram",
+                "name":"订阅",
+                "url":"http://mp.weixin.qq.com",
+                "appid":"wx3f8eb38c63060bf4",
+                "pagepath":"pages/subscribe/subscribe"
+              }
+            ]
+      }
+      """
  #    postData = """
  #     {
  #     "button":[
