@@ -3,13 +3,18 @@ import hashlib
 import json
 import urllib
 from tool.Util import Util
+from tool.tagconfig import PUBLICAPPID
+from tool.tagconfig import PUBLICSECRET
+
 
 class WechatManager(Util):
     def __init__(self):
         # self.appID = 'wxe56d1e66d153e211'
         # self.appSecret = 'ec37ced1ae89e57b250ac43493124823'
-        self.appID = 'wx6b06cac8fee40771'
-        self.appSecret = 'd6e12e186ec9e1dbf756f5cb3395b622'
+        # self.appID = 'wx6b06cac8fee40771'
+        # self.appSecret = 'd6e12e186ec9e1dbf756f5cb3395b622'
+        self.appID = PUBLICAPPID
+        self.appSecret = PUBLICSECRET
 
     #获取用户基本信息
     def getUserInfo(self, openID):
