@@ -193,7 +193,7 @@ class Util:
 
         except Exception as e:
             print e
-            errorInfo = ErrorInfo['SPORTS_02']
+            errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
