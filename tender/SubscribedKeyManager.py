@@ -44,9 +44,13 @@ class SubscribedKeyManager(Util):
         pushType = info['mode']
         #删除之前的订阅信息
         try:
+            searchQuery = db.session.query(SearchKey).filter(
+                SearchKey.foreignID == userID
+            )
             query = db.session.query(SubscribedKey).filter(
                 SubscribedKey.userID == userID
             )
+            searchQuery.delete(synchronize_session=False)
             query.delete(synchronize_session=False)
             def create(keywords):
                 keywords = keywords.strip()
