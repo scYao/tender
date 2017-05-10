@@ -242,6 +242,12 @@ ErrorInfo['TENDER_40'] = {
     'zhInfo' : '没有该文件!'
 }
 
+ErrorInfo['TENDER_41'] = {
+    'code' : 'TENDER_41',
+    'info' : 'user is not boss!',
+    'zhInfo' : '用户不是审定人!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

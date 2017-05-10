@@ -365,3 +365,25 @@ class BossManager(UserBaseManager):
         info['userType'] = USER_TAG_BOSS
         jsonInfo = json.dumps(info)
         return self.createOperationBiddingBook(jsonInfo=jsonInfo, imgFileList=imgFileList)
+
+    def disableUserByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        paramInfo = {}
+        paramInfo['userID'] = userID
+        (status, userInfo) = self.getUserInfo(info=paramInfo)
+        if status is False:
+            return (False, userInfo)
+
+        userType = userInfo['userType']
+        if userType != USER_TAG_BOSS:
+            return (False, ErrorInfo['TENDER_41'])
+
+
+        return self.updateUserDisableInfo(info=info)
+

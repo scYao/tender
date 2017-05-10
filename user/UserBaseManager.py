@@ -1,15 +1,13 @@
 # coding=utf8
 import sys
 import json
-from tender.CustomizedTenderManager import CustomizedTenderManager
-
-from user.UserManager import UserManager
 
 sys.path.append("..")
 import os, random, requests
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+import traceback
 from datetime import datetime
 from sqlalchemy import and_, text, func, desc
 
@@ -121,3 +119,21 @@ class UserBaseManager(Util):
         userIDList = [o.userID for o in allResult]
 
         return (True, userIDList)
+
+
+    def updateUserDisableInfo(self, info):
+        userID = info['userID']
+        disable = info['disable']
+        try:
+            db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).update({
+                UserInfo.disable : disable
+            }, synchronize_session=False)
+        except Exception as e:
+            print e
+            traceback.print_stack()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
