@@ -114,8 +114,8 @@ def deleteUser(info):
             WeChatPushHistory.toUserID == userID
         ).delete(synchronize_session=False)
         db.session.commit()
-    except Exception, Argument:
-        return (False, Argument)
+    except Exception as e:
+        return (False, str(e))
 
 
 #创建推送信息
