@@ -21,6 +21,9 @@ class WechatMessageManager(Util):
                     task1.createUser.apply_async(args=[messageInfo])
                     messageInfo['content'] = '欢迎关注！'
                     return self.sendTextMessage(info=messageInfo)
+                elif messageInfo['event'] == 'unsubscribe':
+                    task1.deleteUser.apply_async(args=[messageInfo])
+                    return 'success'
             return 'success'
         else:
             return 'success'

@@ -85,6 +85,38 @@ def createUser(info):
             return (False, Argument)
 
 
+#公众号取消关注
+#创建用户(公众号）
+@app.task
+def deleteUser(info):
+    wechatManager = WechatManager()
+    util = Util()
+    openID = info['fromUserName']
+    try:
+        query = db.session.query(UserInfo).filter(UserInfo.openid1 == openID)
+        result = query.first()
+        userID = result.userID
+        #(1)删除subscribedKey表
+        db.session.query(SubscribedKey).filter(
+            SubscribedKey.userID == userID
+        ).delete(synchronize_session=False)
+        #(2)删除searchKey表
+        db.session.query(SearchKey).filter(
+            SearchKey.foreignID == userID
+        ).delete(synchronize_session=False)
+        # (3) 删除wechatPush表
+        db.session.query(WeChatPush).filter(
+            WeChatPush.toUserID == userID
+        ).delete(synchronize_session=False)
+        # (4) 删除wechatPushHistory表
+        db.session.query(WeChatPushHistory).filter(
+            WeChatPushHistory.toUserID == userID
+        ).delete(synchronize_session=False)
+        db.session.commit()
+    except Exception, Argument:
+        return (False, Argument)
+
+
 #创建推送信息
 @app.task
 def createWeChatPush(info):
@@ -103,7 +135,7 @@ def pushTemplateMessage():
         UserInfo, WeChatPush.toUserID == UserInfo.userID
     ).outerjoin(
         Tender, WeChatPush.tenderID == Tender.tenderID
-    ).group_by(WeChatPush.toUserID)
+    )
     allResult = query.all()
     postDic = {}
     def generate(result):
@@ -111,20 +143,24 @@ def pushTemplateMessage():
         userInfo = result.UserInfo
         tender = result.Tender
         userID = userInfo.openid1
-        postData = {}
-        postData['touser'] = userID
-        postData['userid'] = userInfo.userID
-        postData['template_id'] = TEMPLATEID
-        postData['url'] = 'http://weixin.qq.com/download'
+        templateData = {}
+        templateData['touser'] = userID
+        templateData['userid'] = userInfo.userID
+        templateData['template_id'] = TEMPLATEID
+        templateData['url'] = 'http://weixin.qq.com/download'
+        templateData['remark'] = '  ' + tender.title + ';' + '\n'
         postData['miniprogram'] = {
              "appid": MINIAPPID,
              "pagepath":"pages/myFavorite/myFavorite"
         }
-        postData['remark'] = {index: tender.title}
         if not postDic.has_key(userID):
-            postDic[userID] = postData
+            templateData['remark'] = '[1]  ' + templateData['remark']
+            postDic[userID] = templateData
+            postDic[userID]['count'] = 1
         else:
-            postDic[userID]['remark'].update(postData['remark'])
+            postDic[userID]['count'] = postDic[userID]['count'] + 1
+            templateData['remark'] = '[' + str(postDic[userID]['count']) + ']  ' + templateData['remark']
+            postDic[userID]['remark'] = postDic[userID]['remark'] + templateData['remark']
     [generate(result) for result in allResult]
 
     for key, value in postDic.iteritems():
@@ -153,7 +189,7 @@ def pushTemplateMessage():
                 "value": "订阅提醒"
             },
             "keyword2": {
-                "value": "最新",
+                "value": "更新" + str(value['count']) + '条',
             },
             "remark": {
                 "value": value['remark'],
