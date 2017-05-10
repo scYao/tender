@@ -128,8 +128,10 @@ def sql_to_model_generate(info, o):
         str = l.strip()
         words = str.split(' ')
         name = words[0]
-
-        template = 'res[\'%s\'] = %s.%s' % (name, o, name)
+        if 'datetime' in words or 'dataTime' in words:
+            template = 'res[\'%s\'] = str(%s.%s)' % (name, o, name)
+        else:
+            template = 'res[\'%s\'] = %s.%s' % (name, o, name)
 
         print template
 
@@ -161,9 +163,9 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = ''' superID nvarchar(100) default '-1' comment '上级ID'',
-	isDirectory boolean default false comment '是否是文件夹',
-	privateLevel int default 0 comment '私密等级, 0 代表public'  '''
+    sql = ''' departmentID nvarchar(100) primary key comment '主键',
+	departmentName nvarchar(100) comment '部门名称',
+	createTime datetime comment '创建时间'  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)

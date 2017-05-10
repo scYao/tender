@@ -176,6 +176,20 @@ create table fileInfo(
 	filePath nvarchar(1000) comment '在OSS 上的名称'
 );
 
+-- 部门表
+create table department(
+	departmentID nvarchar(100) primary key comment '主键',
+	departmentName nvarchar(100) comment '部门名称',
+	createTime datetime comment '创建时间'
+);
+-- 部门下的区域
+create table departmentArea(
+	areaID nvarchar(100) primary key comment '主键',
+	areaName nvarchar(100) comment '区域名称',
+	createTime datetime comment '创建时间',
+	departmentID nvarchar(100) comment '部门ID'
+);
+
 ALTER TABLE pushedTenderInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operator CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -187,6 +201,8 @@ ALTER TABLE quotedPrice CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode
 ALTER TABLE news CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE subscribedKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE fileInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE department CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE departmentArea CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);
@@ -198,3 +214,4 @@ alter table quotedPrice add constraint quote_FK_F_user foreign key(userID) refer
 alter table quotedPrice add constraint quote_FK_tender foreign key(tenderID) references tender(tenderID);
 alter table tenderComment add constraint comment_FK_user foreign key(userID) references userInfo(userID);
 alter table subscribedKey add constraint subscribed_FK_user foreign key(userID) references userInfo(userID);
+alter table departmentArea add constraint area_FK_department foreign key(departmentID) references department(departmentID);
