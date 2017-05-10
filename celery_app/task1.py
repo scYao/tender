@@ -51,9 +51,10 @@ def createUser(info):
                 createInfo['openid2'] = openid2
                 UserInfo.createWeChat(createInfo=createInfo)
                 #(1)变更Tender中userID
-                db.session.query(Tender).filter(
-                    Tender.userID == appUserID
-                ).update({Token.userID: userID}, synchronize_session=False)
+                # 速度太慢，暂时不修改。 若要绑定手机号，一手机号ID为主
+                # db.session.query(Tender).filter(
+                #     Tender.userID == appUserID
+                # ).update({Token.userID: userID}, synchronize_session=False)
                 #(2)变更订阅表subscribedKey中userID
                 db.session.query(SubscribedKey).filter(
                     SubscribedKey.userID == appUserID
