@@ -160,7 +160,9 @@ class FileInfoManager(Util):
             # 先判断是否是文件的创建者
             if userID != createUserID:
                 userBaseManager = UserBaseManager()
-                userInfo = userBaseManager.getUserInfo(info=info)
+                (status, userInfo) = userBaseManager.getUserInfo(info=info)
+                if status is not True:
+                    return (False, userInfo)
                 userType = userInfo['userType']
                 # 只有boss才能删除
                 if userType != USER_TAG_BOSS:

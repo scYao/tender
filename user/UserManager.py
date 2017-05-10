@@ -425,6 +425,9 @@ class UserManager(Util):
         if userType<USER_TAG_BOSS or userType>USER_TAG_OPERATOR:
             return (False, ErrorInfo['TENDER_34'])
 
+        if result.disable is True:
+            return (False, ErrorInfo['TENDER_43'])
+
         # 生成新的Token记录
         userID = result.userID
         createTime = datetime.now()

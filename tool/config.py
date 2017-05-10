@@ -254,6 +254,12 @@ ErrorInfo['TENDER_42'] = {
     'zhInfo' : '不是推送时间!'
 }
 
+ErrorInfo['TENDER_43'] = {
+    'code' : 'TENDER_43',
+    'info' : 'user is disabled!',
+    'zhInfo' : '系统数据更新中!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
