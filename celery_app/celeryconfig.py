@@ -19,14 +19,14 @@ CELERYBEAT_SCHEDULE = {
     #      'schedule': timedelta(hours=12),       # 每 30 秒执行一次
     #      'args': ()                           # 任务函数参数
     # },
-    'multiply-at-morning-time': {
-        'task': 'celery_app.task2.pushTemplateMessage',
-        'schedule': crontab(hour=9, minute=00),   # 每天早上 9 点执行一次
-        'args': ()                                # 任务函数参数
-    },
-    'multiply-at-afternoon-time': {
-        'task': 'celery_app.task2.pushTemplateMessage',
-        'schedule': crontab(hour=15, minute=04),  # 每天早上 17 点 执行一次
-        'args': ()  # 任务函数参数
-    }
+    # 'multiply-at-morning-time': {
+    #     'task': 'celery_app.task2.pushTemplateMessage',
+    #     'schedule': crontab(hour=9, minute=00),   # 每天早上 9 点执行一次
+    #     'args': ()                                # 任务函数参数
+    # },
+    # 'multiply-at-afternoon-time': {
+    #     'task': 'celery_app.task2.pushTemplateMessage',
+    #     'schedule': crontab(hour=15, minute=04),  # 每天早上 17 点 执行一次
+    #     'args': ()  # 任务函数参数
+    # }
 }

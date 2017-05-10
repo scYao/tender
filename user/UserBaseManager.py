@@ -130,6 +130,8 @@ class UserBaseManager(Util):
             ).update({
                 UserInfo.disable : disable
             }, synchronize_session=False)
+            db.session.commit()
+            return (True, None)
         except Exception as e:
             print e
             traceback.print_stack()

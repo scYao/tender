@@ -366,6 +366,7 @@ class BossManager(UserBaseManager):
         jsonInfo = json.dumps(info)
         return self.createOperationBiddingBook(jsonInfo=jsonInfo, imgFileList=imgFileList)
 
+    # 去使能用户
     def disableUserByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
         tokenID = info['tokenID']
@@ -384,6 +385,28 @@ class BossManager(UserBaseManager):
         if userType != USER_TAG_BOSS:
             return (False, ErrorInfo['TENDER_41'])
 
+        info['disable'] = True
+        return self.updateUserDisableInfo(info=info)
 
+    # 是能用户
+    def enableUserByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        paramInfo = {}
+        paramInfo['userID'] = userID
+        (status, userInfo) = self.getUserInfo(info=paramInfo)
+        if status is False:
+            return (False, userInfo)
+
+        userType = userInfo['userType']
+        if userType != USER_TAG_BOSS:
+            return (False, ErrorInfo['TENDER_41'])
+
+        info['disable'] = False
         return self.updateUserDisableInfo(info=info)
 

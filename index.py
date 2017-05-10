@@ -2260,7 +2260,7 @@ def create_pushed_tender_by_boss():
         return json.dumps(data)
 
 
-# 审定人创建推送
+# 审定人暂停用户
 @app.route('/disable_user_by_boss/', methods=['POST', 'GET'])
 def disable_user_by_boss():
     bossManager = BossManager()
@@ -2270,6 +2270,21 @@ def disable_user_by_boss():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.disableUserByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人激活用户
+@app.route('/enable_user_by_boss/', methods=['POST', 'GET'])
+def enable_user_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.enableUserByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

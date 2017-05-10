@@ -22,6 +22,7 @@ from tender.SubscribedKeyManager import SubscribedKeyManager
 from tool.Util import Util
 from tool.tagconfig import TEMPLATEID, MINIAPPID, SEARCH_KEY_TAG_SUBSCRIBE
 from sqlalchemy import and_
+from tool.config import ErrorInfo
 
 #创建用户(公众号）
 @app.task
@@ -81,8 +82,8 @@ def createUser(info):
                 # createInfo = {}
                 UserInfo.createPublic(createInfo=createInfo)
             db.session.commit()
-        except Exception, Argument:
-            return (False, Argument)
+        except Exception as e:
+            return (False, str(e))
 
 
 #公众号取消关注
@@ -201,9 +202,4 @@ def pushTemplateMessage():
         urlResp = urllib.urlopen(url=postUrl, data=postData)
         urlResp = json.loads(urlResp.read())
         return (True, urlResp)
-
-
-
-
-
 

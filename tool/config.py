@@ -248,6 +248,12 @@ ErrorInfo['TENDER_41'] = {
     'zhInfo' : '用户不是审定人!'
 }
 
+ErrorInfo['TENDER_42'] = {
+    'code' : 'TENDER_42',
+    'info' : 'not in the pushable time!',
+    'zhInfo' : '不是推送时间!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
