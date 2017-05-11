@@ -14,7 +14,9 @@ class PushedTenderInfo(db.Model):
     createTime = db.Column(db.DateTime)
     operatorPersonPushedTime = db.Column(db.DateTime)
     responsiblePersonPushedTime = db.Column(db.DateTime)
+    responsiblePersonID = db.Column(db.String(100))
     auditorPushedTime = db.Column(db.DateTime)
+    auditorID = db.Column(db.String(100))
     bossPushedTime = db.Column(db.DateTime)
     state = db.Column(db.Integer)
     step = db.Column(db.Integer)
@@ -81,13 +83,15 @@ class PushedTenderInfo(db.Model):
                  deadline=None, winbidding=False, tenderee=None, tenderProxy=None,
                  tenderer=None, constructionLocation=None, plannedProjectDuration=None,
                  answerDeadline=None, tenderDeadline=None, attender=None,
-                 companyAchievement=None, pmAchievement=None):
+                 companyAchievement=None, pmAchievement=None, responsiblePersonID=None, auditorID=None):
         self.pushedID = pushedID
         self.userID = userID
         self.createTime = createTime
         self.operatorPersonPushedTime = operatorPersonPushedTime
         self.responsiblePersonPushedTime = responsiblePersonPushedTime
+        self.responsiblePersonID = responsiblePersonID
         self.auditorPushedTime = auditorPushedTime
+        self.auditorID = auditorID
         self.bossPushedTime = bossPushedTime
         self.state = state
         self.step = step
@@ -138,6 +142,16 @@ class PushedTenderInfo(db.Model):
 
     @staticmethod
     def create(info):
+        if info.has_key('auditorID'):
+            auditorID = info['auditorID']
+        else:
+            auditorID = None
+
+        if info.has_key('responsiblePersonID'):
+            responsiblePersonID = info['responsiblePersonID']
+        else:
+            responsiblePersonID = None
+
         pushedTenderInfo = PushedTenderInfo(
             pushedID=info['pushedID'],
             userID=info['userID'],
@@ -150,7 +164,9 @@ class PushedTenderInfo(db.Model):
             step=info['step'],
             tenderID=info['tenderID'],
             tag=info['pushedTenderInfoTag'],
-            deadline=info['deadline']
+            deadline=info['deadline'],
+            auditorID=auditorID,
+            responsiblePersonID=responsiblePersonID
             # projectManagerName=info['projectManagerName'],
             # openedDate=info['openedDate'],
             # openedLocation=info['openedLocation'],
@@ -174,13 +190,17 @@ class PushedTenderInfo(db.Model):
 
         if c.responsiblePersonPushedTime is None:
             res['responsiblePersonPushedTime'] = ''
+            res['responsiblePersonID'] = ''
         else:
             res['responsiblePersonPushedTime'] = str(c.responsiblePersonPushedTime)
+            res['responsiblePersonID'] = c.responsiblePersonID
 
         if c.auditorPushedTime is None:
             res['auditorPushedTime'] = ''
+            res['auditorID'] = ''
         else:
             res['auditorPushedTime'] = str(c.auditorPushedTime)
+            res['auditorID'] = c.auditorID
         res['tenderID'] = c.tenderID
         res['state'] = c.state
         if c.deadline is None:

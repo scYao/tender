@@ -20,10 +20,10 @@ def interval_event():
     stsTokenManager = StsTokenManager()
     scheduler = TornadoScheduler()
     scheduler.add_job(stsTokenManager.createStsToken, 'interval', seconds=3000)
-    # scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=9)
-    # scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=11)
-    # scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=13)
-    # scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=17)
+    scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=9)
+    scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=11)
+    scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=13)
+    scheduler.add_job(task2.pushTemplateMessage, 'cron', second=0, minute=30, hour=17)
     scheduler.start()
 
 

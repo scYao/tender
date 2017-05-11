@@ -117,7 +117,9 @@ class PushedTenderManager(Util):
         info['userID'] = userID
         info['operatorPersonPushedTime'] = None
         info['responsiblePersonPushedTime'] = None
+        info['responsiblePersonID'] = None
         info['auditorPushedTime'] = None
+        info['auditorID'] = None
         info['bossPushedTime'] = None
         info['state'] = 0
         info['step'] = 0
@@ -129,8 +131,10 @@ class PushedTenderManager(Util):
             info['operatorPersonPushedTime'] = datetime.now()
         if userType == USER_TAG_AUDITOR:
             info['auditorPushedTime'] = datetime.now()
+            info['auditorID'] = userID
         if userType == USER_TAG_RESPONSIBLEPERSON:
             info['responsiblePersonPushedTime'] = datetime.now()
+            info['responsiblePersonID'] = userID
         #推送人是审定人，直接视为推送到审定人且审定人决定投标,分配一个默认的经办人
         if userType == USER_TAG_BOSS:
             info['state'] = 1
@@ -414,11 +418,13 @@ class PushedTenderManager(Util):
             updateInfo = {}
             if userType == USER_TAG_AUDITOR:
                 updateInfo = {
-                    PushedTenderInfo.auditorPushedTime : datetime.now()
+                    PushedTenderInfo.auditorPushedTime : datetime.now(),
+                    PushedTenderInfo.auditorID : info['userID']
                 }
             elif userType == USER_TAG_RESPONSIBLEPERSON:
                 updateInfo = {
-                    PushedTenderInfo.responsiblePersonPushedTime : datetime.now()
+                    PushedTenderInfo.responsiblePersonPushedTime : datetime.now(),
+                    PushedTenderInfo.responsiblePersonID : info['userID']
                 }
             elif userType == USER_TAG_BOSS:
                 state = int(info['state'])
@@ -466,17 +472,37 @@ class PushedTenderManager(Util):
                 pushedUserList.append(u)
             if result.PushedTenderInfo.responsiblePersonPushedTime \
                     is not None and self.selfUserType <= USER_TAG_RESPONSIBLEPERSON:
+                userManager = UserManager()
+                params = {}
+                params['userID'] = result.PushedTenderInfo.responsiblePersonID
                 u = {}
-                u['userID'] = self.resp['userID']
-                u['userName'] = self.resp['userName']
-                u['userType'] = self.resp['userType']
+                # 兼容老的数据
+                if result.PushedTenderInfo.responsiblePersonID is not None:
+                    (status, userInfo) = userManager.getUserInfo(info=params)
+                    u['userID'] = userInfo['userID']
+                    u['userName'] = userInfo['userName']
+                    u['userType'] = userInfo['userType']
+                else:
+                    u['userID'] = self.resp['userID']
+                    u['userName'] = self.resp['userName']
+                    u['userType'] = self.resp['userType']
+
                 pushedUserList.append(u)
             if result.PushedTenderInfo.auditorPushedTime \
                     is not None and self.selfUserType <= USER_TAG_AUDITOR:
                 u = {}
-                u['userID'] = self.auditor['userID']
-                u['userName'] = self.auditor['userName']
-                u['userType'] = self.auditor['userType']
+                userManager = UserManager()
+                params = {}
+                params['userID'] = result.PushedTenderInfo.auditorID
+                if result.PushedTenderInfo.auditorID is not None:
+                    (status, userInfo) = userManager.getUserInfo(info=params)
+                    u['userID'] = userInfo['userID']
+                    u['userName'] = userInfo['userName']
+                    u['userType'] = userInfo['userType']
+                else:
+                    u['userID'] = self.auditor['userID']
+                    u['userName'] = self.auditor['userName']
+                    u['userType'] = self.auditor['userType']
                 pushedUserList.append(u)
             res['pushedUserList'] = pushedUserList
         return res

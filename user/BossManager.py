@@ -27,6 +27,8 @@ from pushedTender.PushedTenderManager import PushedTenderManager
 from user.UserBaseManager import UserBaseManager
 from user.UserManager import UserManager
 from tender.CustomizedTenderManager import CustomizedTenderManager
+from department.DepartmentManager import DepartmentManager
+from department.DepartmentAreaManager import DepartmentAreaManager
 
 
 class BossManager(UserBaseManager):
@@ -270,6 +272,29 @@ class BossManager(UserBaseManager):
         info['bossUserID'] = userID
         return userManager.createOAUserInfo(info=info)
 
+    #账号管理，修改员工信息
+    def updateUserInfoByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['OAUserType'] = info['userTypeID']
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        userManager = UserManager()
+        info['bossUserID'] = userID
+        return userManager.updateOAUserInfo(info=info)
+
+    # 审定人获取某个员工的信息
+    def getUserInfoByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_BOSS
+        (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        return self.getUserInfo(info=info)
+
     #账号管理，删除员工
     def deleteUserInfoByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -410,3 +435,57 @@ class BossManager(UserBaseManager):
         info['disable'] = False
         return self.updateUserDisableInfo(info=info)
 
+
+    def getDepartmentListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentManager = DepartmentManager()
+        return departmentManager.getDepartmentList(info=info)
+
+    # 审定人创建部门
+    def createDepartmentByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentManager = DepartmentManager()
+        return departmentManager.createDepartment(info=info)
+
+    # 审定人删除部门
+    def deleteDepartmentByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentManager = DepartmentManager()
+        return departmentManager.deleteDepartment(info=info)
+
+    # 审定人更新部门信息
+    def updateDepartmentByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentManager = DepartmentManager()
+        return departmentManager.updateDepartmentName(info=info)
+
+    # 审定人 获取某个部门的信息
+    def getDepartmentByID(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentManager = DepartmentManager()
+        return departmentManager.getDepartmentByID(info=info)

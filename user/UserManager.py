@@ -54,7 +54,7 @@ class UserManager(Util):
             searchInfo['jobPosition'] = result.jobPosition
             searchInfo['userName'] = result.userName
             searchInfo['createTime'] = result.createTime
-            (status, addSearchInfo) = UserInfoSearchKey.createSearchInfo(searchInfo)
+            # (status, addSearchInfo) = UserInfoSearchKey.createSearchInfo(searchInfo)
         _ = [regenerateInfo(result) for result in allResult]
         db.session.commit()
         return (True, '111')
@@ -525,7 +525,7 @@ class UserManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-    #创建OA用户
+    # 创建OA用户
     def createOAUserInfo(self, info):
         userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"')
         tel = info['tel'].replace('\'', '\\\'').replace('\"', '\\\"')
@@ -572,6 +572,7 @@ class UserManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    # 删除oa用户
     def deleteOAUserInfo(self, info):
         selfUserID = info['selfUserID']
         userID = info['userID']
@@ -614,8 +615,44 @@ class UserManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    # 修改oa用户信息
     def updateOAUserInfo(self, info):
-        pass
+        userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"')
+        tel = info['tel'].replace('\'', '\\\'').replace('\"', '\\\"')
+        # info['customizedCompanyID'] = CUSTOMIZEDCOMPANYID
+        info['tel'] = tel
+        info['userType'] = info['userTypeID']
+        info['jobNumber'] = info['jobNumber']
+        info['createTime'] = datetime.now()
+        userID = info['userID']
+        try:
+            # 获取boss的公司ID
+            bossUserID = info['bossUserID']
+            bossResult = db.session.query(UserInfo).filter(
+                UserInfo.userID == bossUserID
+            ).first()
+            if bossResult is None:
+                return (False, ErrorInfo['TENDER_09'])
+            customizedCompanyID = bossResult.customizedCompanyID
+            info['customizedCompanyID'] = customizedCompanyID
+            #判断是否已经存在该员工
+            query = db.session.query(UserInfo).filter(UserInfo.userID == userID)
+            r = query.first()
+            query.update({
+                UserInfo.tel : tel,
+                UserInfo.userType : info['userType'],
+                UserInfo.jobNumber : info['jobNumber'],
+                UserInfo.userName : userName
+            }, synchronize_session=False)
+                # return (False, ErrorInfo['TENDER_07'])
+            db.session.commit()
+            return (True, userID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
 
     # 使用微信账号登录

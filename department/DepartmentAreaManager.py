@@ -115,10 +115,10 @@ class DepartmentAreaManager(Util):
             query = db.session.query(DepartmentArea).filter(
                 DepartmentArea.departmentID == departmentID
             )
-            countQuery = db.session.query(func.count(DepartmentArea)).filter(
+            countQuery = db.session.query(func.count(DepartmentArea.areaID)).filter(
                 DepartmentArea.departmentID == departmentID
             )
-            query = query.offet(startIndex).limit(pageCount)
+            query = query.offset(startIndex).limit(pageCount)
             allResult = query.all()
 
             dataList = [self.__generateArea(o=o) for o in allResult]

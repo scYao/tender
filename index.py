@@ -2529,6 +2529,81 @@ def get_all_data_info_by_boss():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人 获取部门列表
+@app.route('/get_department_list_by_boss/', methods=['POST', 'GET'])
+def get_department_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getDepartmentListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 创建部门
+@app.route('/create_department_by_boss/', methods=['POST', 'GET'])
+def create_department_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.createDepartmentByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 删除部门
+@app.route('/delete_department_by_boss/', methods=['POST', 'GET'])
+def delete_department_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.deleteDepartmentByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 更新部门
+@app.route('/update_department_by_boss/', methods=['POST', 'GET'])
+def update_department_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.updateDepartmentByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 更新部门
+@app.route('/get_department_by_id/', methods=['POST', 'GET'])
+def get_department_by_id():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getDepartmentByID(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 审定人上传标书
 @app.route('/create_operation_bidding_book_by_boss/', methods=['POST', 'GET'])
 def create_operation_bidding_book_by_boss():
@@ -2731,6 +2806,36 @@ def create_user_info_by_boss():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = bossManager.createUserInfoByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 企业账号管理，修改用户信息
+@app.route('/update_user_info_by_boss/', methods=['POST', 'GET'])
+def update_user_info_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.updateUserInfoByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人获取某个员工的信息
+@app.route('/get_user_info_by_boss/', methods=['POST', 'GET'])
+def get_user_info_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getUserInfoByBoss(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
@@ -3073,8 +3178,6 @@ def delete_file_by_user():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
-
-
 
 #创建自定义菜单
 @app.route('/create_menu/', methods=['POST', 'GET'])

@@ -100,10 +100,10 @@ class DepartmentManager(Util):
         pageCount = info['pageCount']
         try:
             query = db.session.query(Department)
-            query = query.offet(startIndex).limit(pageCount)
+            query = query.offset(startIndex).limit(pageCount)
             allResult = query.all()
 
-            countQuery = db.session.query(func.count(Department))
+            countQuery = db.session.query(func.count(Department.departmentID))
 
             dataList = [self.__generateDepartment(o=o) for o in allResult]
             count = countQuery.first()
@@ -115,6 +115,25 @@ class DepartmentManager(Util):
             dataResult['dataList'] = dataList
             dataResult['count'] = count
             return (True, dataResult)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def getDepartmentByID(self, info):
+        departmentID = info['departmentID']
+        try:
+            query = db.session.query(Department).filter(
+                Department.departmentID == departmentID
+            )
+            result = query.first()
+            dataResult = {}
+            dataResult.update(Department.generate(o=result))
+            return (True, dataResult)
+
         except Exception as e:
             print e
             traceback.print_exc()

@@ -856,20 +856,35 @@ def wx_get_user_info_list():
 
 
 if __name__ == '__main__':
-    postDic = {}
-    postData = {}
-    postData['touser'] = '1111'
-    postData['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
-    postData['url'] = 'http://weixin.qq.com/download'
-    postData['data'] = {len(postDic): '----'}
-    postDic = {'11111': postData}
-    postData1 = {}
-    postData1['touser'] = '1111'
-    postData1['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
-    postData1['url'] = 'http://weixin.qq.com/download'
-    postData1['data'] = {len(postDic): '======'}
-    postDic['11111']['data'].update(postData1['data'])
-    print postDic
+    def deco(func):
+        def _deco(a, b):
+            print("before myfunc() called.")
+            ret = func(a, b)
+            print("  after myfunc() called. result: %s" % ret)
+            return ret
+        return _deco
+
+    @deco
+    def myfunc(a, b):
+        print(" myfunc(%s,%s) called." % (a, b))
+        return a + b
+
+    myfunc(1, 2)
+    myfunc(3, 4)
+    # postDic = {}
+    # postData = {}
+    # postData['touser'] = '1111'
+    # postData['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
+    # postData['url'] = 'http://weixin.qq.com/download'
+    # postData['data'] = {len(postDic): '----'}
+    # postDic = {'11111': postData}
+    # postData1 = {}
+    # postData1['touser'] = '1111'
+    # postData1['template_id'] = 'aftmxzzzvvv_EyRClAzu3vDbSn9aztufgsZRq6q1hAs'
+    # postData1['url'] = 'http://weixin.qq.com/download'
+    # postData1['data'] = {len(postDic): '======'}
+    # postDic['11111']['data'].update(postData1['data'])
+    # print postDic
     # title = u'（六合分中心）六合区小北门路（长江路至棠城西路）道路改造工程监理'
     # title = re.sub(r'[\[\]（）]', ' ', title)
     # print title

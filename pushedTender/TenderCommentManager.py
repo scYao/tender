@@ -61,12 +61,12 @@ class TenderCommentManager(Util):
     #删除批注
     def deleteTenderComment(self, info):
         userID = info['userID']
-        tenderID = info['tenderID']
+        commentID = info['commentID']
         try:
             query = db.session.query(TenderComment).filter(
                 and_(
                     TenderComment.userID == userID,
-                    TenderComment.tenderID == tenderID
+                    TenderComment.commentID == commentID
                 )
             )
             query.delete(synchronize_session=False)
