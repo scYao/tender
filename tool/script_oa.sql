@@ -169,13 +169,14 @@ create table subscribedKey(
 
 create table fileInfo(
 	fileID nvarchar(100) primary key comment '文件ID',
-	fileName nvarchar(100) comment '问价名',
+	fileName nvarchar(100) comment '文件名',
 	userID nvarchar(100) comment '创建者',
 	createTime datetime comment '创建时间',
 	superID nvarchar(100) default '-1' comment '上级ID',
 	isDirectory boolean default false comment '是否是文件夹',
 	privateLevel int default 0 comment '私密等级, 0 代表public',
-	filePath nvarchar(1000) comment '在OSS 上的名称'
+	filePath nvarchar(1000) comment '在OSS 上的名称',
+	areaID nvarchar(100) comment '区域ID'
 );
 
 -- 部门表
@@ -192,6 +193,14 @@ create table departmentArea(
 	departmentID nvarchar(100) comment '部门ID'
 );
 
+-- 权限表
+create table departmentRight(
+	rightID nvarchar(100) primary key comment '权限ID',
+	areaID nvarchar(100) comment '区域ID',
+	userID nvarchar(100) comment '用户ID',
+	tag int default 0 comment '0 代表department,  1 代表areaID'
+);
+
 ALTER TABLE pushedTenderInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operator CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -205,6 +214,7 @@ ALTER TABLE subscribedKey CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 ALTER TABLE fileInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE department CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE departmentArea CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE departmentRight CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);

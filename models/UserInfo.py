@@ -86,6 +86,7 @@ class UserInfo(db.Model):
         res['tel'] = userInfo.tel
         res['customizedCompanyID'] = userInfo.customizedCompanyID
         res['userType'] = userInfo.userType
+        res['userTypeName'] = USER_TAG_DIC[userInfo.userType]
         res['jobNumber'] = userInfo.jobNumber
         res['disable'] = userInfo.disable
         return res

@@ -13,12 +13,15 @@ sys.setdefaultencoding('utf-8')
 import json
 from sqlalchemy import and_
 from models.flask_app import db
+from models.Department import Department
 from models.DepartmentArea import DepartmentArea
 from datetime import datetime
 
 from tool.Util import Util
 from tool.config import ErrorInfo
 from tool.tagconfig import FAVORITE_TAG_TENDER, FAVORITE_TAG_WIN_BIDDING
+
+from department.DepartmentRightManager import DepartmentRightManager
 
 from sqlalchemy import func
 
@@ -131,6 +134,127 @@ class DepartmentAreaManager(Util):
             dataResult['dataList'] = dataList
             dataResult['count'] = count
             return (True, dataResult)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def getAreaByID(self, info):
+        areaID = info['areaID']
+
+        try:
+            query = db.session.query(DepartmentArea).filter(
+                DepartmentArea.areaID == areaID
+            )
+            result = query.first()
+            dataResult = {}
+            dataResult.update(DepartmentArea.generate(o=result))
+            return (True, dataResult)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+    def getAreaTreeWithoutUserID(self, info):
+        try:
+            query = db.session.query(Department, DepartmentArea).outerjoin(
+                DepartmentArea, Department.departmentID == DepartmentArea.departmentID
+            )
+
+            allResult = query.all()
+            departmentDic = {}
+            def __generate(o, departmentDic):
+                department = o.Department
+                area = o.DepartmentArea
+
+                departmentID = department.departmentID
+                if not departmentDic.has_key(departmentID):
+                    res = {}
+                    areaList = []
+                    if area is not None:
+                        areaObject = DepartmentArea.generate(o=area)
+                        areaList.append(areaObject)
+                    departmentDic[departmentID] = areaList
+                    res['departmentID'] = departmentID
+                    res['departmentName'] = department.departmentName
+                    res['areaList'] = areaList
+                    return res
+                else:
+                    areaList = departmentDic[departmentID]
+                    areaObject = DepartmentArea.generate(o=area)
+                    areaList.append(areaObject)
+
+            departmentList = [__generate(o=o, departmentDic=departmentDic) for o in allResult]
+            departmentList = filter(None, departmentList)
+            return (True, departmentList)
+
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+
+    def getAreaTree(self, info):
+        departmentRightManager = DepartmentRightManager()
+        (status, rightDic) = departmentRightManager.getRightDicByUserID(info=info)
+        if status is not True:
+            return (False, rightDic)
+        try:
+            query = db.session.query(Department, DepartmentArea).outerjoin(
+                DepartmentArea, Department.departmentID == DepartmentArea.departmentID
+            )
+
+            allResult = query.all()
+            departmentDic = {}
+            def __generate(o, departmentDic):
+                department = o.Department
+                area = o.DepartmentArea
+
+                departmentID = department.departmentID
+                if not departmentDic.has_key(departmentID):
+                    res = {}
+                    areaList = []
+                    if area is not None:
+                        areaObject = DepartmentArea.generate(o=area)
+                        if rightDic.has_key(areaObject['areaID']):
+                            areaObject['hasRight'] = True
+                            areaObject['rightID'] = rightDic[areaObject['areaID']]
+                        else:
+                            areaObject['hasRight'] = False
+                        areaList.append(areaObject)
+                    departmentDic[departmentID] = areaList
+                    res['departmentID'] = departmentID
+                    res['departmentName'] = department.departmentName
+                    res['areaList'] = areaList
+                    if rightDic.has_key(departmentID):
+                        res['hasRight'] = True
+                        res['rightID'] = rightDic[departmentID]
+                    else:
+                        res['hasRight'] = False
+                    return res
+                else:
+                    areaList = departmentDic[departmentID]
+                    areaObject = DepartmentArea.generate(o=area)
+                    if rightDic.has_key(areaObject['areaID']):
+                        areaObject['hasRight'] = True
+                        areaObject['rightID'] = rightDic[areaObject['areaID']]
+                    else:
+                        areaObject['hasRight'] = False
+                    areaList.append(areaObject)
+
+            departmentList = [__generate(o=o, departmentDic=departmentDic) for o in allResult]
+            departmentList = filter(None, departmentList)
+            return (True, departmentList)
+
         except Exception as e:
             print e
             traceback.print_exc()

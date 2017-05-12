@@ -17,7 +17,7 @@ from models.flask_app import db
 from models.FileInfo import FileInfo
 
 from user.UserBaseManager import UserBaseManager
-
+from department.DepartmentRightManager import DepartmentRightManager
 
 class FileInfoManager(Util):
 
@@ -31,13 +31,15 @@ class FileInfoManager(Util):
         isDirectory = info['isDirectory']
         privateLevel = info['privateLevel']
         filePath = info['filePath']
+        areaID = info['areaID']
 
         fileID = self.generateID(fileName)
         now = datetime.now()
         fileInfo = FileInfo(fileID=fileID, fileName=fileName,
                             userID=userID, createTime=now,
                             superID=superID, isDirectory=isDirectory,
-                            privateLevel=privateLevel, filePath=filePath)
+                            privateLevel=privateLevel, filePath=filePath,
+                            areaID=areaID)
         db.session.add(fileInfo)
         return (True, None)
 
@@ -88,9 +90,17 @@ class FileInfoManager(Util):
         countQuery = info['countQuery']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
+        areaID = info['areaID']
 
-        query = query.filter(FileInfo.superID == superID)
-        countQuery = countQuery.filter(FileInfo.superID == superID)
+        departmentRightManager = DepartmentRightManager()
+        (status, areaIDList) = departmentRightManager.getAreaListByUserID(info=info)
+
+        query = query.filter(and_(FileInfo.superID == superID,
+                                  FileInfo.areaID == areaID,
+                                  FileInfo.areaID.in_(tuple(areaIDList))))
+        countQuery = countQuery.filter(and_(FileInfo.superID == superID,
+                                            FileInfo.areaID == areaID,
+                                            FileInfo.areaID.in_(tuple(areaIDList))))
 
         query = query.order_by(desc(
             FileInfo.createTime
@@ -113,6 +123,7 @@ class FileInfoManager(Util):
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
 
+        info['userID'] = userID
 
         info = self.__getBaseQuery(info=info)
         info = self.__addFilterToQuery(info=info)
@@ -151,6 +162,13 @@ class FileInfoManager(Util):
                 return (False, ErrorInfo['TENDER_40'])
             # 文件夹暂时不让删除
             if dataResult.isDirectory is True:
+                superID = dataResult.fileID
+                # 查看文件夹下是否有文件
+                dirResult = db.session.query(FileInfo).filter(
+                    FileInfo.superID == superID
+                ).first()
+                if dirResult is not None:
+                    return (FileInfo, ErrorInfo['TENDER_45'])
                 return (False, ErrorInfo['TENDER_40'])
             filePath = dataResult.filePath
             deleteList = ['files/%s' % filePath]

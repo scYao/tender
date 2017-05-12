@@ -163,9 +163,10 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = ''' departmentID nvarchar(100) primary key comment '主键',
-	departmentName nvarchar(100) comment '部门名称',
-	createTime datetime comment '创建时间'  '''
+    sql = ''' 	rightID nvarchar(100) primary key comment '权限ID',
+	areaID nvarchar(100) comment '区域ID',
+	userID nvarchar(100) comment '用户ID',
+	tag int comment '0 代表department,  1 代表areaID'  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)

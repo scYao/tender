@@ -2604,6 +2604,141 @@ def get_department_by_id():
         data['data'] = result
         return json.dumps(data)
 
+# 审定人 获取部门区域列表
+@app.route('/get_department_area_list_by_boss/', methods=['POST', 'GET'])
+def get_department_area_list_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getDepartmentAreaListByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 创建部门区域
+@app.route('/create_department_area_by_boss/', methods=['POST', 'GET'])
+def create_department_area_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.createDepartmentAreaByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 删除部门区域
+@app.route('/delete_department_area_by_boss/', methods=['POST', 'GET'])
+def delete_department_area_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.deleteDepartmentAreaByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 获取指定部门区域
+@app.route('/get_area_by_id_by_boss/', methods=['POST', 'GET'])
+def get_area_by_id_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getAreaByIDByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 更新部门区域
+@app.route('/update_department_area_name_by_boss/', methods=['POST', 'GET'])
+def update_department_area_name_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.updateDepartmentAreaNameByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 部门区域树
+@app.route('/get_area_tree_by_boss/', methods=['POST', 'GET'])
+def get_area_tree_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getAreaTreeByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 部门区域树
+@app.route('/get_area_tree_withoud_user_id_by_boss/', methods=['POST', 'GET'])
+def get_area_tree_withoud_user_id_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.getAreaTreeWithoutUserIDByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 设置权限
+@app.route('/create_right_by_boss/', methods=['POST', 'GET'])
+def create_right_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.createRightByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 审定人 取消权限
+@app.route('/delete_right_by_boss/', methods=['POST', 'GET'])
+def delete_right_by_boss():
+    bossManager = BossManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = bossManager.deleteRightByBoss(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 # 审定人上传标书
 @app.route('/create_operation_bidding_book_by_boss/', methods=['POST', 'GET'])
 def create_operation_bidding_book_by_boss():

@@ -29,6 +29,7 @@ from user.UserManager import UserManager
 from tender.CustomizedTenderManager import CustomizedTenderManager
 from department.DepartmentManager import DepartmentManager
 from department.DepartmentAreaManager import DepartmentAreaManager
+from department.DepartmentRightManager import DepartmentRightManager
 
 
 class BossManager(UserBaseManager):
@@ -489,3 +490,101 @@ class BossManager(UserBaseManager):
             return (False, errorInfo)
         departmentManager = DepartmentManager()
         return departmentManager.getDepartmentByID(info=info)
+
+    # 审定人 获取某个部门的信息
+    def getDepartmentAreaListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentAreaManager = DepartmentAreaManager()
+        return departmentAreaManager.getAreaListByDepartmentID(info=info)
+
+    # 审定人 创建部门区域
+    def createDepartmentAreaByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentAreaManager = DepartmentAreaManager()
+        return departmentAreaManager.createDepartmentArea(info=info)
+
+    # 审定人 删除部门区域
+    def deleteDepartmentAreaByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentAreaManager = DepartmentAreaManager()
+        return departmentAreaManager.deleteDepartmentArea(info=info)
+
+    # 审定人 获取指定部门区域
+    def getAreaByIDByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentAreaManager = DepartmentAreaManager()
+        return departmentAreaManager.getAreaByID(info=info)
+
+    # 审定人 更新部门区域
+    def updateDepartmentAreaNameByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentAreaManager = DepartmentAreaManager()
+        return departmentAreaManager.updateDepartmentAreaName(info=info)
+
+
+    def getAreaTreeByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentAreaManager = DepartmentAreaManager()
+        return departmentAreaManager.getAreaTree(info=info)
+
+    def getAreaTreeWithoutUserIDByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentAreaManager = DepartmentAreaManager()
+        return departmentAreaManager.getAreaTreeWithoutUserID(info=info)
+
+    # 设置权限
+    def createRightByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentRightManager = DepartmentRightManager()
+        return departmentRightManager.createRight(info=info)
+
+    # 取消权限
+    def deleteRightByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        departmentRightManager = DepartmentRightManager()
+        return departmentRightManager.deleteRight(info=info)

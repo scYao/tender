@@ -260,6 +260,18 @@ ErrorInfo['TENDER_43'] = {
     'zhInfo' : '系统数据更新中!'
 }
 
+ErrorInfo['TENDER_44'] = {
+    'code' : 'TENDER_44',
+    'info' : 'can not set right!',
+    'zhInfo' : '权限已经设置过!'
+}
+
+ErrorInfo['TENDER_45'] = {
+    'code' : 'TENDER_45',
+    'info' : 'directory is not empty!',
+    'zhInfo' : '请先删除文件夹内文件!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
