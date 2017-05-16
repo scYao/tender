@@ -557,16 +557,6 @@ class BossManager(UserBaseManager):
         departmentAreaManager = DepartmentAreaManager()
         return departmentAreaManager.getAreaTree(info=info)
 
-    def getAreaTreeWithoutUserIDByBoss(self, jsonInfo):
-        info = json.loads(jsonInfo)
-        tokenID = info['tokenID']
-        (status, userID) = self.isTokenValid(tokenID)
-        if status is not True:
-            errorInfo = ErrorInfo['TENDER_01']
-            return (False, errorInfo)
-        departmentAreaManager = DepartmentAreaManager()
-        return departmentAreaManager.getAreaTreeWithoutUserID(info=info)
-
     # 设置权限
     def createRightByBoss(self, jsonInfo):
         info = json.loads(jsonInfo)
@@ -588,3 +578,15 @@ class BossManager(UserBaseManager):
             return (False, errorInfo)
         departmentRightManager = DepartmentRightManager()
         return departmentRightManager.deleteRight(info=info)
+
+
+    def getMyFileListByBoss(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['userID'] = userID
+        info['userType'] = USER_TAG_BOSS

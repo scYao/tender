@@ -150,7 +150,7 @@ def pushTemplateMessage():
         templateData['template_id'] = TEMPLATEID
         templateData['url'] = 'http://weixin.qq.com/download'
         templateData['remark'] = '  ' + tender.title + ';' + '\n'
-        postData['miniprogram'] = {
+        templateData['miniprogram'] = {
              "appid": MINIAPPID,
              "pagepath":"pages/myFavorite/myFavorite"
         }

@@ -15,6 +15,7 @@ from tool.config import ErrorInfo
 from tool.tagconfig import USER_TAG_BOSS
 from models.flask_app import db
 from models.FileInfo import FileInfo
+from models.DepartmentArea import DepartmentArea
 
 from user.UserBaseManager import UserBaseManager
 from department.DepartmentRightManager import DepartmentRightManager
@@ -72,6 +73,44 @@ class FileInfoManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            query = db.session.query(FileInfo, DepartmentArea).outerjoin(
+                DepartmentArea, FileInfo.areaID == DepartmentArea.areaID
+            )
+            countQuery = db.session.query(func.count(FileInfo.fileID)).filter(
+                FileInfo.userID == userID
+            )
+            query = query.filter(
+                FileInfo.userID == userID
+            ).offset(startIndex).limit(pageCount)
+
+            def __generateFileInfo(o):
+                res = {}
+                fileInfo = o.FileInfo
+                area = o.DepartmentArea
+                res.update(FileInfo.generate(o=fileInfo, ossInfo=self.ossInfo))
+                res.update(DepartmentArea.generate(o=area))
+                return res
+            allResult = query.all()
+            count = countQuery.first()
+            if count is not None:
+                count = count[0]
+            else:
+                count = 0
+            dataList = [__generateFileInfo(o=o) for o in allResult]
+            dataResult = {}
+            dataResult['count'] = count
+            dataResult['dataList'] = dataList
+            return (True, dataResult)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
     # 查看所有的文件 共管理员用户使用
     def getAllFileList(self, info):
@@ -91,16 +130,22 @@ class FileInfoManager(Util):
         startIndex = info['startIndex']
         pageCount = info['pageCount']
         areaID = info['areaID']
+        userType = info['userType']
 
         departmentRightManager = DepartmentRightManager()
         (status, areaIDList) = departmentRightManager.getAreaListByUserID(info=info)
 
         query = query.filter(and_(FileInfo.superID == superID,
-                                  FileInfo.areaID == areaID,
-                                  FileInfo.areaID.in_(tuple(areaIDList))))
+                                  FileInfo.areaID == areaID))
+
         countQuery = countQuery.filter(and_(FileInfo.superID == superID,
-                                            FileInfo.areaID == areaID,
-                                            FileInfo.areaID.in_(tuple(areaIDList))))
+                                            FileInfo.areaID == areaID))
+
+
+        if userType != USER_TAG_BOSS:
+            query = query.filter(FileInfo.areaID.in_(tuple(areaIDList)))
+            countQuery = countQuery.filter(FileInfo.areaID.in_(tuple(areaIDList)))
+
 
         query = query.order_by(desc(
             FileInfo.createTime
@@ -122,9 +167,15 @@ class FileInfoManager(Util):
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
             return (False, errorInfo)
-
         info['userID'] = userID
 
+        userBaseManager = UserBaseManager()
+        (status, userInfo) = userBaseManager.getUserInfo(info=info)
+        if status is not True:
+            return (False, userInfo)
+        userType = userInfo['userType']
+
+        info['userType'] = userType
         info = self.__getBaseQuery(info=info)
         info = self.__addFilterToQuery(info=info)
         query = info['query']
@@ -141,7 +192,6 @@ class FileInfoManager(Util):
         dataResult['dataList'] = dataList
         dataResult['count'] = count
         return (True, dataResult)
-
 
 
     # 删除某个文件

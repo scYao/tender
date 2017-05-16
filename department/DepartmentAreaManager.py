@@ -15,13 +15,15 @@ from sqlalchemy import and_
 from models.flask_app import db
 from models.Department import Department
 from models.DepartmentArea import DepartmentArea
+from models.DepartmentRight import DepartmentRight
 from datetime import datetime
 
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.tagconfig import FAVORITE_TAG_TENDER, FAVORITE_TAG_WIN_BIDDING
+from tool.tagconfig import FAVORITE_TAG_TENDER, FAVORITE_TAG_WIN_BIDDING, USER_TAG_BOSS
 
 from department.DepartmentRightManager import DepartmentRightManager
+from user.UserBaseManager import UserBaseManager
 
 from sqlalchemy import func
 
@@ -161,34 +163,62 @@ class DepartmentAreaManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
-    def getAreaTreeWithoutUserID(self, info):
+    def getAreaTreeWithoutUserID(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+        info['userID'] = userID
+        userBaseManager = UserBaseManager()
+        (status, userInfo) = userBaseManager.getUserInfo(info=info)
+        if status is not True:
+            return (False, userInfo)
+        userType = userInfo['userType']
+        departmentRightManager = DepartmentRightManager()
+        (status, rightDic) = departmentRightManager.getRightDicByUserID(info=info)
+        if status is not True:
+            return (False, rightDic)
         try:
-            query = db.session.query(Department, DepartmentArea).outerjoin(
+            query = db.session.query(Department, DepartmentArea, DepartmentRight).outerjoin(
                 DepartmentArea, Department.departmentID == DepartmentArea.departmentID
             )
 
             allResult = query.all()
             departmentDic = {}
+            areaDic = {}
             def __generate(o, departmentDic):
                 department = o.Department
                 area = o.DepartmentArea
 
                 departmentID = department.departmentID
+                if userType != USER_TAG_BOSS and not rightDic.has_key(departmentID):
+                    return None
                 if not departmentDic.has_key(departmentID):
                     res = {}
                     areaList = []
                     if area is not None:
-                        areaObject = DepartmentArea.generate(o=area)
-                        areaList.append(areaObject)
+                        areaID = area.areaID
+                        if userType == USER_TAG_BOSS or rightDic.has_key(areaID):
+                            if not areaDic.has_key(areaID):
+                                areaObject = DepartmentArea.generate(o=area)
+                                areaList.append(areaObject)
+                                areaDic[areaID] = True
                     departmentDic[departmentID] = areaList
                     res['departmentID'] = departmentID
                     res['departmentName'] = department.departmentName
                     res['areaList'] = areaList
                     return res
                 else:
-                    areaList = departmentDic[departmentID]
-                    areaObject = DepartmentArea.generate(o=area)
-                    areaList.append(areaObject)
+                    if area is not None:
+                        areaID = area.areaID
+                        if userType == USER_TAG_BOSS or rightDic.has_key(area.areaID):
+                            if not areaDic.has_key(areaID):
+                                areaList = departmentDic[departmentID]
+                                areaObject = DepartmentArea.generate(o=area)
+                                areaList.append(areaObject)
+                                areaDic[areaID] = True
 
             departmentList = [__generate(o=o, departmentDic=departmentDic) for o in allResult]
             departmentList = filter(None, departmentList)

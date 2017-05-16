@@ -856,21 +856,21 @@ def wx_get_user_info_list():
 
 
 if __name__ == '__main__':
-    def deco(func):
-        def _deco(a, b):
-            print("before myfunc() called.")
-            ret = func(a, b)
-            print("  after myfunc() called. result: %s" % ret)
-            return ret
-        return _deco
-
-    @deco
-    def myfunc(a, b):
-        print(" myfunc(%s,%s) called." % (a, b))
-        return a + b
-
-    myfunc(1, 2)
-    myfunc(3, 4)
+    # def deco(func):
+    #     def _deco(a, b):
+    #         print("before myfunc() called.")
+    #         ret = func(a, b)
+    #         print("  after myfunc() called. result: %s" % ret)
+    #         return ret
+    #     return _deco
+    #
+    # @deco
+    # def myfunc(a, b):
+    #     print(" myfunc(%s,%s) called." % (a, b))
+    #     return a + b
+    #
+    # myfunc(1, 2)
+    # myfunc(3, 4)
     # postDic = {}
     # postData = {}
     # postData['touser'] = '1111'
@@ -922,7 +922,7 @@ if __name__ == '__main__':
 #     # operate_pushed_tender_info()
 #     # get_resp_pushed_list_by_boss()
 #     # get_undistributed_tender_list_by_resp()
-#     # get_tender_doing_list()
+    get_tender_doing_list()
 #     # get_operator_list()
 #     # get_pushed_list_by_operator()
 #     # create_pushed_tender_by_operator()

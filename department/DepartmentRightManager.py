@@ -92,6 +92,7 @@ class DepartmentRightManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    #  获取用户拥有的区域列表
     def getAreaListByUserID(self, info):
         userID = info['userID']
         try:

@@ -43,6 +43,7 @@ from wechatPublic.WechatManager import WechatManager
 from wechatPublic.WechatMessageManager import WechatMessageManager
 from stoken.StsTokenManager import StsTokenManager
 from fileInfo.FileInfoManager import FileInfoManager
+from department.DepartmentAreaManager import DepartmentAreaManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -2694,21 +2695,6 @@ def get_area_tree_by_boss():
         data['data'] = result
         return json.dumps(data)
 
-# 审定人 部门区域树
-@app.route('/get_area_tree_withoud_user_id_by_boss/', methods=['POST', 'GET'])
-def get_area_tree_withoud_user_id_by_boss():
-    bossManager = BossManager()
-    data = {}
-    data['status'] = 'FAILED'
-    data['data'] = 'NULL'
-    if request.method == 'POST':
-        paramsJson = request.form['data']
-        (status, result) = bossManager.getAreaTreeWithoutUserIDByBoss(paramsJson)
-        if status is not False:
-            data['status'] = 'SUCCESS'
-        data['data'] = result
-        return json.dumps(data)
-
 # 审定人 设置权限
 @app.route('/create_right_by_boss/', methods=['POST', 'GET'])
 def create_right_by_boss():
@@ -3268,6 +3254,7 @@ def get_sts_token_info():
         data['data'] = result
         return json.dumps(data)
 
+
 # 用户获取文件列表
 @app.route('/get_file_list_by_user/', methods=['POST', 'GET'])
 def get_file_list_by_user():
@@ -3314,6 +3301,21 @@ def delete_file_by_user():
         data['data'] = result
         return json.dumps(data)
 
+# 获取我的文件列表
+@app.route('/get_my_file_list/', methods=['POST', 'GET'])
+def get_my_file_list():
+    fileInfoManager = FileInfoManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = fileInfoManager.getMyFileList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 #创建自定义菜单
 @app.route('/create_menu/', methods=['POST', 'GET'])
 def create_menu():
@@ -3324,6 +3326,22 @@ def create_menu():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = wechatManager.createMenu(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+
+# 审定人 部门区域树
+@app.route('/get_area_tree_withoud_user_id/', methods=['POST', 'GET'])
+def get_area_tree_withoud_user_id():
+    departmentAreaManager = DepartmentAreaManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = departmentAreaManager.getAreaTreeWithoutUserID(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
