@@ -209,8 +209,9 @@ class DepartmentAreaManager(Util):
                 area = o.DepartmentArea
 
                 departmentID = department.departmentID
-                if userType != USER_TAG_BOSS and not rightDic.has_key(departmentID):
-                    return None
+                # if userType != USER_TAG_BOSS and not rightDic.has_key(departmentID):
+                #     return None
+                # 先将所有的department加入，然后再遍历一遍，将areaList为空的去掉
                 if not departmentDic.has_key(departmentID):
                     res = {}
                     areaList = []
@@ -238,6 +239,8 @@ class DepartmentAreaManager(Util):
 
             departmentList = [__generate(o=o, departmentDic=departmentDic) for o in allResult]
             departmentList = filter(None, departmentList)
+            if userType != USER_TAG_BOSS:
+                departmentList = [o for o in departmentList if len(o['areaList'])>0 or rightDic.has_key(o['departmentID'])]
             return (True, departmentList)
 
         except Exception as e:

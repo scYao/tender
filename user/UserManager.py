@@ -421,6 +421,8 @@ class UserManager(Util):
             errorInfo = ErrorInfo['TENDER_05']
             return (False, errorInfo)
         userType = result.userType
+        jobNumber = result.jobNumber
+
 
         if userType<USER_TAG_BOSS or userType>USER_TAG_OPERATOR:
             return (False, ErrorInfo['TENDER_34'])
@@ -451,6 +453,7 @@ class UserManager(Util):
         resultDic = {}
         resultDic['tokenID'] = tokenID
         resultDic['userType'] = userType
+        resultDic['jobNumber'] = jobNumber
         return (True, resultDic)
 
 
