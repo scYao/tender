@@ -29,11 +29,14 @@ class DepartmentManager(Util):
 
     # 创建部门
     def createDepartment(self, info):
-        departmentName = info['departmentName']
+        departmentName = info['departmentName'].strip()
 
         departmentID = self.generateID(departmentName)
         now = datetime.now()
         try:
+            (status, reason) = self.__dupCheck(info=info)
+            if status is not True:
+                return (False, ErrorInfo['TENDER_46'])
             department = Department(departmentID=departmentID,
                                     departmentName=departmentName, createTime=now)
             db.session.add(department)
@@ -49,9 +52,12 @@ class DepartmentManager(Util):
 
     # 修改部门名称
     def updateDepartmentName(self, info):
-        departmentName = info['departmentName']
+        departmentName = info['departmentName'].strip()
         departmentID = info['departmentID']
         try:
+            (status, reason) = self.__dupCheck(info=info)
+            if status is not True:
+                return (False, ErrorInfo['TENDER_46'])
             db.session.query(Department).filter(
                 Department.departmentID == departmentID
             ).update({
@@ -93,6 +99,17 @@ class DepartmentManager(Util):
         res = {}
         res.update(Department.generate(o=o))
         return res
+
+
+    def __dupCheck(self, info):
+        departmentName = info['departmentName'].strip()
+        result = db.session.query(Department).filter(
+            Department.departmentName == departmentName
+        ).first()
+        if result is not None:
+            return (False, None)
+        else:
+            return (True, None)
 
     #
     def getDepartmentList(self, info):

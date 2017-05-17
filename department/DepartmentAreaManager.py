@@ -38,6 +38,9 @@ class DepartmentAreaManager(Util):
         areaName = info['areaName']
 
         try:
+            (status, reason) = self.__dupCheck(info=info)
+            if status is not True:
+                return (False, ErrorInfo['TENDER_47'])
             now = datetime.now()
             areaID = self.generateID(areaName)
             departmentArea = DepartmentArea(areaID=areaID, areaName=areaName,
@@ -53,11 +56,24 @@ class DepartmentAreaManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+    def __dupCheck(self, info):
+        areaName = info['areaName'].strip()
+        result = db.session.query(DepartmentArea).filter(
+            DepartmentArea.areaName == areaName
+        ).first()
+        if result is not None:
+            return (False, None)
+        else:
+            return (True, None)
+
     # 更改部门名称
     def updateDepartmentAreaName(self, info):
         areaID = info['areaID']
         areaName = info['areaName']
         try:
+            (status, reason) = self.__dupCheck(info=info)
+            if status is not True:
+                return (False, ErrorInfo['TENDER_47'])
             db.session.query(DepartmentArea).filter(
                 DepartmentArea.areaID == areaID
             ).update({

@@ -272,6 +272,18 @@ ErrorInfo['TENDER_45'] = {
     'zhInfo' : '请先删除文件夹内文件!'
 }
 
+ErrorInfo['TENDER_46'] = {
+    'code' : 'TENDER_46',
+    'info' : 'department name already exists!',
+    'zhInfo' : '部门名称已存在!'
+}
+
+ErrorInfo['TENDER_47'] = {
+    'code' : 'TENDER_47',
+    'info' : 'area name already exists!',
+    'zhInfo' : '子部门名称已存在!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n
