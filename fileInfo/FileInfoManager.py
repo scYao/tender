@@ -218,7 +218,7 @@ class FileInfoManager(Util):
                     FileInfo.superID == superID
                 ).first()
                 if dirResult is not None:
-                    return (FileInfo, ErrorInfo['TENDER_45'])
+                    return (False, ErrorInfo['TENDER_45'])
                 query.delete(synchronize_session=False)
                 db.session.commit()
                 return (True, None)
