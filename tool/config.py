@@ -284,6 +284,18 @@ ErrorInfo['TENDER_47'] = {
     'zhInfo' : '子部门名称已存在!'
 }
 
+ErrorInfo['TENDER_48'] = {
+    'code' : 'TENDER_48',
+    'info' : 'directory does not exist!',
+    'zhInfo' : '文件夹不存在!'
+}
+
+ErrorInfo['TENDER_49'] = {
+    'code' : 'TENDER_49',
+    'info' : 'can not rename directory, you are not the creator of the directory!',
+    'zhInfo' : '无法命名别人的文件夹!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

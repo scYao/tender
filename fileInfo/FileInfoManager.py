@@ -219,7 +219,10 @@ class FileInfoManager(Util):
                 ).first()
                 if dirResult is not None:
                     return (FileInfo, ErrorInfo['TENDER_45'])
-                return (False, ErrorInfo['TENDER_40'])
+                query.delete(synchronize_session=False)
+                db.session.commit()
+                return (True, None)
+                # return (False, ErrorInfo['TENDER_40'])
             filePath = dataResult.filePath
             deleteList = ['files/%s' % filePath]
             self.deleteOSSImages(deleteList, self.ossInfo)
@@ -261,3 +264,39 @@ class FileInfoManager(Util):
     # 管理员删除文件
     def deleteFileByManager(self, jsonInfo):
         pass
+
+
+    def renameDirectory(self, info):
+        fileID = info['fileID']
+        userID = info['userID']
+        fileName = info['fileName'].strip()
+
+        try:
+            query = db.session.query(FileInfo).filter(
+                FileInfo.fileID == fileID
+            )
+
+            result = query.first()
+
+            if result is None:
+                return (False, ErrorInfo['TENDER_48'])
+
+            fileUserID = result.userID
+            if userID != fileUserID:
+                return (False, ErrorInfo['TENDER_49'])
+
+            query.update(
+                {
+                    FileInfo.fileName : fileName
+                },
+                synchronize_session=False
+            )
+            db.session.commit()
+            return (True, fileID)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
