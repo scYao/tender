@@ -3316,6 +3316,21 @@ def get_my_file_list():
         data['data'] = result
         return json.dumps(data)
 
+# 重命名文件夹
+@app.route('/rename_directory/', methods=['POST', 'GET'])
+def rename_directory():
+    fileInfoManager = FileInfoManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = fileInfoManager.renameDirectory(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
 #创建自定义菜单
 @app.route('/create_menu/', methods=['POST', 'GET'])
 def create_menu():

@@ -31,6 +31,7 @@ class UserInfo(db.Model):
     jobNumber = db.Column(db.String(100))
     openid1 = db.Column(db.String(100))
     openid2 = db.Column(db.String(100))
+    openid3 = db.Column(db.String(100))
     unionid = db.Column(db.String(100))
     disable = db.Column(db.Boolean)
 
@@ -42,7 +43,8 @@ class UserInfo(db.Model):
                  createTime=None, deviceID=None, code=None,
                  cityID=63, provinceID=10, companyName=None, jobPosition=None,
                  customizedCompanyID=None, userType=0, jobNumber=None,
-                 openid1=None, openid2=None, unionid=None, disable=False):
+                 openid1=None, openid2=None, openid3=None,
+                 unionid=None, disable=False):
         self.userID = userID
         self.userName = userName
         self.password = password
@@ -64,6 +66,7 @@ class UserInfo(db.Model):
         self.jobNumber = jobNumber
         self.openid1 = openid1
         self.openid2 = openid2
+        self.openid3 = openid3
         self.unionid = unionid
         self.disable = disable
 
@@ -138,7 +141,7 @@ class UserInfo(db.Model):
         userInfo = UserInfo(
             userID=createInfo['userID'], userName=createInfo['userName'],
             tel=createInfo['tel'], createTime=createInfo['createTime'],
-            openid2=createInfo['openid2'], unionid = createInfo['unionid']
+            openid2=createInfo['openid2'], unionid=createInfo['unionid']
         )
         db.session.add(userInfo)
         return (True, None)

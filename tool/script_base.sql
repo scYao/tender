@@ -96,6 +96,7 @@ create table userInfo
     jobNumber nvarchar(100) comment '工号',
     openid1 nvarchar(100) comment '微信公众号的openid',
     openid2 nvarchar(100) comment '小程序的openid',
+    openid3 nvarchar(100) comment 'oa小程序的openid',
     unionid nvarchar(100) comment '公众号, 小程序统一ID',
     disable boolean default false comment '是否被禁用'
 );

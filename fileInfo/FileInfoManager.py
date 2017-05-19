@@ -266,8 +266,9 @@ class FileInfoManager(Util):
         pass
 
 
-    def renameDirectory(self, info):
+    def doRenameDirectory(self, info):
         fileID = info['fileID']
+        userType = info['userType']
         userID = info['userID']
         fileName = info['fileName'].strip()
 
@@ -282,8 +283,9 @@ class FileInfoManager(Util):
                 return (False, ErrorInfo['TENDER_48'])
 
             fileUserID = result.userID
-            if userID != fileUserID:
-                return (False, ErrorInfo['TENDER_49'])
+            if userType != USER_TAG_BOSS:
+                if userID != fileUserID:
+                    return (False, ErrorInfo['TENDER_49'])
 
             query.update(
                 {
@@ -300,3 +302,21 @@ class FileInfoManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+    def renameDirectory(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['userID'] = userID
+        userBaseManager = UserBaseManager()
+        (status, userInfo) = userBaseManager.getUserInfo(info=info)
+        if status is not True:
+            return (False, userInfo)
+        userType = userInfo['userType']
+
+        info['userType'] = userType
+        return self.doRenameDirectory(info=info)

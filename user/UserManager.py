@@ -720,6 +720,80 @@ class UserManager(Util):
         else:
             return (False, None)
 
+    def doWechatAppLogin(self, info):
+        appID = info['appID']
+        appSecret = info['appSecret']
+        columnOpenID = info['columnOpenID']
+        stringOpenID = info['stringOpenID']
+
+        #第一步：获取参数code, encryptedData, rawData, signature, iv
+        code = info['code']
+        encryptedData = info['encryptedData']
+        rawData = info['rawData']
+        rawData = str(rawData)
+        signature = info['signature']
+        iv = info['iv']
+        #第二步：　获取唯一的openid, session_key
+        url = 'https://api.weixin.qq.com/sns/jscode2session?appid=%s' \
+              '&secret=%s&js_code=%s&grant_type=authorization_code' % (appID, appSecret, code)
+        f = urllib.urlopen(url)
+        ret = json.loads(f.read())
+        #判断是否获取成功
+        if(len(ret['session_key']) > 1 and len(ret['openid']) > 1):
+            #第三步：根据openid, 生成tokenID, 将tokenID, session_key 存入到数据库中
+            openID = ret['openid']
+            sessionKey = ret['session_key']
+            sessionKey = str(sessionKey)
+            #第四步，　验证签名
+            newSignature = hashlib.sha1(rawData + sessionKey).hexdigest()
+            if(newSignature == signature):
+                encryptedData = encryptedData.encode('utf-8')
+                resultDict = self.decrypt(encryptedData, iv, sessionKey)
+                tokenManager = TokenManager()
+                unionid = self.generateUnionID(resultDict['nickName'])
+                #查询是否存在已经创建的用户
+                query = db.session.query(UserInfo).filter(UserInfo.unionid == unionid)
+                result = query.first()
+                userQuery = query.filter(columnOpenID == openID)
+                userResult = userQuery.first()
+                if userResult is not None:
+                    #第一种情况，用户已经登录过小程序
+                    userID = userResult.userID
+                else:
+
+                    #第二种情况，用户登录过公众号， 小程序为第一次登录
+                    userID = self.generateID(openID)
+                    if result is not None:
+                        updateInfo = {
+                            UserInfo.userID: userID,
+                            columnOpenID: openID
+                        }
+                        query.update(updateInfo, synchronize_session=False)
+                    else:
+                        #第三种情况，用户没有登录过公众号， 小程序为第一次登录
+                        createInfo = {}
+                        createInfo['userID'] = userID
+                        createInfo['userName'] = resultDict['nickName']
+                        createInfo['tel'] = ''
+                        createInfo[stringOpenID] = openID
+                        createInfo['createTime'] = datetime.now()
+                        createInfo['unionid'] = self.generateUnionID(resultDict['nickName'])
+                        UserInfo.createApplet(createInfo=createInfo)
+                db.session.commit()
+                tokenID = tokenManager.createToken(userID=userID)
+                return (True, tokenID)
+        else:
+            return (False, None)
+
+    # 使用微信账号登录
+    def oaLoginWithWechat(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        info['appID'] = self.appID
+        info['appSecret'] = self.appSecret
+        info['columnOpenID'] = UserInfo.openid3
+        info['stringOpenID'] = 'openid3'
+        return self.doWechatAppLogin(info=info)
+
 
     #微信登录时候，解密用户加密的数据信息
     def decrypt(self, encryptedData, iv, sessionKey):
@@ -778,3 +852,7 @@ class UserManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+
+
+    # def oaWechatBindTel(self, jsonInfo):
