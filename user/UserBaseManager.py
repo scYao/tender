@@ -144,8 +144,23 @@ class UserBaseManager(Util):
 
     def checkRight(self, info):
         userID = info['userID']
-        operationTag = info['operationTag']
-
-        if operationTag == RIGHT_TAG_CONTRACT:
-            return (True, None)
+        # operationTag = info['operationTag']
+        #
+        # if operationTag == RIGHT_TAG_CONTRACT:
+        #     return (True, None)
         return (True, None)
+
+    def tokenCheck(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['userID'] = userID
+        userBaseManager = UserBaseManager()
+        (status, reason) = userBaseManager.checkRight(info=info)
+        if status is not True:
+            return (False, reason)
+        return (True, info)

@@ -141,6 +141,21 @@ def sql_to_model_generate(info, o):
 
         print template
 
+# 生产update内容
+# companyID = info['companyID'].replace('\'', '\\\'').replace('\"', '\\\"')
+def sql_update(info, c):
+    lines = info.split('\n')
+    for l in lines:
+        str = l.strip()
+        words = str.split(' ')
+        name = words[0]
+        stype = words[1]
+        # 只有字符串带replace
+
+        template = "%s.%s : info['%s']," % (c, name, name)
+        print template
+
+
 # info['companyName'] = companyName
 # info['newArchiveID'] = newArchiveID
 # info['registerArea'] = registerArea
@@ -169,11 +184,22 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''	emergencyID nvarchar(100) primary key comment '突发事件ID',
-	createTime datetime comment '创建时间',
-	description text comment '描述',
-	resolvent text comment '解决方法',
-	contractID nvarchar(100) comment '合同ID'  '''
+    sql = '''	contractID nvarchar(100) primary key comment '合同ID',
+	title nvarchar(1000) comment '工程名称',
+	serialNumber nvarchar(100) comment '流水号',
+	createTime datetime comment '合同签订日期',
+	projectTypeID int comment '项目类型ID',
+	operationTypeID int comment '承接方式ID',
+	contractPrice double comment '合同金额（万元）',
+	contractWorkContent nvarchar(1000) comment '合同工作内容（工程量）',
+	contractor nvarchar(1000) comment '承包单位',
+	biddingDate datetime comment '中标通知书日期',
+	contractRecordDate datetime comment '合同备案日期',
+	contractKeepingDeprt nvarchar(1000) comment '合同保管部门',
+	archiveInfo nvarchar(1000) comment '合同归档情况',
+	contractDuration nvarchar(1000) comment '合同工期（开竣工日期）',
+	resultSubmissionDate nvarchar(100) comment '提交成果日期',
+	resultReviewDate nvarchar(100) comment '成果审查合格日期',  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)
@@ -187,4 +213,5 @@ if __name__ == '__main__':
     sql_to_generate_info(sql)
     print '\n'
     sql_to_create_info(sql)
-
+    print '\n'
+    sql_update(sql, 'Contract')

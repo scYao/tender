@@ -3407,3 +3407,48 @@ def get_contract_list():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+# 获取合同详情
+@app.route('/get_contract_detail/', methods=['POST', 'GET'])
+def get_contract_detail():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.getContractDetail(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取合同详情
+@app.route('/delete_contract/', methods=['POST', 'GET'])
+def delete_contract():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.deleteContract(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 编辑合同内容
+@app.route('/update_contract/', methods=['POST', 'GET'])
+def update_contract():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.updateContract(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
