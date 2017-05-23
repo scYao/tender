@@ -17,6 +17,7 @@ from models.ImgPath import ImgPath
 from models.UserInfo import UserInfo
 from tool.Util import Util
 from tool.config import ErrorInfo
+from tool.tagconfig import RIGHT_TAG_CONTRACT
 
 from UserManager import UserManager
 
@@ -139,3 +140,11 @@ class UserBaseManager(Util):
             errorInfo['detail'] = str(e)
             db.session.rollback()
             return (False, errorInfo)
+
+
+    def checkRight(self, info):
+        userID = info['userID']
+        operationTag = info['operationTag']
+
+        if operationTag == RIGHT_TAG_CONTRACT:
+            return (True, None)

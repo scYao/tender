@@ -44,6 +44,7 @@ from wechatPublic.WechatMessageManager import WechatMessageManager
 from stoken.StsTokenManager import StsTokenManager
 from fileInfo.FileInfoManager import FileInfoManager
 from department.DepartmentAreaManager import DepartmentAreaManager
+from contract.ContractManager import ContractManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -287,6 +288,21 @@ def get_tender_detail_text():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, jsonlist) = tenderManager.getTenderDetailText(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = jsonlist
+        return json.dumps(data)
+
+# 获取投标信息详情
+@app.route('/get_tender_detail_for_wechat_app/', methods=['POST', 'GET'])
+def get_tender_detail_for_wechat_app():
+    tenderManager = TenderManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, jsonlist) = tenderManager.getTenderDetailForWechatApp(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = jsonlist
@@ -3357,6 +3373,21 @@ def get_area_tree_withoud_user_id():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = departmentAreaManager.getAreaTreeWithoutUserID(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建合同
+@app.route('/create_contract/', methods=['POST', 'GET'])
+def create_contract():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.createContract(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result

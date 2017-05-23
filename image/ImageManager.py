@@ -285,3 +285,24 @@ class ImageManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, None)
+
+
+    def addImageListWithoutOSS(self, info):
+        imgList = info['imgList']
+        foreignID = info['foreignID']
+        try:
+            for img in imgList:
+                imgPath = img.imgPath
+                imgName = img.imgName
+                imageID = self.generateID(imgPath)
+                _img = ImgPath(imgPathID=imageID, path=imgPath,
+                               foreignID=foreignID, imgName=imgName)
+                db.session.add(_img)
+
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['SPORTS_16']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+        return (True, None)

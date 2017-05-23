@@ -456,6 +456,58 @@ class PushedTenderManager(Util):
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
 
+    def getPushedUserList(self, info):
+        pushedTenderInfo = info['pushedTenderInfo']
+
+        pushedUserList = []
+
+        self.__getRespAuditorInfo(info=info)
+        if pushedTenderInfo.operatorPersonPushedTime is not None:
+            u = {}
+            userManager = UserManager()
+            params = {}
+            params['userID'] = pushedTenderInfo.userID
+            (status, userInfo) = userManager.getUserInfo(info=params)
+            u['userID'] = userInfo['userID']
+            u['userName'] = userInfo['userName']
+            u['userType'] = userInfo['userType']
+            pushedUserList.append(u)
+        if pushedTenderInfo.responsiblePersonPushedTime \
+                is not None and self.selfUserType <= USER_TAG_RESPONSIBLEPERSON:
+            userManager = UserManager()
+            params = {}
+            params['userID'] = pushedTenderInfo.responsiblePersonID
+            u = {}
+            # 兼容老的数据
+            if pushedTenderInfo.responsiblePersonID is not None:
+                (status, userInfo) = userManager.getUserInfo(info=params)
+                u['userID'] = userInfo['userID']
+                u['userName'] = userInfo['userName']
+                u['userType'] = userInfo['userType']
+            else:
+                u['userID'] = self.resp['userID']
+                u['userName'] = self.resp['userName']
+                u['userType'] = self.resp['userType']
+
+            pushedUserList.append(u)
+        if pushedTenderInfo.auditorPushedTime \
+                is not None and self.selfUserType <= USER_TAG_AUDITOR:
+            u = {}
+            userManager = UserManager()
+            params = {}
+            params['userID'] = pushedTenderInfo.auditorID
+            if pushedTenderInfo.auditorID is not None:
+                (status, userInfo) = userManager.getUserInfo(info=params)
+                u['userID'] = userInfo['userID']
+                u['userName'] = userInfo['userName']
+                u['userType'] = userInfo['userType']
+            else:
+                u['userID'] = self.auditor['userID']
+                u['userName'] = self.auditor['userName']
+                u['userType'] = self.auditor['userType']
+            pushedUserList.append(u)
+        return (True, pushedUserList)
+
     def __generatePushedBrief(self, result):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))

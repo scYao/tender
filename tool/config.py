@@ -296,6 +296,12 @@ ErrorInfo['TENDER_49'] = {
     'zhInfo' : '无法命名别人的文件夹!'
 }
 
+ErrorInfo['TENDER_50'] = {
+    'code' : 'TENDER_50',
+    'info' : 'permission denied!',
+    'zhInfo' : '没有足够的权限!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

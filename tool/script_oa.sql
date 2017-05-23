@@ -201,6 +201,83 @@ create table departmentRight(
 	tag int default 0 comment '0 代表department,  1 代表areaID'
 );
 
+-- 合同管理相关表
+-- 项目类型标
+create table projectType(
+	projectTypeID int primary key comment '项目类型ID',
+	projectTypeName nvarchar(100) comment '项目类型名称'
+);
+
+-- 承接方式表
+create table projectOperationType(
+	operationTypeID int primary key comment '承接方式ID',
+	operationTypeName nvarchar(100) comment '承接方式'
+);
+
+-- 合同
+create table contract(
+	contractID nvarchar(100) primary key comment '合同ID',
+	title nvarchar(1000) comment '工程名称',
+	serialNumber nvarchar(100) comment '流水号',
+	createTime datetime comment '合同签订日期',
+	projectTypeID int comment '项目类型ID',
+	operationTypeID int comment '承接方式ID',
+	contractPrice double comment '合同金额（万元）',
+	contractWorkContent nvarchar(1000) comment '合同工作内容（工程量）',
+	contractor nvarchar(1000) comment '承包单位',
+	biddingDate datetime comment '中标通知书日期',
+	contractRecordDate datetime comment '合同备案日期',
+	contractKeepingDeprt nvarchar(1000) comment '合同保管部门',
+	archiveInfo nvarchar(1000) comment '合同归档情况',
+	contractDuration nvarchar(1000) comment '合同工期（开竣工日期）',
+	resultSubmissionDate nvarchar(100) comment '提交成果日期',
+	resultReviewDate nvarchar(100) comment '成果审查合格日期',
+	-- submittalDate nvarchar(100) comment '送审日期',
+	-- submittalPrice double comment '送审金额（万元）',
+	-- authorizedPrice double comment '审定金额（万元）',
+	-- cumulativeInvoicePrice double comment '累计开票金额（万元）',
+	-- cumulativePayPrice double comment '累计付款金额（万元）',
+	-- balance double comment '余款（万元）'
+);
+
+-- 合同进度表
+create table contractProjectProcess(
+	processID nvarchar(100) primary key comment '合同进度ID',
+	createTime datetime comment '时间',
+	processRate int comment '进度值',
+	description text comment '描述',
+	userName nvarchar(100) comment '汇报人',
+	contractID nvarchar(100) comment '合同ID'
+);
+
+-- 决算进度
+create table contractFinalAccounts(
+	accountID nvarchar(100) primary key comment '进度ID',
+	submittalDate nvarchar(100) comment '送审日期',
+	submittalPrice double comment '送审金额（万元）',
+	authorizedPrice double comment '审定金额（万元）',
+	cumulativeInvoicePrice double comment '累计开票金额（万元）',
+	cumulativePayPrice double comment '累计付款金额（万元）',
+	balance double comment '余款（万元）',
+	contractID nvarchar(100) comment '合同ID'
+);
+
+-- 突发事件
+create table contractEmergency(
+	emergencyID nvarchar(100) primary key comment '突发事件ID',
+	createTime datetime comment '创建时间',
+	description text comment '描述',
+	resolvent text comment '解决方法',
+	contractID nvarchar(100) comment '合同ID'
+);
+
+create table operationRight(
+	rightID nvarchar(100) primary key comment '',
+	userID nvarchar(100) comment '',
+	operatorTag int comment '',
+
+);
+
 ALTER TABLE pushedTenderInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operator CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -215,6 +292,12 @@ ALTER TABLE fileInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 ALTER TABLE department CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE departmentArea CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE departmentRight CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE contract CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE projectType CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE projectOperationType CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE contractProjectProcess CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE contractFinalAccounts CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE contractEmergency CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);
@@ -227,3 +310,8 @@ alter table quotedPrice add constraint quote_FK_tender foreign key(tenderID) ref
 alter table tenderComment add constraint comment_FK_user foreign key(userID) references userInfo(userID);
 alter table subscribedKey add constraint subscribed_FK_user foreign key(userID) references userInfo(userID);
 alter table departmentArea add constraint area_FK_department foreign key(departmentID) references department(departmentID);
+alter table contract add constraint contract_FK_type foreign key(projectTypeID) references projectType(projectTypeID);
+alter table contract add constraint contract_FK_o_type foreign key(operationTypeID) references projectOperationType(operationTypeID);
+alter table contractProjectProcess add constraint process_FK_contract foreign key(contractID) references contract(contractID);
+alter table contractFinalAccounts add constraint account_FK_contract foreign key(contractID) references contract(contractID);
+alter table contractEmergency add constraint emergency_FK_contract foreign key(contractID) references contract(contractID);

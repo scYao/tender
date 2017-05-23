@@ -4,6 +4,8 @@ import traceback
 import urllib2
 import poster
 import requests
+from pushedTender.PushedTenderManager import PushedTenderManager
+from user.UserBaseManager import UserBaseManager
 
 sys.path.append("..")
 import os
@@ -22,7 +24,7 @@ from models.TenderSlave import TenderSlave
 from models.Favorite import Favorite
 from models.SearchKey import SearchKey
 from models.PushedTenderInfo import PushedTenderInfo
-from tool.tagconfig import SEARCH_KEY_TAG_TENDRE, PUSH_TENDER_INFO_TAG_TENDER
+from tool.tagconfig import SEARCH_KEY_TAG_TENDRE, PUSH_TENDER_INFO_TAG_TENDER, USER_TAG_BOSS
 from sqlalchemy import desc, and_, func
 from user.AdminManager import AdminManager
 from bs4 import BeautifulSoup
@@ -403,12 +405,55 @@ class TenderManager(Util):
                 tenderDetail['favoriteID'] = favoriteResult.favoriteID
         return (True, tenderDetail)
 
+    def getTenderDetailForWechatApp(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        # 权限校验在getTenderDetail里
+        (status, dataInfo) = self.getTenderDetail(jsonInfo=jsonInfo)
+        if status is not True:
+            return (False, dataInfo)
+
+        info = json.loads(jsonInfo)
+        tenderID = info['tenderID']
+        try:
+            result = db.session.query(PushedTenderInfo).filter(
+                PushedTenderInfo.tenderID == tenderID
+            ).first()
+            if result is None:
+                return (False, ErrorInfo['TENDER_04'])
+            dataInfo['deadline'] = str(result.deadline)
+            dataInfo['state'] = result.state
+            pushedTenderManager = PushedTenderManager()
+            params = {}
+            params['pushedTenderInfo'] = result
+            params['userType'] = USER_TAG_BOSS
+            userBaseManager = UserBaseManager()
+            info['userID'] = userID
+            (status, userInfo) = userBaseManager.getUserInfo(info=info)
+            params['customizedCompanyID'] = userInfo['customizedCompanyID']
+            params['selfUserType'] = USER_TAG_BOSS
+            (status, pushedUserList) = pushedTenderManager.getPushedUserList(info=params)
+            dataInfo['pushedUserList'] = pushedUserList
+            soup = BeautifulSoup(dataInfo['detail'], 'lxml')
+            detail = soup.get_text().encode("utf-8")
+            dataInfo['detail'] = detail.strip()
+            return (True, dataInfo)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+
+
 
     def getTenderDetailText(self, jsonInfo):
         (status, callBackInfo) = self.getTenderDetail(jsonInfo=jsonInfo)
-        if status:
+        if status is True:
             soup = BeautifulSoup(callBackInfo['detail'], 'lxml')
-            result =  soup.get_text().encode("utf-8")
+            result = soup.get_text().encode("utf-8")
             callBackInfo['detail'] = result.strip()
             return (True, callBackInfo)
         else:
