@@ -302,6 +302,12 @@ ErrorInfo['TENDER_50'] = {
     'zhInfo' : '没有足够的权限!'
 }
 
+ErrorInfo['TENDER_51'] = {
+    'code' : 'TENDER_51',
+    'info' : 'delete image error!',
+    'zhInfo' : '删除图片错误!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

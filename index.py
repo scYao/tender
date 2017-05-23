@@ -3452,3 +3452,33 @@ def update_contract():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+# 往合同中增加文件
+@app.route('/add_file_to_contract/', methods=['POST', 'GET'])
+def add_file_to_contract():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.addFileToContract(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 删除合同中的文件
+@app.route('/delete_contract_file/', methods=['POST', 'GET'])
+def delete_contract_file():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.deleteContractFile(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)

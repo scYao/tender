@@ -87,6 +87,31 @@ class ImageManager(Util):
         return (True, None)
 
 
+    def deleteImage(self, info):
+        imgPathID = info["imgPathID"]
+        directory = info['directory']
+
+        deleteList = []
+
+        ossInfo = {}
+        ossInfo['bucket'] = 'sjtender'
+        try:
+            deleteQuery = db.session.query(ImgPath).filter(
+                ImgPath.imgPathID == imgPathID
+            )
+            imgPath = deleteQuery.first()
+            deleteList.append('%s/%s' % (directory, imgPath.path))
+            deleteQuery.delete(synchronize_session=False)
+            self.deleteOSSImages(deleteList, ossInfo)
+            db.session.commit()
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_51']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
+
+        return (True, None)
+
     # 删除图片操作
     def deleteImgList(self, info):
         deleteImgIDList = info["deleteImgIDList"]
@@ -129,8 +154,8 @@ class ImageManager(Util):
         deleteList = ['%s/%s' % (directory, i.path) for i in allResult]
         ossInfo = {}
         ossInfo['bucket'] = 'sjsecondhand'
-        query.delete(synchronize_session=False)
         try:
+            query.delete(synchronize_session=False)
             if len(deleteList) > 0:
                 self.deleteOSSImages(deleteList, ossInfo)
         except Exception as e:

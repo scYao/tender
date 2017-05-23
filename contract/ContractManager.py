@@ -221,3 +221,26 @@ class ContractManager(Util):
             db.session.rollback()
             return (False, errorInfo)
 
+
+    def addFileToContract(self, jsonInfo):
+        userBaseManager = UserBaseManager()
+        (status, info) = userBaseManager.tokenCheck(jsonInfo=jsonInfo)
+        if status is not True:
+            return (False, info)
+
+        info['foreignID'] = info['contractID']
+        imgManager = ImageManager()
+        return imgManager.addImageListWithoutOSS(info=info)
+
+
+    def deleteContractFile(self, jsonInfo):
+        userBaseManager = UserBaseManager()
+        (status, info) = userBaseManager.tokenCheck(jsonInfo=jsonInfo)
+        if status is not True:
+            return (False, info)
+
+        imgManager = ImageManager()
+        info['directory'] = 'contract'
+        return imgManager.deleteImage(info=info)
+
+
