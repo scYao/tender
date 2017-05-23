@@ -47,12 +47,6 @@ class ContractManager(Util):
         contractDuration = info['contractDuration'].replace('\'', '\\\'').replace('\"', '\\\"')
         resultSubmissionDate = info['resultSubmissionDate'].replace('\'', '\\\'').replace('\"', '\\\"')
         resultReviewDate = info['resultReviewDate'].replace('\'', '\\\'').replace('\"', '\\\"')
-        submittalDate = info['submittalDate'].replace('\'', '\\\'').replace('\"', '\\\"')
-        submittalPrice = info['submittalPrice']
-        authorizedPrice = info['authorizedPrice']
-        cumulativeInvoicePrice = info['cumulativeInvoicePrice']
-        cumulativePayPrice = info['cumulativePayPrice']
-        balance = info['balance']
 
 
         contractID = self.generateID(title)
@@ -67,10 +61,7 @@ class ContractManager(Util):
                                 contractKeepingDeprt=contractKeepingDeprt,
                                 archiveInfo=archiveInfo, contractDuration=contractDuration,
                                 resultSubmissionDate=resultSubmissionDate,
-                                resultReviewDate=resultReviewDate, submittalDate=submittalDate,
-                                submittalPrice=submittalPrice, authorizedPrice=authorizedPrice,
-                                cumulativeInvoicePrice=cumulativeInvoicePrice,
-                                cumulativePayPrice=cumulativePayPrice, balance=balance)
+                                resultReviewDate=resultReviewDate)
             db.session.add(contract)
             db.session.commit()
         except Exception as e:
@@ -107,3 +98,44 @@ class ContractManager(Util):
         if status is not True:
             return (False, reason)
         return self.__doCreateContract(info=info)
+
+    def __generateContractBrief(self, o):
+        res = {}
+        res.update(Contract.generate(o=o))
+        return res
+
+    def getContractList(self, jsonInfo):
+        info = json.loads(jsonInfo)
+        tokenID = info['tokenID']
+        (status, userID) = self.isTokenValid(tokenID)
+        if status is not True:
+            errorInfo = ErrorInfo['TENDER_01']
+            return (False, errorInfo)
+
+        info['userID'] = userID
+        userBaseManager = UserBaseManager()
+        (status, reason) = userBaseManager.checkRight(info=info)
+        if status is not True:
+            return (False, reason)
+
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            allResult = db.session.query(
+                Contract
+            ).offset(startIndex).limit(pageCount).all()
+            count = db.session.query(func.count(Contract)).first()
+            if count is None:
+                count = 0
+
+            dataList = [self.__generateContractBrief(o=o) for o in allResult]
+            dataInfo = {}
+            dataInfo['contractList'] = dataList
+            dataInfo['count'] = count
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

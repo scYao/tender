@@ -25,21 +25,19 @@ class Contract(db.Model):
     contractDuration = db.Column(db.String(1000))
     resultSubmissionDate = db.Column(db.String(100))
     resultReviewDate = db.Column(db.String(100))
-    submittalDate = db.Column(db.String(100))
-    submittalPrice = db.Column(db.Float)
-    authorizedPrice = db.Column(db.Float)
-    cumulativeInvoicePrice = db.Column(db.Float)
-    cumulativePayPrice = db.Column(db.Float)
-    balance = db.Column(db.Float)
+    # submittalDate = db.Column(db.String(100))
+    # submittalPrice = db.Column(db.Float)
+    # authorizedPrice = db.Column(db.Float)
+    # cumulativeInvoicePrice = db.Column(db.Float)
+    # cumulativePayPrice = db.Column(db.Float)
+    # balance = db.Column(db.Float)
 
     def __init__(self, contractID=None, title=None, serialNumber=None,
                  createTime=None, projectTypeID=0, operationTypeID=0,
                  contractPrice=0, contractWorkContent=None,
                  contractor=None, biddingDate=None, contractRecordDate=None,
                  contractKeepingDeprt=None, archiveInfo=None, contractDuration=None,
-                 resultSubmissionDate=None, resultReviewDate=None,
-                 submittalDate=None, submittalPrice=0, authorizedPrice=0,
-                 cumulativeInvoicePrice=0, cumulativePayPrice=0, balance=0):
+                 resultSubmissionDate=None, resultReviewDate=None):
         self.contractID = contractID
         self.title = title
         self.serialNumber = serialNumber
@@ -56,12 +54,12 @@ class Contract(db.Model):
         self.contractDuration = contractDuration
         self.resultSubmissionDate = resultSubmissionDate
         self.resultReviewDate = resultReviewDate
-        self.submittalDate = submittalDate
-        self.submittalPrice = submittalPrice
-        self.authorizedPrice = authorizedPrice
-        self.cumulativeInvoicePrice = cumulativeInvoicePrice
-        self.cumulativePayPrice = cumulativePayPrice
-        self.balance = balance
+        # self.submittalDate = submittalDate
+        # self.submittalPrice = submittalPrice
+        # self.authorizedPrice = authorizedPrice
+        # self.cumulativeInvoicePrice = cumulativeInvoicePrice
+        # self.cumulativePayPrice = cumulativePayPrice
+        # self.balance = balance
 
     def __repr__(self):
         return self.contractID
@@ -85,11 +83,11 @@ class Contract(db.Model):
         res['contractDuration'] = o.contractDuration
         res['resultSubmissionDate'] = o.resultSubmissionDate
         res['resultReviewDate'] = o.resultReviewDate
-        res['submittalDate'] = o.submittalDate
-        res['submittalPrice'] = o.submittalPrice
-        res['authorizedPrice'] = o.authorizedPrice
-        res['cumulativeInvoicePrice'] = o.cumulativeInvoicePrice
-        res['cumulativePayPrice'] = o.cumulativePayPrice
-        res['balance'] = o.balance
+        # res['submittalDate'] = o.submittalDate
+        # res['submittalPrice'] = o.submittalPrice
+        # res['authorizedPrice'] = o.authorizedPrice
+        # res['cumulativeInvoicePrice'] = o.cumulativeInvoicePrice
+        # res['cumulativePayPrice'] = o.cumulativePayPrice
+        # res['balance'] = o.balance
 
         return res

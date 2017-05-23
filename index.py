@@ -3392,3 +3392,18 @@ def create_contract():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+# 获取合同列表
+@app.route('/get_contract_list/', methods=['POST', 'GET'])
+def get_contract_list():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.getContractList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)

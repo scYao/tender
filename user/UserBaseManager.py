@@ -148,3 +148,4 @@ class UserBaseManager(Util):
 
         if operationTag == RIGHT_TAG_CONTRACT:
             return (True, None)
+        return (True, None)
