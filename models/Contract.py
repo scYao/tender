@@ -13,8 +13,8 @@ class Contract(db.Model):
     title = db.Column(db.String(1000))
     serialNumber = db.Column(db.String(100))
     createTime = db.Column(db.DateTime)
-    projectTypeID = db.Column(db.Integer)
-    operationTypeID = db.Column(db.Integer)
+    projectTypeName = db.Column(db.Integer)
+    operationTypeName = db.Column(db.Integer)
     contractPrice = db.Column(db.Float)
     contractWorkContent = db.Column(db.String(1000))
     contractor = db.Column(db.String(1000))
@@ -33,7 +33,7 @@ class Contract(db.Model):
     # balance = db.Column(db.Float)
 
     def __init__(self, contractID=None, title=None, serialNumber=None,
-                 createTime=None, projectTypeID=0, operationTypeID=0,
+                 createTime=None, projectTypeName=0, operationTypeName=0,
                  contractPrice=0, contractWorkContent=None,
                  contractor=None, biddingDate=None, contractRecordDate=None,
                  contractKeepingDeprt=None, archiveInfo=None, contractDuration=None,
@@ -42,8 +42,8 @@ class Contract(db.Model):
         self.title = title
         self.serialNumber = serialNumber
         self.createTime = createTime
-        self.projectTypeID = projectTypeID
-        self.operationTypeID = operationTypeID
+        self.projectTypeName = projectTypeName
+        self.operationTypeName = operationTypeName
         self.contractPrice = contractPrice
         self.contractWorkContent = contractWorkContent
         self.contractor = contractor
@@ -71,8 +71,8 @@ class Contract(db.Model):
         res['title'] = o.title
         res['serialNumber'] = o.serialNumber
         res['createTime'] = str(o.createTime)
-        res['projectTypeID'] = o.projectTypeID
-        res['operationTypeID'] = o.operationTypeID
+        res['projectTypeName'] = o.projectTypeName
+        res['operationTypeName'] = o.operationTypeName
         res['contractPrice'] = o.contractPrice
         res['contractWorkContent'] = o.contractWorkContent
         res['contractor'] = o.contractor

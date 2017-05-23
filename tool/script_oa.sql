@@ -202,7 +202,7 @@ create table departmentRight(
 );
 
 -- 合同管理相关表
--- 项目类型标
+-- 项目类型表
 create table projectType(
 	projectTypeID int primary key comment '项目类型ID',
 	projectTypeName nvarchar(100) comment '项目类型名称'
@@ -220,8 +220,8 @@ create table contract(
 	title nvarchar(1000) comment '工程名称',
 	serialNumber nvarchar(100) comment '流水号',
 	createTime datetime comment '合同签订日期',
-	projectTypeID int comment '项目类型ID',
-	operationTypeID int comment '承接方式ID',
+	projectTypeName nvarchar(100) comment '项目类型',
+	operationTypeName nvarchar(100) comment '承接方式',
 	contractPrice double comment '合同金额（万元）',
 	contractWorkContent nvarchar(1000) comment '合同工作内容（工程量）',
 	contractor nvarchar(1000) comment '承包单位',
@@ -310,8 +310,8 @@ alter table quotedPrice add constraint quote_FK_tender foreign key(tenderID) ref
 alter table tenderComment add constraint comment_FK_user foreign key(userID) references userInfo(userID);
 alter table subscribedKey add constraint subscribed_FK_user foreign key(userID) references userInfo(userID);
 alter table departmentArea add constraint area_FK_department foreign key(departmentID) references department(departmentID);
-alter table contract add constraint contract_FK_type foreign key(projectTypeID) references projectType(projectTypeID);
-alter table contract add constraint contract_FK_o_type foreign key(operationTypeID) references projectOperationType(operationTypeID);
+-- alter table contract add constraint contract_FK_type foreign key(projectTypeID) references projectType(projectTypeID);
+-- alter table contract add constraint contract_FK_o_type foreign key(operationTypeID) references projectOperationType(operationTypeID);
 alter table contractProjectProcess add constraint process_FK_contract foreign key(contractID) references contract(contractID);
 alter table contractFinalAccounts add constraint account_FK_contract foreign key(contractID) references contract(contractID);
 alter table contractEmergency add constraint emergency_FK_contract foreign key(contractID) references contract(contractID);

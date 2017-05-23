@@ -35,8 +35,8 @@ class ContractManager(Util):
         title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"')
         serialNumber = info['serialNumber'].replace('\'', '\\\'').replace('\"', '\\\"')
         createTime = info['createTime']
-        projectTypeID = info['projectTypeID']
-        operationTypeID = info['operationTypeID']
+        projectTypeName = info['projectTypeName']
+        operationTypeName = info['operationTypeName']
         contractPrice = info['contractPrice']
         contractWorkContent = info['contractWorkContent'].replace('\'', '\\\'').replace('\"', '\\\"')
         contractor = info['contractor'].replace('\'', '\\\'').replace('\"', '\\\"')
@@ -54,7 +54,7 @@ class ContractManager(Util):
         try:
             contract = Contract(contractID=contractID, title=title,
                                 serialNumber=serialNumber, createTime=createTime,
-                                projectTypeID=projectTypeID, operationTypeID=operationTypeID,
+                                projectTypeName=projectTypeName, operationTypeName=operationTypeName,
                                 contractPrice=contractPrice, contractWorkContent=contractWorkContent,
                                 contractor=contractor, biddingDate=biddingDate,
                                 contractRecordDate=contractRecordDate,
@@ -64,6 +64,7 @@ class ContractManager(Util):
                                 resultReviewDate=resultReviewDate)
             db.session.add(contract)
             db.session.commit()
+            return (True, contractID)
         except Exception as e:
             print e
             traceback.print_exc()
@@ -93,11 +94,13 @@ class ContractManager(Util):
         if status is not True:
             return (False, ErrorInfo['TENDER_50'])
 
+        (status, contractID) = self.__doCreateContract(info=info)
         imgManager = ImageManager()
+        info['foreignID'] = contractID
         (status, reason) = imgManager.addImageListWithoutOSS(info=info)
         if status is not True:
             return (False, reason)
-        return self.__doCreateContract(info=info)
+        return (True, contractID)
 
     def __generateContractBrief(self, o):
         res = {}
@@ -198,8 +201,8 @@ class ContractManager(Util):
                 Contract.title : info['title'],
                 Contract.serialNumber : info['serialNumber'],
                 Contract.createTime : info['createTime'],
-                Contract.projectTypeID : info['projectTypeID'],
-                Contract.operationTypeID : info['operationTypeID'],
+                Contract.projectTypeName : info['projectTypeName'],
+                Contract.operationTypeName : info['operationTypeName'],
                 Contract.contractPrice : info['contractPrice'],
                 Contract.contractWorkContent : info['contractWorkContent'],
                 Contract.contractor : info['contractor'],
