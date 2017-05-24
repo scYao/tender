@@ -123,7 +123,7 @@ class ContractManager(Util):
 
             dataList = [self.__generateContractBrief(o=o) for o in allResult]
             dataInfo = {}
-            dataInfo['contractList'] = dataList
+            dataInfo['dataList'] = dataList
             dataInfo['count'] = count
             return (True, dataInfo)
         except Exception as e:
@@ -251,4 +251,5 @@ class ContractManager(Util):
             return (False, info)
 
         imgManager = ImageManager()
+        info['foreignID'] = info['contractID']
         return imgManager.getImageList(info=info)

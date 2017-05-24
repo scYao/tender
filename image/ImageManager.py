@@ -318,13 +318,14 @@ class ImageManager(Util):
             query = db.session.query(ImgPath).filter(
                 ImgPath.foreignID == foreignID
             ).offset(startIndex).limit(pageCount)
-            countQuery = db.session.query(func.count()).filter(
+            countQuery = db.session.query(func.count(ImgPath.imgPathID)).filter(
                 ImgPath.foreignID == foreignID
             )
             allResult = query.all()
             def __generateImg(o):
                 res = {}
-                res.update(ImgPath.generate(img=o, ossInfo=self.ossInfo, directory='contract', isFile=True))
+                res.update(ImgPath.generate(img=o, ossInfo=self.ossInfo,
+                                            directory='contract', hd=True, isFile=True))
                 return res
             dataList = [__generateImg(o=o) for o in allResult]
             count = countQuery.first()

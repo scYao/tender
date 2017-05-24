@@ -45,6 +45,7 @@ from stoken.StsTokenManager import StsTokenManager
 from fileInfo.FileInfoManager import FileInfoManager
 from department.DepartmentAreaManager import DepartmentAreaManager
 from contract.ContractManager import ContractManager
+from contract.ContractProjectProcessManager import ContractProjectProcessManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -3493,6 +3494,51 @@ def get_contract_file_list():
     if request.method == 'POST':
         paramsJson = request.form['data']
         (status, result) = contractManager.getContractFileList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建合同项目进度
+@app.route('/create_contract_project_process/', methods=['POST', 'GET'])
+def create_contract_project_process():
+    contractProjectProcessManager = ContractProjectProcessManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractProjectProcessManager.createContractProjectProcess(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 删除合同项目进度
+@app.route('/delete_contract_project_process/', methods=['POST', 'GET'])
+def delete_contract_project_process():
+    contractProjectProcessManager = ContractProjectProcessManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractProjectProcessManager.deleteContractProjectProcess(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取合同项目进度列表
+@app.route('/get_contract_project_process_list/', methods=['POST', 'GET'])
+def get_contract_project_process_list():
+    contractProjectProcessManager = ContractProjectProcessManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractProjectProcessManager.getContractProjectProcessList(paramsJson)
         if status is not False:
             data['status'] = 'SUCCESS'
         data['data'] = result
