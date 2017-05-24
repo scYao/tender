@@ -55,15 +55,24 @@ class Contract(db.Model):
         res['contractID'] = o.contractID
         res['title'] = o.title
         res['serialNumber'] = o.serialNumber
-        res['createTime'] = str(o.createTime)[:10]
+        if o.createTime is not None:
+            res['createTime'] = str(o.createTime)[:10]
+        else:
+            res['createTime'] = ''
         res['projectTypeName'] = o.projectTypeName
         res['operationTypeName'] = o.operationTypeName
         res['contractPrice'] = o.contractPrice
         res['contractWorkContent'] = o.contractWorkContent
         res['contractor'] = o.contractor
         res['responsiblePerson'] = o.responsiblePerson
-        res['biddingDate'] = str(o.biddingDate)[:10]
-        res['contractRecordDate'] = str(o.contractRecordDate)[:10]
+        if o.biddingDate is not None:
+            res['biddingDate'] = str(o.biddingDate)[:10]
+        else:
+            res['biddingDate'] = ''
+        if o.contractRecordDate is not None:
+            res['contractRecordDate'] = str(o.contractRecordDate)[:10]
+        else:
+            res['contractRecordDate'] = ''
         res['contractKeepingDeprt'] = o.contractKeepingDeprt
         res['archiveInfo'] = o.archiveInfo
         res['contractDuration'] = o.contractDuration

@@ -27,7 +27,10 @@ class ContractEmergency(db.Model):
     def generate(o):
         res = {}
         res['emergencyID'] = o.emergencyID
-        res['createTime'] = str(o.createTime)
+        if o.createTime is not None:
+            res['createTime'] = str(o.createTime)
+        else:
+            res['createTime'] = ''
         res['description'] = o.description
         res['resolvent'] = o.resolvent
         res['contractID'] = o.contractID

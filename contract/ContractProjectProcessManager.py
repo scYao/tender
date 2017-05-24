@@ -29,7 +29,6 @@ class ContractProjectProcessManager(Util):
 
     def __doCreateContractProjectProcess(self, info):
         createTime = info['createTime']
-        processRate = info['processRate']
         description = info['description'].replace('\'', '\\\'').replace('\"', '\\\"').strip()
         userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"').strip()
         contractID = info['contractID']
@@ -40,7 +39,7 @@ class ContractProjectProcessManager(Util):
 
         try:
             proc = ContractProjectProcess(processID=processID, createTime=createTime,
-                                          processRate=processRate, description=description,
+                                          description=description,
                                           userName=userName, contractID=contractID,
                                           resultSubmissionDate=resultSubmissionDate,
                                           resultReviewDate=resultReviewDate)

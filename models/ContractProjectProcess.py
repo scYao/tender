@@ -35,7 +35,10 @@ class ContractProjectProcess(db.Model):
     def generate(o):
         res = {}
         res['processID'] = o.processID
-        res['createTime'] = str(o.createTime)
+        if o.createTime is not None:
+            res['createTime'] = str(o.createTime)[:10]
+        else:
+            res['createTime'] = ''
         res['processRate'] = o.processRate
         res['description'] = o.description
         res['userName'] = o.userName

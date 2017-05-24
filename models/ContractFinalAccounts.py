@@ -42,7 +42,10 @@ class ContractFinalAccounts(db.Model):
         res['submittalDate'] = o.submittalDate
         res['submittalPrice'] = o.submittalPrice
         res['authorizedPrice'] = o.authorizedPrice
-        res['authorizedDate'] = str(o.authorizedDate)
+        if o.authorizedDate is not None:
+            res['authorizedDate'] = str(o.authorizedDate)
+        else:
+            res['authorizedDate'] = ''
         res['cumulativeInvoicePrice'] = o.cumulativeInvoicePrice
         res['cumulativePayPrice'] = o.cumulativePayPrice
         res['balance'] = o.balance
