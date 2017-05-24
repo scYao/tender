@@ -40,13 +40,12 @@ class ContractManager(Util):
         contractPrice = info['contractPrice']
         contractWorkContent = info['contractWorkContent'].replace('\'', '\\\'').replace('\"', '\\\"')
         contractor = info['contractor'].replace('\'', '\\\'').replace('\"', '\\\"')
+        responsiblePerson = info['responsiblePerson'].replace('\'', '\\\'').replace('\"', '\\\"')
         biddingDate = info['biddingDate']
         contractRecordDate = info['contractRecordDate']
         contractKeepingDeprt = info['contractKeepingDeprt'].replace('\'', '\\\'').replace('\"', '\\\"')
         archiveInfo = info['archiveInfo'].replace('\'', '\\\'').replace('\"', '\\\"')
         contractDuration = info['contractDuration'].replace('\'', '\\\'').replace('\"', '\\\"')
-        resultSubmissionDate = info['resultSubmissionDate'].replace('\'', '\\\'').replace('\"', '\\\"')
-        resultReviewDate = info['resultReviewDate'].replace('\'', '\\\'').replace('\"', '\\\"')
 
 
         contractID = self.generateID(title)
@@ -56,12 +55,10 @@ class ContractManager(Util):
                                 serialNumber=serialNumber, createTime=createTime,
                                 projectTypeName=projectTypeName, operationTypeName=operationTypeName,
                                 contractPrice=contractPrice, contractWorkContent=contractWorkContent,
-                                contractor=contractor, biddingDate=biddingDate,
+                                contractor=contractor, responsiblePerson=responsiblePerson, biddingDate=biddingDate,
                                 contractRecordDate=contractRecordDate,
                                 contractKeepingDeprt=contractKeepingDeprt,
-                                archiveInfo=archiveInfo, contractDuration=contractDuration,
-                                resultSubmissionDate=resultSubmissionDate,
-                                resultReviewDate=resultReviewDate)
+                                archiveInfo=archiveInfo, contractDuration=contractDuration)
             db.session.add(contract)
             db.session.commit()
             return (True, contractID)
@@ -123,6 +120,8 @@ class ContractManager(Util):
             count = db.session.query(func.count(Contract.contractID)).first()
             if count is None:
                 count = 0
+            else:
+                count = count[0]
 
             dataList = [self.__generateContractBrief(o=o) for o in allResult]
             dataInfo = {}
@@ -206,13 +205,12 @@ class ContractManager(Util):
                 Contract.contractPrice : info['contractPrice'],
                 Contract.contractWorkContent : info['contractWorkContent'],
                 Contract.contractor : info['contractor'],
+                Contract.responsiblePerson : info['responsiblePerson'],
                 Contract.biddingDate : info['biddingDate'],
                 Contract.contractRecordDate : info['contractRecordDate'],
                 Contract.contractKeepingDeprt : info['contractKeepingDeprt'],
                 Contract.archiveInfo : info['archiveInfo'],
-                Contract.contractDuration : info['contractDuration'],
-                Contract.resultSubmissionDate : info['resultSubmissionDate'],
-                Contract.resultReviewDate : info['resultReviewDate']
+                Contract.contractDuration : info['contractDuration']
             }, synchronize_session=False)
             db.session.commit()
             return (True, None)

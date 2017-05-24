@@ -14,16 +14,21 @@ class ContractProjectProcess(db.Model):
     processRate = db.Column(db.Integer)
     description = db.Column(db.Text)
     userName = db.Column(db.String(100))
+    resultSubmissionDate = db.Column(db.String(100))
+    resultReviewDate = db.Column(db.String(100))
     contractID = db.Column(db.String(100), db.ForeignKey('Contract.contractID'))
 
     def __init__(self, processID=None, createTime=None,
-                 processRate=0, description=None, userName=None, contractID=None):
+                 processRate=0, description=None, userName=None,
+                 contractID=None, resultSubmissionDate=None, resultReviewDate=None):
         self.processID = processID
         self.createTime = createTime
         self.processRate = processRate
         self.description = description
         self.userName = userName
         self.contractID = contractID
+        self.resultSubmissionDate = resultSubmissionDate
+        self.resultReviewDate = resultReviewDate
 
 
     @staticmethod
@@ -35,6 +40,8 @@ class ContractProjectProcess(db.Model):
         res['description'] = o.description
         res['userName'] = o.userName
         res['contractID'] = o.contractID
+        res['resultSubmissionDate'] = o.resultSubmissionDate
+        res['resultReviewDate'] = o.resultReviewDate
         return res
 
 

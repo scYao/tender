@@ -506,12 +506,14 @@ class UserManager(Util):
                 ).offset(startIndex).limit(pageCount)
             allResult = query.all()
             dataList = [UserInfo.generateOAInfo(result) for result in allResult]
+
             countQuery = db.session.query(
                 func.count(UserInfo.userID)
             ).filter(
                 and_(
-                    UserInfo.customizedCompanyID == CUSTOMIZEDCOMPANYID,
-                    UserInfo.userType >= userType
+                    UserInfo.customizedCompanyID == info['customizedCompanyID'],
+                    UserInfo.userType >= userType,
+                    UserInfo.userType != USER_TAG_BOSS
                 )
             )
             count = countQuery.first()

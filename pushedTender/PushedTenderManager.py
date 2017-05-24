@@ -719,8 +719,10 @@ class PushedTenderManager(Util):
             ).order_by(desc(
                 PushedTenderInfo.operatorPersonPushedTime
             ))
-            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).filter(
-                and_(PushedTenderInfo.userID == userID,
+            countQuery = db.session.query(func.count(PushedTenderInfo.pushedID)).outerjoin(
+                Operator, PushedTenderInfo.tenderID == Operator.tenderID
+            ).filter(
+                and_(Operator.userID == userID,
                      PushedTenderInfo.step == step)
             )
             count = countQuery.first()
@@ -1006,19 +1008,17 @@ class PushedTenderManager(Util):
             else:
                 o['userName'] = ''
 
-        countQuery = db.session.query(PushedTenderInfo).filter(and_(
-                PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
-                PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
-                or_(Operator.userID != '-1',
-                        Operator.state == 0)
-                ))
-        countResult = countQuery.all()
-        countPushedIDTuple = (o.tenderID for o in countResult)
-        countQuery = db.session.query(func.count(Operator.operatorID)).filter(
-            and_(Operator.tenderID.in_(countPushedIDTuple),
-                or_(Operator.userID != '-1',
-                    Operator.state == 0))
-        )
+
+        countQuery = db.session.query(func.count(Operator.operatorID)).outerjoin(
+            PushedTenderInfo, PushedTenderInfo.tenderID == Operator.tenderID
+        ).outerjoin(
+            Tender, PushedTenderInfo.tenderID == Tender.tenderID
+        ).filter(and_(
+            PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_APPROVE,
+            PushedTenderInfo.step == PUSH_TENDER_INFO_TAG_STEP_WAIT,
+            Operator.userID != '-1',
+            Operator.state == 0
+        ))
         count = countQuery.first()
         callBackInfo = {}
         callBackInfo['dataList'] = resultList

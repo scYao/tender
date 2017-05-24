@@ -162,8 +162,10 @@ class OperatorManager(UserBaseManager):
                      UserInfo.userType == USER_TAG_OPERATOR)
             ).all()
             dataList = [self.__generateUserInfo(o=o) for o in allResult]
+
             count = db.session.query(func.count(UserInfo.userID)).filter(
-                UserInfo.customizedCompanyID == companyID
+                and_(UserInfo.customizedCompanyID == companyID,
+                     UserInfo.userType == USER_TAG_OPERATOR)
             ).first()
             count = count[0]
             userResult = {}

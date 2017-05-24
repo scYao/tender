@@ -225,19 +225,12 @@ create table contract(
 	contractPrice double comment '合同金额（万元）',
 	contractWorkContent nvarchar(1000) comment '合同工作内容（工程量）',
 	contractor nvarchar(1000) comment '承包单位',
+	responsiblePerson nvarchar(1000) comment '项目负责人',
 	biddingDate datetime comment '中标通知书日期',
 	contractRecordDate datetime comment '合同备案日期',
 	contractKeepingDeprt nvarchar(1000) comment '合同保管部门',
 	archiveInfo nvarchar(1000) comment '合同归档情况',
-	contractDuration nvarchar(1000) comment '合同工期（开竣工日期）',
-	resultSubmissionDate nvarchar(100) comment '提交成果日期',
-	resultReviewDate nvarchar(100) comment '成果审查合格日期',
-	-- submittalDate nvarchar(100) comment '送审日期',
-	-- submittalPrice double comment '送审金额（万元）',
-	-- authorizedPrice double comment '审定金额（万元）',
-	-- cumulativeInvoicePrice double comment '累计开票金额（万元）',
-	-- cumulativePayPrice double comment '累计付款金额（万元）',
-	-- balance double comment '余款（万元）'
+	contractDuration nvarchar(1000) comment '合同工期（开竣工日期）'
 );
 
 -- 合同进度表
@@ -247,7 +240,9 @@ create table contractProjectProcess(
 	processRate int comment '进度值',
 	description text comment '描述',
 	userName nvarchar(100) comment '汇报人',
-	contractID nvarchar(100) comment '合同ID'
+	contractID nvarchar(100) comment '合同ID',
+	resultSubmissionDate nvarchar(100) comment '提交成果日期',
+	resultReviewDate nvarchar(100) comment '成果审查合格日期'
 );
 
 -- 决算进度
@@ -255,10 +250,12 @@ create table contractFinalAccounts(
 	accountID nvarchar(100) primary key comment '进度ID',
 	submittalDate nvarchar(100) comment '送审日期',
 	submittalPrice double comment '送审金额（万元）',
+	authorizedDate datetime comment '审定日期',
 	authorizedPrice double comment '审定金额（万元）',
 	cumulativeInvoicePrice double comment '累计开票金额（万元）',
 	cumulativePayPrice double comment '累计付款金额（万元）',
 	balance double comment '余款（万元）',
+	unPaidBalance double comment '未结算金额',
 	contractID nvarchar(100) comment '合同ID'
 );
 
