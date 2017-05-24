@@ -184,14 +184,11 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''	processID nvarchar(100) primary key comment '合同进度ID',
-	createTime datetime comment '时间',
-	processRate int comment '进度值',
+    sql = '''	emergencyID nvarchar(100) primary key comment '突发事件ID',
+	createTime datetime comment '创建时间',
 	description text comment '描述',
-	userName nvarchar(100) comment '汇报人',
-	contractID nvarchar(100) comment '合同ID',
-	resultSubmissionDate nvarchar(100) comment '提交成果日期',
-	resultReviewDate nvarchar(100) comment '成果审查合格日期'  '''
+	resolvent text comment '解决方法',
+	contractID nvarchar(100) comment '合同ID'  '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)

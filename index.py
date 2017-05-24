@@ -46,6 +46,8 @@ from fileInfo.FileInfoManager import FileInfoManager
 from department.DepartmentAreaManager import DepartmentAreaManager
 from contract.ContractManager import ContractManager
 from contract.ContractProjectProcessManager import ContractProjectProcessManager
+from contract.ContractFinalAccountsManager import ContractFinalAccountsManager
+from contract.ContractEmergencyManager import ContractEmergencyManager
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -3543,3 +3545,94 @@ def get_contract_project_process_list():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+# 创建合同决算
+@app.route('/create_contract_final_account/', methods=['POST', 'GET'])
+def create_contract_final_account():
+    contractFinalAccountsManager = ContractFinalAccountsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractFinalAccountsManager.createContractFinalAccount(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 删除合同决算
+@app.route('/delete_contract_final_account/', methods=['POST', 'GET'])
+def delete_contract_final_account():
+    contractFinalAccountsManager = ContractFinalAccountsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractFinalAccountsManager.deleteContractFinalAccount(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取合同决算列表
+@app.route('/get_contract_final_account_list/', methods=['POST', 'GET'])
+def get_contract_final_account_list():
+    contractFinalAccountsManager = ContractFinalAccountsManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractFinalAccountsManager.getContractFinalAccountList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 创建合同突发事件
+@app.route('/create_contract_emergency/', methods=['POST', 'GET'])
+def create_contract_emergency():
+    contractEmergencyManager = ContractEmergencyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractEmergencyManager.createContractEmergency(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 删除合同突发事件
+@app.route('/delete_contract_emergency/', methods=['POST', 'GET'])
+def delete_contract_emergency():
+    contractEmergencyManager = ContractEmergencyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractEmergencyManager.deleteContractEmergency(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
+# 获取合同突发事件列表
+@app.route('/get_contract_emergency_list/', methods=['POST', 'GET'])
+def get_contract_emergency_list():
+    contractEmergencyManager = ContractEmergencyManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractEmergencyManager.getContractEmergencyList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)
+
