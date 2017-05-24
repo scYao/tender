@@ -3482,3 +3482,18 @@ def delete_contract_file():
             data['status'] = 'SUCCESS'
         data['data'] = result
         return json.dumps(data)
+
+# 获取合同文件列表
+@app.route('/get_contract_file_list/', methods=['POST', 'GET'])
+def get_contract_file_list():
+    contractManager = ContractManager()
+    data = {}
+    data['status'] = 'FAILED'
+    data['data'] = 'NULL'
+    if request.method == 'POST':
+        paramsJson = request.form['data']
+        (status, result) = contractManager.getContractFileList(paramsJson)
+        if status is not False:
+            data['status'] = 'SUCCESS'
+        data['data'] = result
+        return json.dumps(data)

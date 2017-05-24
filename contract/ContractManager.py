@@ -18,11 +18,9 @@ import hashlib
 from sqlalchemy import and_, text, func, desc
 import traceback
 from models.flask_app import db
-from models.UserInfo import UserInfo
 from models.Contract import Contract
 from tool.Util import Util
 from tool.config import ErrorInfo
-from tool.StringConfig import STRING_INFO_SMS_REGISTER
 from user.UserBaseManager import UserBaseManager
 from image.ImageManager import ImageManager
 
@@ -245,3 +243,12 @@ class ContractManager(Util):
         return imgManager.deleteImage(info=info)
 
 
+
+    def getContractFileList(self, jsonInfo):
+        userBaseManager = UserBaseManager()
+        (status, info) = userBaseManager.tokenCheck(jsonInfo=jsonInfo)
+        if status is not True:
+            return (False, info)
+
+        imgManager = ImageManager()
+        return imgManager.getImageList(info=info)

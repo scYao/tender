@@ -12,14 +12,15 @@ import jieba
 from models.ImgPath import ImgPath
 from tool.config import ErrorInfo
 from tool.Util import Util
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from datetime import datetime
 from pypinyin import lazy_pinyin
 
 class ImageManager(Util):
 
     def __init__(self):
-        pass
+        self.ossInfo = {}
+        self.ossInfo['bucket'] = 'sjtender'
 
     # 增加图片操作
     def addImage(self, info):
@@ -210,29 +211,6 @@ class ImageManager(Util):
             return (False, errorInfo)
         return (True, None)
 
-    # 获取图片列表
-    def getImgList(self, info):
-        foreignID = info['foreignID']
-        if info.has_key('directory'):
-            directory = info['directory']
-        else:
-            directory = 'merchandise'
-        allResult = db.session.query(ImgPath).filter(
-            ImgPath.foreignID == foreignID
-        ).all()
-
-        ossInfo = {}
-        ossInfo['bucket'] = 'sjsecondhand'
-
-        def generateImg(img):
-            res = {}
-            res['imgPathID'] = img.imgPathID
-            ossInfo['objectKey'] = '%s/%s@!constrain-300h' % (directory, img.path)
-            res['path'] = self.getSecurityUrl(ossInfo)
-            return res
-
-        imgList = [generateImg(img) for img in allResult]
-        return (True, imgList)
     #获取物流公司图片
     def getLogisticsCompanyImg(self, imgPath):
         ossInfo = {}
@@ -317,8 +295,8 @@ class ImageManager(Util):
         foreignID = info['foreignID']
         try:
             for img in imgList:
-                imgPath = img.imgPath
-                imgName = img.imgName
+                imgPath = img['imgPath']
+                imgName = img['imgName']
                 imageID = self.generateID(imgPath)
                 _img = ImgPath(imgPathID=imageID, path=imgPath,
                                foreignID=foreignID, imgName=imgName)
@@ -327,7 +305,39 @@ class ImageManager(Util):
             db.session.commit()
         except Exception as e:
             print e
-            errorInfo = ErrorInfo['SPORTS_16']
+            errorInfo = ErrorInfo['TENDER_02']
             errorInfo['detail'] = str(e)
             return (False, errorInfo)
         return (True, None)
+
+    def getImageList(self, info):
+        foreignID = info['foreignID']
+        startIndex = info['startIndex']
+        pageCount = info['pageCount']
+        try:
+            query = db.session.query(ImgPath).filter(
+                ImgPath.foreignID == foreignID
+            ).offset(startIndex).limit(pageCount)
+            countQuery = db.session.query(func.count()).filter(
+                ImgPath.foreignID == foreignID
+            )
+            allResult = query.all()
+            def __generateImg(o):
+                res = {}
+                res.update(ImgPath.generate(img=o, ossInfo=self.ossInfo, directory='contract', isFile=True))
+                return res
+            dataList = [__generateImg(o=o) for o in allResult]
+            count = countQuery.first()
+            if count is None:
+                count = 0
+            else:
+                count = count[0]
+            dataInfo = {}
+            dataInfo['dataList'] = dataList
+            dataInfo['count'] = count
+            return (True, dataInfo)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            return (False, errorInfo)
