@@ -95,7 +95,7 @@ class ContractEmergencyManager(Util):
             query = db.session.query(ContractEmergency).filter(
                 ContractEmergency.contractID == contractID
             )
-            countQuery = db.session.query(func.count(ContractEmergency)
+            countQuery = db.session.query(func.count(ContractEmergency.emergencyID)
                                           ).filter(
                 ContractEmergency.contractID == contractID
             )

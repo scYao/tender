@@ -87,17 +87,17 @@ class ContractFinalAccountsManager(Util):
         return self.__doDeleteContractFinalAccount(info=info)
 
     def __doGetContractFinalAccountList(self, info):
-        accountID = info['accountID']
+        contractID = info['contractID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
 
         try:
             query = db.session.query(ContractFinalAccounts).filter(
-                ContractFinalAccounts.accountID == accountID
+                ContractFinalAccounts.contractID == contractID
             )
             countQuery = db.session.query(func.count(ContractFinalAccounts.accountID)
                                           ).filter(
-                ContractFinalAccounts.accountID == accountID
+                ContractFinalAccounts.contractID == contractID
             )
 
 
