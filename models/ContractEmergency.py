@@ -28,7 +28,7 @@ class ContractEmergency(db.Model):
         res = {}
         res['emergencyID'] = o.emergencyID
         if o.createTime is not None:
-            res['createTime'] = str(o.createTime)
+            res['createTime'] = str(o.createTime)[:10]
         else:
             res['createTime'] = ''
         res['description'] = o.description

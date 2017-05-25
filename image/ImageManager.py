@@ -297,9 +297,11 @@ class ImageManager(Util):
             for img in imgList:
                 imgPath = img['imgPath']
                 imgName = img['imgName']
+                tag = img['tag']
                 imageID = self.generateID(imgPath)
                 _img = ImgPath(imgPathID=imageID, path=imgPath,
-                               foreignID=foreignID, imgName=imgName)
+                               foreignID=foreignID, tag=tag,
+                               imgName=imgName)
                 db.session.add(_img)
 
             db.session.commit()
@@ -314,14 +316,18 @@ class ImageManager(Util):
         foreignID = info['foreignID']
         startIndex = info['startIndex']
         pageCount = info['pageCount']
+        tag = info['tag']
         try:
             query = db.session.query(ImgPath).filter(
                 ImgPath.foreignID == foreignID
-            ).offset(startIndex).limit(pageCount)
+            )
             countQuery = db.session.query(func.count(ImgPath.imgPathID)).filter(
                 ImgPath.foreignID == foreignID
             )
-            allResult = query.all()
+            if tag != '-1':
+                query = query.filter(ImgPath.tag == tag)
+                countQuery = countQuery.filter(ImgPath.tag == tag)
+            allResult = query.offset(startIndex).limit(pageCount).all()
             def __generateImg(o):
                 res = {}
                 res.update(ImgPath.generate(img=o, ossInfo=self.ossInfo,

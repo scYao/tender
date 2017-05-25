@@ -42,7 +42,7 @@ class ContractEmergencyManager(Util):
                                                   description=description,
                                                   resolvent=resolvent, contractID=contractID)
             db.session.add(contractEmergency)
-            db.session.commit(contractEmergency)
+            db.session.commit()
             return (True, emergencyID)
         except Exception as e:
             print e
