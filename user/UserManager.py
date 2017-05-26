@@ -454,6 +454,11 @@ class UserManager(Util):
         resultDic['tokenID'] = tokenID
         resultDic['userType'] = userType
         resultDic['jobNumber'] = jobNumber
+        if userType==USER_TAG_BOSS or result.tel=='18512538533':
+            l = [2, 7, 8]
+        else:
+            l = [2, 7]
+        resultDic['rightList'] = l
         return (True, resultDic)
 
 

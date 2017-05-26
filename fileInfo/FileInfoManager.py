@@ -34,13 +34,19 @@ class FileInfoManager(Util):
         filePath = info['filePath']
         areaID = info['areaID']
 
+
+        if info.has_key('tag'):
+            tag = info['tag']
+        else:
+            tag = 0
+
         fileID = self.generateID(fileName)
         now = datetime.now()
         fileInfo = FileInfo(fileID=fileID, fileName=fileName,
                             userID=userID, createTime=now,
                             superID=superID, isDirectory=isDirectory,
                             privateLevel=privateLevel, filePath=filePath,
-                            areaID=areaID)
+                            areaID=areaID, tag=tag)
         db.session.add(fileInfo)
         return (True, None)
 
@@ -145,6 +151,10 @@ class FileInfoManager(Util):
         if userType != USER_TAG_BOSS:
             query = query.filter(FileInfo.areaID.in_(tuple(areaIDList)))
             countQuery = countQuery.filter(FileInfo.areaID.in_(tuple(areaIDList)))
+
+        if info.has_key('tag'):
+            query = query.filter(FileInfo.tag == info['tag'])
+            countQuery = countQuery.filter(FileInfo.tag == info['tag'])
 
 
         query = query.order_by(desc(

@@ -176,7 +176,8 @@ create table fileInfo(
 	isDirectory boolean default false comment '是否是文件夹',
 	privateLevel int default 0 comment '私密等级, 0 代表public',
 	filePath nvarchar(1000) comment '在OSS 上的名称',
-	areaID nvarchar(100) comment '区域ID'
+	areaID nvarchar(100) comment '区域ID',
+	tag int comment '合同类型'
 );
 
 -- 部门表

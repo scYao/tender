@@ -1515,7 +1515,7 @@ class PushedTenderManager(Util):
             ).filter(Tender.tenderID == tenderID)
             result = query.first()
             tenderResult = tenderQuery.first()
-            if result and tenderResult:
+            if result is not None and tenderResult is not None:
                 callBackInfo = {}
                 callBackInfo.update(PushedTenderInfo.generate(c=result))
                 callBackInfo.update(Tender.generateBrief(tender=tenderResult.Tender))

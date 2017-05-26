@@ -19,12 +19,13 @@ class FileInfo(db.Model):
     privateLevel = db.Column(db.Integer)
     filePath = db.Column(db.String(1000))
     areaID = db.Column(db.String(100))
+    tag = db.Column(db.Integer)
 
 
     def __init__(self, fileID=None, fileName=None,
                  userID=None, createTime=None, superID='-1',
                  isDirectory=False, privateLevel=0, filePath=None,
-                 areaID=None):
+                 areaID=None, tag=0):
         self.fileID = fileID
         self.fileName = fileName
         self.userID = userID
@@ -34,6 +35,7 @@ class FileInfo(db.Model):
         self.privateLevel = privateLevel
         self.filePath = filePath
         self.areaID = areaID
+        self.tag = tag
 
     @staticmethod
     def generate(o, ossInfo):
@@ -42,6 +44,7 @@ class FileInfo(db.Model):
         res['fileName'] = o.fileName
         res['userID'] = o.userID
         res['isDirectory'] = o.isDirectory
+        res['tag'] = o.tag
         res['createTime'] = str(o.createTime)
 
         util = Util()
