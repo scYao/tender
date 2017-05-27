@@ -512,6 +512,11 @@ class PushedTenderManager(Util):
         res = {}
         res.update(PushedTenderInfo.generateBrief(c=result.PushedTenderInfo))
         res.update(Tender.generateBrief(tender=result.Tender))
+        # 判断是否有此属性
+        if hasattr(result, 'City'):
+            res.update(City.generate(city=result.City))
+        else:
+            res['cityName'] = ''
         # 获取推送人员列表
         if self.resp is not None:
             pushedUserList = []
@@ -593,11 +598,13 @@ class PushedTenderManager(Util):
 
         try:
             query = db.session.query(
-                PushedTenderInfo, Tender, UserInfo
+                PushedTenderInfo, Tender, UserInfo, City
             ).outerjoin(
                 Tender, PushedTenderInfo.tenderID == Tender.tenderID
             ).outerjoin(
                 UserInfo, PushedTenderInfo.userID == UserInfo.userID
+            ).outerjoin(
+                City, Tender.cityID == City.cityID
             ).filter(
                 PushedTenderInfo.state == PUSH_TENDER_INFO_TAG_STATE_UNREAD
             )
