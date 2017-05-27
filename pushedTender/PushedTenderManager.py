@@ -1068,7 +1068,8 @@ class PushedTenderManager(Util):
                 return res
             else:
                 imgList = mDic[operationID]
-                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo))
+                imgList.append(ImgPath.generate(img=imgPath, directory=BID_DOC_DIRECTORY, ossInfo=ossInfo,
+                                                hd=True, isFile=True))
         bookDataList = [generateInfo(result=result) for result in bookResult]
         bookDataList = filter(None, bookDataList)
         return bookDataList
