@@ -32,15 +32,40 @@ class ContractManager(Util):
     def __doCreateContract(self, info):
         title = info['title'].replace('\'', '\\\'').replace('\"', '\\\"')
         serialNumber = info['serialNumber'].replace('\'', '\\\'').replace('\"', '\\\"')
-        createTime = info['createTime']
+        if info.has_key('createTime'):
+            if info['createTime'] == '':
+                createTime = None
+            else:
+                createTime = info['createTime']
+        else:
+            createTime = None
+
         projectTypeName = info['projectTypeName']
         operationTypeName = info['operationTypeName']
-        contractPrice = info['contractPrice']
+        if info.has_key('contractPrice'):
+            if info['contractPrice'] == '':
+                contractPrice = None
+            else:
+                contractPrice = info['contractPrice']
+        else:
+            contractPrice = None
         contractWorkContent = info['contractWorkContent'].replace('\'', '\\\'').replace('\"', '\\\"')
         contractor = info['contractor'].replace('\'', '\\\'').replace('\"', '\\\"')
         responsiblePerson = info['responsiblePerson'].replace('\'', '\\\'').replace('\"', '\\\"')
-        biddingDate = info['biddingDate']
-        contractRecordDate = info['contractRecordDate']
+        if info.has_key('biddingDate'):
+            if info['biddingDate'] == '':
+                biddingDate = None
+            else:
+                biddingDate = info['biddingDate']
+        else:
+            biddingDate = None
+        if info.has_key('contractRecordDate'):
+            if info['contractRecordDate'] == '':
+                contractRecordDate = None
+            else:
+                contractRecordDate = info['contractRecordDate']
+        else:
+            contractRecordDate = None
         contractKeepingDeprt = info['contractKeepingDeprt'].replace('\'', '\\\'').replace('\"', '\\\"')
         archiveInfo = info['archiveInfo'].replace('\'', '\\\'').replace('\"', '\\\"')
         contractDuration = info['contractDuration'].replace('\'', '\\\'').replace('\"', '\\\"')
@@ -194,18 +219,49 @@ class ContractManager(Util):
             query = db.session.query(Contract).filter(
                 Contract.contractID == contractID
             )
+            if info.has_key('createTime'):
+                if info['createTime'] == '':
+                    createTime = None
+                else:
+                    createTime = info['createTime']
+            else:
+                createTime = None
+
+            if info.has_key('contractPrice'):
+                if info['contractPrice'] == '':
+                    contractPrice = None
+                else:
+                    contractPrice = info['contractPrice']
+            else:
+                contractPrice = None
+
+            if info.has_key('biddingDate'):
+                if info['biddingDate'] == '':
+                    biddingDate = None
+                else:
+                    biddingDate = info['biddingDate']
+            else:
+                biddingDate = None
+
+            if info.has_key('contractRecordDate'):
+                if info['contractRecordDate'] == '':
+                    contractRecordDate = None
+                else:
+                    contractRecordDate = info['contractRecordDate']
+            else:
+                contractRecordDate = None
             query.update({
                 Contract.title : info['title'],
                 Contract.serialNumber : info['serialNumber'],
-                Contract.createTime : info['createTime'],
+                Contract.createTime : createTime,
                 Contract.projectTypeName : info['projectTypeName'],
                 Contract.operationTypeName : info['operationTypeName'],
-                Contract.contractPrice : info['contractPrice'],
+                Contract.contractPrice : contractPrice,
                 Contract.contractWorkContent : info['contractWorkContent'],
                 Contract.contractor : info['contractor'],
                 Contract.responsiblePerson : info['responsiblePerson'],
-                Contract.biddingDate : info['biddingDate'],
-                Contract.contractRecordDate : info['contractRecordDate'],
+                Contract.biddingDate : biddingDate,
+                Contract.contractRecordDate : contractRecordDate,
                 Contract.contractKeepingDeprt : info['contractKeepingDeprt'],
                 Contract.archiveInfo : info['archiveInfo'],
                 Contract.contractDuration : info['contractDuration']

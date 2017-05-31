@@ -29,12 +29,53 @@ class ContractFinalAccountsManager(Util):
 
     def __doCreateContractFinalAccount(self, info):
         submittalDate = info['submittalDate'].replace('\'', '\\\'').replace('\"', '\\\"')
-        submittalPrice = info['submittalPrice']
-        authorizedDate = info['authorizedDate']
-        authorizedPrice = info['authorizedPrice']
-        cumulativeInvoicePrice = info['cumulativeInvoicePrice']
-        cumulativePayPrice = info['cumulativePayPrice']
-        unPaidBalance = info['unPaidBalance']
+        if info.has_key('submittalPrice'):
+            if info['submittalPrice'] == '':
+                submittalPrice = None
+            else:
+                submittalPrice = info['submittalPrice']
+        else:
+            submittalPrice = None
+
+        if info.has_key('authorizedDate'):
+            if info['authorizedDate'] == '':
+                authorizedDate = None
+            else:
+                authorizedDate = info['authorizedDate']
+        else:
+            authorizedDate = None
+
+        if info.has_key('authorizedPrice'):
+            if info['authorizedPrice'] == '':
+                authorizedPrice = None
+            else:
+                authorizedPrice = info['authorizedPrice']
+        else:
+            authorizedPrice = None
+
+        if info.has_key('cumulativeInvoicePrice'):
+            if info['cumulativeInvoicePrice'] == '':
+                cumulativeInvoicePrice = None
+            else:
+                cumulativeInvoicePrice = info['cumulativeInvoicePrice']
+        else:
+            cumulativeInvoicePrice = None
+
+        if info.has_key('cumulativePayPrice'):
+            if info['cumulativePayPrice'] == '':
+                cumulativePayPrice = None
+            else:
+                cumulativePayPrice = info['cumulativePayPrice']
+        else:
+            cumulativePayPrice = None
+
+        if info.has_key('unPaidBalance'):
+            if info['unPaidBalance'] == '':
+                unPaidBalance = None
+            else:
+                unPaidBalance = info['unPaidBalance']
+        else:
+            unPaidBalance = None
         contractID = info['contractID'].replace('\'', '\\\'').replace('\"', '\\\"')
 
         accountID = self.generateID(contractID)
@@ -42,8 +83,8 @@ class ContractFinalAccountsManager(Util):
             contractFinalAccounts = ContractFinalAccounts(accountID=accountID, submittalDate=submittalDate,
                                                           submittalPrice=submittalPrice, authorizedPrice=authorizedPrice,
                                                           authorizedDate=authorizedDate, cumulativeInvoicePrice=cumulativeInvoicePrice,
-                                                          cumulativePayPrice=cumulativePayPrice, unPaidBalance=unPaidBalance
-                                                          ,contractID=contractID)
+                                                          cumulativePayPrice=cumulativePayPrice, unPaidBalance=unPaidBalance,
+                                                          contractID=contractID)
             db.session.add(contractFinalAccounts)
             db.session.commit()
             return (True, accountID)

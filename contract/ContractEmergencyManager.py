@@ -29,7 +29,14 @@ class ContractEmergencyManager(Util):
 
 
     def __doCreateContractEmergency(self, info):
-        createTime = info['createTime']
+        if info.has_key('createTime'):
+            if info['createTime'] == '':
+                createTime = None
+            else:
+                createTime = info['createTime']
+        else:
+            createTime = None
+
         description = info['description']
         resolvent = info['resolvent']
         contractID = info['contractID'].replace('\'', '\\\'').replace('\"', '\\\"')

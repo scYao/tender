@@ -28,7 +28,13 @@ class ContractProjectProcessManager(Util):
         pass
 
     def __doCreateContractProjectProcess(self, info):
-        createTime = info['createTime']
+        if info.has_key('createTime'):
+            if info['createTime'] == '':
+                createTime = None
+            else:
+                createTime = info['createTime']
+        else:
+            createTime = None
         description = info['description'].replace('\'', '\\\'').replace('\"', '\\\"').strip()
         userName = info['userName'].replace('\'', '\\\'').replace('\"', '\\\"').strip()
         contractID = info['contractID']
