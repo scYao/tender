@@ -308,6 +308,30 @@ ErrorInfo['TENDER_51'] = {
     'zhInfo' : '删除图片错误!'
 }
 
+ErrorInfo['TENDER_52'] = {
+    'code' : 'TENDER_52',
+    'info' : 'contract contains emergency!',
+    'zhInfo' : '合同存在突发事项!'
+}
+
+ErrorInfo['TENDER_53'] = {
+    'code' : 'TENDER_53',
+    'info' : 'contract contains account!',
+    'zhInfo' : '合同存在决算进度!'
+}
+
+ErrorInfo['TENDER_54'] = {
+    'code' : 'TENDER_54',
+    'info' : 'contract contains project process!',
+    'zhInfo' : '合同存在项目进度!'
+}
+
+ErrorInfo['TENDER_55'] = {
+    'code' : 'TENDER_55',
+    'info' : 'contract contains files!',
+    'zhInfo' : '合同存在文件!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

@@ -23,7 +23,10 @@ from tool.Util import Util
 from tool.config import ErrorInfo
 from user.UserBaseManager import UserBaseManager
 from image.ImageManager import ImageManager
-
+from ContractEmergencyManager import ContractEmergencyManager
+from ContractFinalAccountsManager import ContractFinalAccountsManager
+from ContractProjectProcessManager import ContractProjectProcessManager
+from fileInfo.FileInfoManager import FileInfoManager
 
 class ContractManager(Util):
     def __init__(self):
@@ -191,6 +194,28 @@ class ContractManager(Util):
             return (False, info)
 
         contractID = info['contractID']
+        # 检查是否存在突发事件
+        contractEmergencyManager = ContractEmergencyManager()
+        (status, reason) = contractEmergencyManager.checkEmergency(info=info)
+        if status is not True:
+            return (False, reason)
+
+        contractFinalAccountsManager = ContractFinalAccountsManager()
+        (status, reason) = contractFinalAccountsManager.checkAccount(info=info)
+        if status is not True:
+            return (False, reason)
+
+        contractProjectProcessManager = ContractProjectProcessManager()
+        (status, reason) = contractProjectProcessManager.checkProcess(info=info)
+        if status is not True:
+            return (False, reason)
+
+        fileInfoManager = FileInfoManager()
+        info['areaID'] = contractID
+        (status, reason) = fileInfoManager.checkFileExists(info=info)
+        if status is not True:
+            return (False, reason)
+
         try:
             # 在删除contract之前，要先删除文件，和其他列表
             db.session.query(Contract).filter(

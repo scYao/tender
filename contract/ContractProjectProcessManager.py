@@ -137,3 +137,21 @@ class ContractProjectProcessManager(Util):
             return (False, info)
 
         return self.__doGetContractProjectProcessList(info=info)
+
+    def checkProcess(self, info):
+        contractID = info['contractID']
+        try:
+            result = db.session.query(ContractProjectProcess).filter(
+                ContractProjectProcess.contractID == contractID
+            ).first()
+            if result is not None:
+                return (False, ErrorInfo['TENDER_54'])
+            return (True, None)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
+

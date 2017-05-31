@@ -138,3 +138,21 @@ class ContractEmergencyManager(Util):
             return (False, info)
 
         return self.__doGetContractEmergencyList(info=info)
+
+    # 检查合同是否存在突发事件
+    def checkEmergency(self, info):
+        contractID = info['contractID']
+        try:
+            result = db.session.query(ContractEmergency).filter(
+                ContractEmergency.contractID == contractID
+            ).first()
+            if result is not None:
+                return (False, ErrorInfo['TENDER_52'])
+            return (True, None)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

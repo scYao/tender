@@ -333,3 +333,21 @@ class FileInfoManager(Util):
 
         info['userType'] = userType
         return self.doRenameDirectory(info=info)
+
+
+    def checkFileExists(self, info):
+        areaID = info['areaID']
+        try:
+            result = db.session.query(FileInfo).filter(
+                FileInfo.areaID == areaID
+            ).first()
+            if result is not None:
+                return (False, ErrorInfo['TENDER_55'])
+            return (True, None)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)

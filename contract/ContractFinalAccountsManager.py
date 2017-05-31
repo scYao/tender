@@ -174,3 +174,20 @@ class ContractFinalAccountsManager(Util):
         if status is not True:
             return (False, info)
         return self.__doGetContractFinalAccountList(info=info)
+
+    def checkAccount(self, info):
+        contractID = info['contractID']
+        try:
+            result = db.session.query(ContractFinalAccounts).filter(
+                ContractFinalAccounts.contractID == contractID
+            ).first()
+            if result is not None:
+                return (False, ErrorInfo['TENDER_53'])
+            return (True, None)
+        except Exception as e:
+            print e
+            traceback.print_exc()
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
