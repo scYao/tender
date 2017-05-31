@@ -97,6 +97,8 @@ class FileInfoManager(Util):
                 fileInfo = o.FileInfo
                 area = o.DepartmentArea
                 res.update(FileInfo.generate(o=fileInfo, ossInfo=self.ossInfo))
+                if area is None:
+                    return None
                 res.update(DepartmentArea.generate(o=area))
                 return res
             allResult = query.all()
@@ -106,6 +108,7 @@ class FileInfoManager(Util):
             else:
                 count = 0
             dataList = [__generateFileInfo(o=o) for o in allResult]
+            dataList = filter(None, dataList)
             dataResult = {}
             dataResult['count'] = count
             dataResult['dataList'] = dataList
