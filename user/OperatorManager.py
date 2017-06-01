@@ -225,6 +225,7 @@ class OperatorManager(UserBaseManager):
     # 由进行中 变为已完成
     def completePushedTenderInfo(self, jsonInfo):
         info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']
@@ -236,6 +237,7 @@ class OperatorManager(UserBaseManager):
     # 由已完成变为历史记录
     def updateToHistory(self, jsonInfo):
         info = json.loads(jsonInfo)
+        info['userType'] = USER_TAG_OPERATOR
         (status, userID) = PushedTenderManager.isTokenValidByUserType(info=info)
         if status is not True:
             errorInfo = ErrorInfo['TENDER_01']

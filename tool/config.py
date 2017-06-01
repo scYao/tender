@@ -332,6 +332,12 @@ ErrorInfo['TENDER_55'] = {
     'zhInfo' : '合同存在文件!'
 }
 
+ErrorInfo['TENDER_56'] = {
+    'code' : 'TENDER_56',
+    'info' : 'user type error!',
+    'zhInfo' : '身份校验出错!'
+}
+
 
 #支付宝公钥
 ALIPAY_PUBLIC_KEY = '''-----BEGIN PUBLIC KEY-----\n

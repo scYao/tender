@@ -1545,7 +1545,7 @@ def get_doing_detail_by_resp():
         data['data'] = result
         return json.dumps(data)
 
-# 经办人, 批注进行中的项目
+# 负责人, 批注进行中的项目
 @app.route('/create_tender_comment_by_resp/', methods=['POST', 'GET'])
 def create_tender_comment_by_resp():
     responsiblePersonManager = ResponsiblePersonManager()

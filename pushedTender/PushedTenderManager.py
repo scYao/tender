@@ -50,44 +50,36 @@ class PushedTenderManager(Util):
     def isTokenValidByUserType(info):
 
         tokenID = info['tokenID']
-        util = Util()
-        return util.isTokenValid(tokenID=tokenID)
-        # userType = info['userType']
-        # query = db.session.query(
-        #     Token, UserInfo
-        # ).outerjoin(
-        #     UserInfo, Token.userID == UserInfo.userID
-        # ).filter(and_(
-        #     UserInfo.userType == userType,
-        #     Token.tokenID == tokenID
-        # ))
-        # result = query.first()
-        # if result is None:
-        #     errorInfo = ErrorInfo['TENDER_01']
-        #     errorInfo['detail'] = result
-        #     return (False, errorInfo)
-        # token = result.Token
-        # now = datetime.now()
-        # # 将token登录时间更新为最近的一次操作时间
-        # db.session.query(Token).filter(
-        #     Token.tokenID == tokenID
-        # ).update(
-        #     {Token.createTime: now},
-        #     synchronize_session=False)
-        # try:
-        #     db.session.commit()
-        # except Exception as e:
-        #     print e
-        #     errorInfo = ErrorInfo['SPORTS_02']
-        #     errorInfo['detail'] = str(e)
-        #     db.session.rollback()
-        #     return (False, errorInfo)
-        # days = (now - token.createTime).days
-        # if days > token.validity:
-        #     errorInfo = ErrorInfo['SPORTS_01']
-        #     errorInfo['detail'] = result
-        #     return (False, errorInfo)
-        # return (True, result.Token.userID)
+        # util = Util()
+        # return util.isTokenValid(tokenID=tokenID)
+        #
+        userType = info['userType']
+        try:
+            tokenResult = db.session.query(Token).filter(
+                Token.tokenID == tokenID
+            ).first()
+            # token不存在
+            if tokenResult is None:
+                errorInfo = ErrorInfo['TENDER_01']
+                errorInfo['detail'] = None
+                return (False, errorInfo)
+            userID = tokenResult.userID
+            userResult = db.session.query(UserInfo).filter(
+                UserInfo.userID == userID
+            ).first()
+            # 用户不存在
+            if userResult is None:
+                return (False, ErrorInfo['TENDER_09'])
+            realUserType = userResult.userType
+            if userType != realUserType:
+                return (False, ErrorInfo['TENDER_56'])
+            return (True, userID)
+        except Exception as e:
+            print e
+            errorInfo = ErrorInfo['TENDER_02']
+            errorInfo['detail'] = str(e)
+            db.session.rollback()
+            return (False, errorInfo)
 
     def createPushMessage(self, info):
         tag = info['tag']

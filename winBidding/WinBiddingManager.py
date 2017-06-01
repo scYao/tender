@@ -122,7 +122,7 @@ class WinBiddingManager(Util):
             countQuery = self.__getQueryResult(info=info)
             count = countQuery.first()
             count = count[0]
-            allResult = query.offset(startIndex).limit(pageCount).all()
+            allResult = query.order_by(desc(WinBiddingPub.publishDate)).offset(startIndex).limit(pageCount).all()
             biddingList = [self.__generateBrief(o=result) for result in allResult]
             callBackInfo = {}
             callBackInfo['dataList'] = biddingList
