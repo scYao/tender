@@ -168,6 +168,14 @@ class UserManager(Util):
         tel = info['tel']
         code = info['code']
         now = datetime.now()
+        # 判断是否已经注册
+        result = db.session.query(UserInfo).filter(
+            UserInfo.tel == tel
+        ).first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_23']
+            errorInfo['detail'] = None
+            return (False, errorInfo)
         result = db.session.query(SmsCode).filter(
             and_(SmsCode.tel == tel, SmsCode.code == code,
                  func.TIMESTAMPDIFF(text('MINUTE'), SmsCode.createTime, now) <= 5)
@@ -231,6 +239,16 @@ class UserManager(Util):
     def sendSMS(self, jsonInfo):
         info = json.loads(jsonInfo)
         tel = info['tel']
+
+        # 判断是否已经注册
+        result = db.session.query(UserInfo).filter(
+            UserInfo.tel == tel
+        ).first()
+        if result is None:
+            errorInfo = ErrorInfo['TENDER_23']
+            errorInfo['detail'] = None
+            return (False, errorInfo)
+
         codeID = self.generateID(str(tel))
         code = '%d%d%d%d' % (random.randint(0, 9), random.randint(0, 9),
                              random.randint(0, 9), random.randint(0, 9))

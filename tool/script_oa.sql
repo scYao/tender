@@ -276,6 +276,22 @@ create table operationRight(
 
 );
 
+-- 权限类型
+create table rightType(
+	rightTypeID nvarchar(100) primary key comment '权限类型ID',
+	rightTypeName nvarchar(100) comment '权限类型名称',
+	createTime datetime comment '创建时间'
+);
+
+-- 用户权限表
+create table userRight(
+	rightID nvarchar(100) primary key comment '权限ID',
+	rightTypeID nvarchar(100) comment '区域ID',
+	userID nvarchar(100) comment '用户ID',
+	createTime datetime comment '创建时间'
+);
+
+
 ALTER TABLE pushedTenderInfo CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operator CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE operation CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -296,6 +312,9 @@ ALTER TABLE projectOperationType CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb
 ALTER TABLE contractProjectProcess CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE contractFinalAccounts CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE contractEmergency CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE rightType CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE userRight CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 alter table pushedTenderInfo add constraint push_FK_user foreign key(userID) references UserInfo(userID);
 alter table operation add constraint operation_FK_operator foreign key(operatorID) references operator(operatorID);
