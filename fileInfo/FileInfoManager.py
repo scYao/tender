@@ -150,10 +150,10 @@ class FileInfoManager(Util):
         countQuery = countQuery.filter(and_(FileInfo.superID == superID,
                                             FileInfo.areaID == areaID))
 
-
-        if userType != USER_TAG_BOSS:
-            query = query.filter(FileInfo.areaID.in_(tuple(areaIDList)))
-            countQuery = countQuery.filter(FileInfo.areaID.in_(tuple(areaIDList)))
+        # 暂时先删除
+        # if userType != USER_TAG_BOSS:
+        #     query = query.filter(FileInfo.areaID.in_(tuple(areaIDList)))
+        #     countQuery = countQuery.filter(FileInfo.areaID.in_(tuple(areaIDList)))
 
         if info.has_key('tag'):
             query = query.filter(FileInfo.tag == info['tag'])
