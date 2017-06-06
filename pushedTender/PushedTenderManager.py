@@ -804,7 +804,11 @@ class PushedTenderManager(Util):
             for o in dataList:
                 o['cityName'] = cityDic[o['cityID']]
                 if o['userID'] != '-1':
-                    o['userName'] = userDic[o['userID']]
+                    # 经办人对应用户被删除
+                    if userDic.has_key(o['userID']):
+                        o['userName'] = userDic[o['userID']]
+                    else:
+                        o['userName'] = ''
                 else:
                     o['userName'] = ''
             callBackInfo = {}
