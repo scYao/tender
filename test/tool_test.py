@@ -72,7 +72,7 @@ def sql_to_model_members(info):
         name = words[0]
         stype = words[1]
         pri = words[2]
-        if pri == 'primary':
+        if pri == 'primary' or pri == 'auto_increment':
             pri = ', primary_key=True'
         else:
             pri = ''
@@ -152,7 +152,8 @@ def sql_update(info, c):
         stype = words[1]
         # 只有字符串带replace
 
-        template = "%s.%s : info['%s']," % (c, name, name)
+        # template = "%s.%s : info['%s']," % (c, name, name)
+        template = "%s.%s : %s," % (c, name, name)
         print template
 
 
@@ -184,11 +185,28 @@ def create_tender(str):
         print template
 
 if __name__ == '__main__':
-    sql = '''	emergencyID nvarchar(100) primary key comment '突发事件ID',
-	createTime datetime comment '创建时间',
-	description text comment '描述',
-	resolvent text comment '解决方法',
-	contractID nvarchar(100) comment '合同ID'  '''
+    sql = '''userID int comment '用户ID',
+    userName nvarchar(100) comment '用户名，昵称',
+    info text comment '个人简介，个性签名等',
+    portraitPath text comment '头像路径',
+    tel nvarchar(20) comment '手机号码',
+    email nvarchar(100) comment '电子邮箱',
+    gender smallint comment '性别',
+    createTime datetime comment '创建时间',
+    idCardNum nvarchar(100) comment '身份证号',
+    jobPosition nvarchar(100) comment '职位',
+    companyName nvarchar(100) comment '公司名称',
+    url nvarchar(100) comment '网址',
+    addressDescription nvarchar(100) comment '地址',
+    longitude nvarchar(20) comment '经度',
+    latitude nvarchar(20) comment '维度',
+    wechatNum nvarchar(200) comment '微信号',
+    QQNum nvarchar(200) comment 'QQ号',
+    wechatOfficialAccounts nvarchar(200) comment '微信公众号',
+    visitCount int default 0 comment '访问量，人气',
+    voteCount int default 0 comment '点赞量',
+    favoriteCount int default 0 comment '收藏量',
+    backgroundID int comment '背景ID' '''
     sql_to_model_members(sql)
     print '\n'
     sql_to_model_init(sql)
@@ -203,4 +221,4 @@ if __name__ == '__main__':
     print '\n'
     sql_to_create_info(sql)
     print '\n'
-    sql_update(sql, 'Contract')
+    sql_update(sql, 'BusinessCard')

@@ -30,6 +30,7 @@ cache = Cache(app=app, config=cache_config)
 
 app.config['WHOOSH_BASE'] = WHOOSH_BASE
 # app.config["SQLALCHEMY_ECHO"] = True
+app.config['SQLALCHEMY_POOL_SIZE'] = 1
 
 CORS(app)
 
